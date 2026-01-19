@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saskatchewan Railway Network Timeline</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #aaa;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .nav {
+            background: #0f3460;
+            padding: 10px;
+            text-align: center;
+        }
+        .nav a {
+            color: #e94560;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 15px;
+            border: 1px solid #e94560;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        .nav a:hover {
+            background: #e94560;
+            color: #fff;
+        }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 140px);
+        }
+        .map-container {
+            flex: 1;
+            display: flex;
+        }
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+        .sidebar {
+            width: 300px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .controls label {
+            display: block;
+            margin-bottom: 10px;
+            color: #e94560;
+            font-weight: bold;
+        }
+        .year-display {
+            font-size: 48px;
+            text-align: center;
+            color: #e94560;
+            margin: 10px 0;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .play-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .play-controls button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .play-controls button:hover {
+            background: #ff6b6b;
+        }
+        .legend {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .legend h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e94560;
+            padding-bottom: 5px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+        .legend-item:hover {
+            background: #1a1a2e;
+        }
+        .legend-item.inactive {
+            opacity: 0.4;
+        }
+        .legend-circle {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid white;
+        }
+        .legend-count {
+            margin-left: auto;
+            background: #1a1a2e;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .stats {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .stats h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e94560;
+            padding-bottom: 5px;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #1a1a2e;
+        }
+        .chart-container {
+            height: 200px;
+            background: #16213e;
+            padding: 20px;
+            border-top: 1px solid #0f3460;
+        }
+        .chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 150px;
+            padding: 0 20px;
+        }
+        .chart-bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            max-width: 60px;
+        }
+        .chart-bar {
+            width: 40px;
+            background: linear-gradient(to top, #e94560, #ff6b6b);
+            border-radius: 3px 3px 0 0;
+            transition: height 0.5s ease;
+            position: relative;
+        }
+        .chart-bar.highlighted {
+            background: linear-gradient(to top, #4ecca3, #7fff00);
+        }
+        .chart-bar .count {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #fff;
+        }
+        .chart-label {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #aaa;
+        }
+        .info-box {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .info-box h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .info-box p {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Saskatchewan Railway Network Timeline</h1>
+        <p>Watch as different railway companies expanded across Saskatchewan from 1882 to 1920. Click on railway names in the legend to show/hide them.</p>
+    </div>
+    <div class="nav">
+        <a href="index.html">Home</a>
+        <a href="one_hour_map.html">1-Hour Corridor</a>
+        <a href="railway_timeline.html">Railway Timeline</a>
+    </div>
+    <div class="main-container">
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="sidebar">
+                <div class="controls">
+                    <label>Select Year:</label>
+                    <div class="year-display" id="yearDisplay">1882</div>
+                    <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1882">
+                    <div class="play-controls">
+                        <button id="playBtn">Play</button>
+                        <button id="resetBtn">Reset</button>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <h3>Railway Companies</h3>
+                    <div class="legend-item" data-railway="CPR">
+                        <div class="legend-circle" style="background: #e94560;"></div>
+                        <span>CPR (Canadian Pacific)</span>
+                        <span class="legend-count" id="count-CPR">0</span>
+                    </div>
+                    <div class="legend-item" data-railway="QLSRSC">
+                        <div class="legend-circle" style="background: #4ecca3;"></div>
+                        <span>QLSRSC</span>
+                        <span class="legend-count" id="count-QLSRSC">0</span>
+                    </div>
+                    <div class="legend-item" data-railway="CNoR">
+                        <div class="legend-circle" style="background: #ffd93d;"></div>
+                        <span>CNoR (Canadian Northern)</span>
+                        <span class="legend-count" id="count-CNoR">0</span>
+                    </div>
+                    <div class="legend-item" data-railway="GTPR">
+                        <div class="legend-circle" style="background: #6c5ce7;"></div>
+                        <span>GTPR (Grand Trunk Pacific)</span>
+                        <span class="legend-count" id="count-GTPR">0</span>
+                    </div>
+                    <div class="legend-item" data-railway="Other">
+                        <div class="legend-circle" style="background: #888;"></div>
+                        <span>Other Railways</span>
+                        <span class="legend-count" id="count-Other">0</span>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <h3>Statistics</h3>
+                    <div class="stat-item">
+                        <span>Total Settlements:</span>
+                        <span id="totalSettlements">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>With Railway:</span>
+                        <span id="withRailway">0</span>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h3>About the Railways</h3>
+                    <p id="railwayInfo">
+                        <b>CPR (1882+):</b> First transcontinental through southern SK.<br><br>
+                        <b>QLSRSC (1889-90):</b> Regina to Prince Albert via Saskatoon.<br><br>
+                        <b>CNoR (1899+):</b> Northerly competitor through Saskatoon.<br><br>
+                        <b>GTPR (1905+):</b> Third transcontinental via Saskatoon.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="chart-container">
+            <div class="chart" id="yearChart"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let data = null;
+        let map = null;
+        let markers = {};
+        let visibleRailways = {CPR: true, QLSRSC: true, CNoR: true, GTPR: true, Other: true};
+        let isPlaying = false;
+        let playInterval = null;
+
+        const railwayColors = {
+            CPR: '#e94560',
+            QLSRSC: '#4ecca3',
+            CNoR: '#ffd93d',
+            GTPR: '#6c5ce7',
+            Other: '#888'
+        };
+
+        function initMap() {
+            map = L.map('map').setView([52.0, -106.0], 6);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        async function loadData() {
+            const response = await fetch('data/railway_timeline.json');
+            data = await response.json();
+
+            // Create markers for all settlements
+            Object.keys(data).forEach(railway => {
+                markers[railway] = [];
+                data[railway].forEach(s => {
+                    const marker = L.circleMarker([s.lat, s.lon], {
+                        radius: 6,
+                        fillColor: railwayColors[railway],
+                        color: '#fff',
+                        weight: 1,
+                        opacity: 0,
+                        fillOpacity: 0
+                    }).addTo(map);
+
+                    marker.bindPopup(`
+                        <b>${s.name}</b><br>
+                        Railway: ${railway}<br>
+                        Year: ${s.year}
+                    `);
+
+                    markers[railway].push({marker, data: s});
+                });
+            });
+
+            // Count total settlements
+            const total = Object.values(data).reduce((sum, arr) => sum + arr.length, 0);
+            document.getElementById('totalSettlements').textContent = total;
+
+            // Build year chart
+            buildYearChart();
+
+            updateYear(1882);
+        }
+
+        function buildYearChart() {
+            // Count settlements by year
+            const yearCounts = {};
+            for (let y = 1882; y <= 1920; y++) {
+                yearCounts[y] = 0;
+            }
+
+            Object.values(data).flat().forEach(s => {
+                if (s.year >= 1882 && s.year <= 1920) {
+                    yearCounts[s.year]++;
+                }
+            });
+
+            const maxCount = Math.max(...Object.values(yearCounts));
+            const chartDiv = document.getElementById('yearChart');
+            chartDiv.innerHTML = '';
+
+            for (let y = 1882; y <= 1920; y++) {
+                const count = yearCounts[y];
+                const height = maxCount > 0 ? (count / maxCount) * 120 : 0;
+
+                const container = document.createElement('div');
+                container.className = 'chart-bar-container';
+                container.innerHTML = `
+                    <div class="chart-bar" data-year="${y}" style="height: ${height}px;">
+                        ${count > 0 ? `<span class="count">${count}</span>` : ''}
+                    </div>
+                    <span class="chart-label">${y % 5 === 0 || y === 1882 ? y : ''}</span>
+                `;
+                chartDiv.appendChild(container);
+            }
+        }
+
+        function updateYear(year) {
+            document.getElementById('yearDisplay').textContent = year;
+            document.getElementById('yearSlider').value = year;
+
+            const counts = {CPR: 0, QLSRSC: 0, CNoR: 0, GTPR: 0, Other: 0};
+            let totalWithRailway = 0;
+
+            Object.keys(markers).forEach(railway => {
+                markers[railway].forEach(m => {
+                    const isVisible = m.data.year <= year && visibleRailways[railway];
+                    if (m.data.year <= year) {
+                        counts[railway]++;
+                        totalWithRailway++;
+                    }
+
+                    m.marker.setStyle({
+                        opacity: isVisible ? 1 : 0,
+                        fillOpacity: isVisible ? 0.8 : 0
+                    });
+                });
+            });
+
+            // Update counts
+            Object.keys(counts).forEach(railway => {
+                document.getElementById(`count-${railway}`).textContent = counts[railway];
+            });
+            document.getElementById('withRailway').textContent = totalWithRailway;
+
+            // Highlight current year in chart
+            document.querySelectorAll('.chart-bar').forEach(bar => {
+                if (parseInt(bar.dataset.year) === year) {
+                    bar.classList.add('highlighted');
+                } else {
+                    bar.classList.remove('highlighted');
+                }
+            });
+        }
+
+        function toggleRailway(railway) {
+            visibleRailways[railway] = !visibleRailways[railway];
+            const legendItem = document.querySelector(`.legend-item[data-railway="${railway}"]`);
+            legendItem.classList.toggle('inactive', !visibleRailways[railway]);
+            updateYear(parseInt(document.getElementById('yearSlider').value));
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                clearInterval(playInterval);
+                document.getElementById('playBtn').textContent = 'Play';
+                isPlaying = false;
+            } else {
+                isPlaying = true;
+                document.getElementById('playBtn').textContent = 'Pause';
+                let year = parseInt(document.getElementById('yearSlider').value);
+
+                playInterval = setInterval(() => {
+                    year++;
+                    if (year > 1920) {
+                        year = 1882;
+                    }
+                    updateYear(year);
+                }, 300);
+            }
+        }
+
+        function reset() {
+            if (isPlaying) togglePlay();
+            updateYear(1882);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            loadData();
+
+            document.getElementById('yearSlider').addEventListener('input', (e) => {
+                updateYear(parseInt(e.target.value));
+            });
+
+            document.getElementById('playBtn').addEventListener('click', togglePlay);
+            document.getElementById('resetBtn').addEventListener('click', reset);
+
+            document.querySelectorAll('.legend-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    toggleRailway(item.dataset.railway);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

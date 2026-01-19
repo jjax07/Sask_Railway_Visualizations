@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saskatchewan Railway Visualizations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        .header {
+            background: #16213e;
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 {
+            color: #e94560;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        .header p {
+            color: #aaa;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .card {
+            background: #16213e;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #0f3460;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.2);
+        }
+        .card-image {
+            height: 200px;
+            background: #0f3460;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+        }
+        .card-content {
+            padding: 25px;
+        }
+        .card h2 {
+            color: #e94560;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        .card p {
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .card-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        .card-features li {
+            padding: 5px 0;
+            color: #ccc;
+            font-size: 14px;
+        }
+        .card-features li::before {
+            content: "✓ ";
+            color: #4ecca3;
+        }
+        .btn {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background: #ff6b6b;
+        }
+        .about {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 40px;
+            border: 1px solid #0f3460;
+        }
+        .about h2 {
+            color: #e94560;
+            margin-bottom: 20px;
+        }
+        .about p {
+            color: #aaa;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        .about ul {
+            color: #aaa;
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        .footer {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            margin-top: 40px;
+            border-top: 1px solid #0f3460;
+        }
+        .footer p {
+            color: #666;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #e94560;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Saskatchewan Railway Visualizations</h1>
+        <p>Interactive visualizations exploring how railway networks shaped settlement patterns in Saskatchewan from 1882 to 1920.</p>
+    </div>
+
+    <div class="container">
+        <div class="cards">
+            <div class="card">
+                <div class="card-image">🚂</div>
+                <div class="card-content">
+                    <h2>One-Hour Railway Corridor</h2>
+                    <p>Explore which settlements could be reached from Saskatoon within one hour by train as the network expanded.</p>
+                    <ul class="card-features">
+                        <li>Interactive time slider (1890-1920)</li>
+                        <li>40 km radius visualization</li>
+                        <li>Settlement connection timeline</li>
+                        <li>Play animation to watch growth</li>
+                    </ul>
+                    <a href="one_hour_map.html" class="btn">Explore Map</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-image">🗺️</div>
+                <div class="card-content">
+                    <h2>Railway Network Timeline</h2>
+                    <p>Watch the four major railway companies expand across Saskatchewan year by year.</p>
+                    <ul class="card-features">
+                        <li>CPR, QLSRSC, CNoR, and GTPR</li>
+                        <li>Year-by-year animation (1882-1920)</li>
+                        <li>Filter by railway company</li>
+                        <li>Settlement statistics chart</li>
+                    </ul>
+                    <a href="railway_timeline.html" class="btn">View Timeline</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="about">
+            <h2>About This Project</h2>
+            <p>These visualizations are part of a larger research project examining Saskatchewan's historical urban settlements. The data comes from the Urban Saskatchewan History project, which documents 429 settlements from the 1921 census.</p>
+
+            <p>Key findings from this research:</p>
+            <ul>
+                <li><b>1890:</b> Saskatoon receives its first railway (QLSRSC), connecting it to Regina and Prince Albert</li>
+                <li><b>1905:</b> Canadian Northern Railway (CNoR) reaches Saskatoon, adding new connections</li>
+                <li><b>1908:</b> Grand Trunk Pacific (GTPR) arrives, making Saskatoon a major junction</li>
+                <li><b>By 1910:</b> 11 settlements within one hour of Saskatoon by train</li>
+            </ul>
+
+            <p>The one-hour travel radius (40 km at 40 km/h average speed including stops) represents a practical limit for day trips and regular commerce, showing how railways enabled regional integration.</p>
+
+            <h3 style="color: #e94560; margin-top: 25px; margin-bottom: 15px;">Railway Companies</h3>
+            <ul>
+                <li><b>CPR (Canadian Pacific Railway):</b> First transcontinental through southern Saskatchewan (1882)</li>
+                <li><b>QLSRSC (Qu'Appelle, Long Lake & Saskatchewan):</b> Regina to Prince Albert via Saskatoon (1889-1890)</li>
+                <li><b>CNoR (Canadian Northern Railway):</b> Northerly route through Saskatoon (1899+)</li>
+                <li><b>GTPR (Grand Trunk Pacific Railway):</b> Third transcontinental through Saskatoon (1905+)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Created by Jessica Jack, University of Saskatchewan | January 2026</p>
+        <p>Part of the <a href="https://github.com/jjax07/Sask_Railway_Visualizations">Saskatchewan Railway Visualizations</a> project</p>
+    </div>
+</body>
+</html>

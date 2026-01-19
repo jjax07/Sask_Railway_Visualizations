@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One-Hour Railway Corridor from Saskatoon</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #aaa;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .nav {
+            background: #0f3460;
+            padding: 10px;
+            text-align: center;
+        }
+        .nav a {
+            color: #e94560;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 15px;
+            border: 1px solid #e94560;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        .nav a:hover {
+            background: #e94560;
+            color: #fff;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 160px);
+        }
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+        .sidebar {
+            width: 320px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .controls label {
+            display: block;
+            margin-bottom: 10px;
+            color: #e94560;
+            font-weight: bold;
+        }
+        .year-display {
+            font-size: 48px;
+            text-align: center;
+            color: #e94560;
+            margin: 10px 0;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .stats {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .stats h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e94560;
+            padding-bottom: 5px;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #1a1a2e;
+        }
+        .settlement-list {
+            margin-top: 20px;
+        }
+        .settlement-list h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .settlement-item {
+            background: #0f3460;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+            border-left: 3px solid #e94560;
+        }
+        .settlement-item .name {
+            font-weight: bold;
+        }
+        .settlement-item .details {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        .legend {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .legend h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+        .legend-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .play-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .play-controls button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .play-controls button:hover {
+            background: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>One-Hour Railway Corridor from Saskatoon</h1>
+        <p>Explore which settlements could be reached from Saskatoon within one hour by train (40 km at 40 km/h average speed) as the railway network expanded from 1890 to 1920.</p>
+    </div>
+    <div class="nav">
+        <a href="index.html">Home</a>
+        <a href="one_hour_map.html">1-Hour Corridor</a>
+        <a href="railway_timeline.html">Railway Timeline</a>
+    </div>
+    <div class="container">
+        <div id="map"></div>
+        <div class="sidebar">
+            <div class="controls">
+                <label>Select Year:</label>
+                <div class="year-display" id="yearDisplay">1890</div>
+                <input type="range" id="yearSlider" min="1890" max="1920" step="5" value="1890">
+                <div class="play-controls">
+                    <button id="playBtn">Play</button>
+                    <button id="resetBtn">Reset</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <h3>Statistics</h3>
+                <div class="stat-item">
+                    <span>Connected Settlements:</span>
+                    <span id="connectedCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Total in Range:</span>
+                    <span id="totalCount">0</span>
+                </div>
+            </div>
+
+            <div class="legend">
+                <h3>Legend</h3>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #e94560;"></div>
+                    <span>Saskatoon</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #4ecca3;"></div>
+                    <span>Connected Settlement</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #666; opacity: 0.5;"></div>
+                    <span>Not Yet Connected</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: transparent; border: 2px dashed #e94560;"></div>
+                    <span>40 km Radius (1 hour)</span>
+                </div>
+            </div>
+
+            <div class="settlement-list">
+                <h3>Settlements Within 1 Hour</h3>
+                <div id="settlementList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let data = null;
+        let map = null;
+        let markers = {};
+        let radiusCircle = null;
+        let isPlaying = false;
+        let playInterval = null;
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([52.12, -106.67], 9);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        // Load data and initialize
+        async function loadData() {
+            const response = await fetch('data/one_hour_corridor.json');
+            data = await response.json();
+
+            // Add Saskatoon marker
+            const saskatoonIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background:#e94560; width:20px; height:20px; border-radius:50%; border:3px solid white;"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+
+            L.marker([data.saskatoon.lat, data.saskatoon.lon], {icon: saskatoonIcon})
+                .addTo(map)
+                .bindPopup('<b>Saskatoon</b><br>First railway: 1890 (QLSRSC)');
+
+            // Add 40km radius circle
+            radiusCircle = L.circle([data.saskatoon.lat, data.saskatoon.lon], {
+                radius: 40000,
+                color: '#e94560',
+                fillColor: '#e94560',
+                fillOpacity: 0.1,
+                dashArray: '10, 10',
+                weight: 2
+            }).addTo(map);
+
+            // Add settlement markers
+            data.settlements.forEach(s => {
+                const marker = L.circleMarker([s.lat, s.lon], {
+                    radius: 8,
+                    fillColor: '#666',
+                    color: '#fff',
+                    weight: 1,
+                    opacity: 0.5,
+                    fillOpacity: 0.5
+                }).addTo(map);
+
+                marker.bindPopup(`
+                    <b>${s.name}</b><br>
+                    Distance: ${s.distance_km} km<br>
+                    Railway: ${s.first_railway || 'Unknown'}<br>
+                    Railway Arrives: ${s.railway_arrives || 'Unknown'}<br>
+                    Connected to Saskatoon: ${s.connected_to_saskatoon || 'Unknown'}
+                `);
+
+                markers[s.name] = {marker, data: s};
+            });
+
+            document.getElementById('totalCount').textContent = data.settlements.length;
+            updateYear(1890);
+        }
+
+        // Update visualization for selected year
+        function updateYear(year) {
+            document.getElementById('yearDisplay').textContent = year;
+            document.getElementById('yearSlider').value = year;
+
+            let connectedCount = 0;
+            let listHTML = '';
+
+            const connectedSettlements = [];
+
+            data.settlements.forEach(s => {
+                const isConnected = s.connected_to_saskatoon && s.connected_to_saskatoon <= year;
+                const m = markers[s.name];
+
+                if (isConnected) {
+                    connectedCount++;
+                    connectedSettlements.push(s);
+                    m.marker.setStyle({
+                        fillColor: '#4ecca3',
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    });
+                } else {
+                    m.marker.setStyle({
+                        fillColor: '#666',
+                        opacity: 0.5,
+                        fillOpacity: 0.5
+                    });
+                }
+            });
+
+            // Sort by distance
+            connectedSettlements.sort((a, b) => a.distance_km - b.distance_km);
+
+            connectedSettlements.forEach(s => {
+                listHTML += `
+                    <div class="settlement-item">
+                        <div class="name">${s.name}</div>
+                        <div class="details">
+                            ${s.distance_km} km | ${s.first_railway} (${s.railway_arrives})
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('connectedCount').textContent = connectedCount;
+            document.getElementById('settlementList').innerHTML = listHTML || '<p style="color:#666;">No settlements connected yet</p>';
+        }
+
+        // Play animation
+        function togglePlay() {
+            if (isPlaying) {
+                clearInterval(playInterval);
+                document.getElementById('playBtn').textContent = 'Play';
+                isPlaying = false;
+            } else {
+                isPlaying = true;
+                document.getElementById('playBtn').textContent = 'Pause';
+                let year = parseInt(document.getElementById('yearSlider').value);
+
+                playInterval = setInterval(() => {
+                    year += 5;
+                    if (year > 1920) {
+                        year = 1890;
+                    }
+                    updateYear(year);
+                }, 1500);
+            }
+        }
+
+        // Reset to 1890
+        function reset() {
+            if (isPlaying) {
+                togglePlay();
+            }
+            updateYear(1890);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            loadData();
+
+            document.getElementById('yearSlider').addEventListener('input', (e) => {
+                updateYear(parseInt(e.target.value));
+            });
+
+            document.getElementById('playBtn').addEventListener('click', togglePlay);
+            document.getElementById('resetBtn').addEventListener('click', reset);
+        });
+    </script>
+</body>
+</html>
