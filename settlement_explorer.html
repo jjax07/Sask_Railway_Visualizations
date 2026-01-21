@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settlement Explorer: One-Hour Railway Connections</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #aaa;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .nav {
+            background: #0f3460;
+            padding: 10px;
+            text-align: center;
+        }
+        .nav a {
+            color: #e94560;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 15px;
+            border: 1px solid #e94560;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        .nav a:hover {
+            background: #e94560;
+            color: #fff;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 160px);
+        }
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+        .sidebar {
+            width: 350px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .settlement-selector {
+            margin-bottom: 20px;
+        }
+        .settlement-selector label {
+            display: block;
+            margin-bottom: 10px;
+            color: #e94560;
+            font-weight: bold;
+        }
+        .settlement-selector input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #0f3460;
+            border-radius: 5px;
+            background: #1a1a2e;
+            color: #eee;
+            font-size: 16px;
+        }
+        .settlement-selector input:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        .selected-info {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 3px solid #e94560;
+        }
+        .selected-info h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .selected-info p {
+            color: #ccc;
+            margin: 5px 0;
+        }
+        .selected-info .railway-tag {
+            display: inline-block;
+            background: #4ecca3;
+            color: #1a1a2e;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin: 2px;
+            font-weight: bold;
+        }
+        .selected-info .railway-tag.future {
+            background: #666;
+            color: #aaa;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .controls label {
+            display: block;
+            margin-bottom: 10px;
+            color: #e94560;
+            font-weight: bold;
+        }
+        .year-display {
+            font-size: 48px;
+            text-align: center;
+            color: #e94560;
+            margin: 10px 0;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .stats {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .stats h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e94560;
+            padding-bottom: 5px;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #1a1a2e;
+        }
+        .stat-item .value {
+            font-weight: bold;
+        }
+        .stat-item .connected {
+            color: #4ecca3;
+        }
+        .stat-item .pending {
+            color: #666;
+        }
+        .stat-item .new {
+            color: #ffcc00;
+        }
+        .settlement-list {
+            margin-top: 20px;
+        }
+        .settlement-list h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .settlement-item {
+            background: #0f3460;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 3px;
+            border-left: 3px solid #4ecca3;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .settlement-item:hover {
+            transform: translateX(5px);
+        }
+        .settlement-item.pending {
+            border-left-color: #666;
+            opacity: 0.7;
+        }
+        .settlement-item.new-connection {
+            border-left-color: #ffcc00;
+            animation: pulse 1s ease-in-out;
+        }
+        @keyframes pulse {
+            0%, 100% { background: #0f3460; }
+            50% { background: #1a4a3e; }
+        }
+        .settlement-item .name {
+            font-weight: bold;
+        }
+        .settlement-item .details {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        .settlement-item .new-badge {
+            display: inline-block;
+            background: #ffcc00;
+            color: #1a1a2e;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+        .legend {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .legend h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        .legend-circle {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        .play-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .play-controls button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .play-controls button:hover {
+            background: #ff6b6b;
+        }
+        .no-connections {
+            color: #888;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Settlement Explorer: One-Hour Railway Connections</h1>
+        <p>Select any Saskatchewan settlement to see which other settlements could be reached within one hour by train (40 km at 40 km/h). Use the time slider to see how connectivity evolved from 1882 to 1920.</p>
+    </div>
+    <div class="nav">
+        <a href="index.html">Home</a>
+        <a href="one_hour_map.html">Saskatoon Corridor</a>
+        <a href="settlement_explorer.html">Settlement Explorer</a>
+        <a href="railway_timeline.html">Railway Timeline</a>
+    </div>
+    <div class="container">
+        <div id="map"></div>
+        <div class="sidebar">
+            <div class="settlement-selector">
+                <label for="settlementSearch">Search Settlement:</label>
+                <input type="text" id="settlementSearch" list="settlementList" placeholder="Type to search...">
+                <datalist id="settlementList"></datalist>
+            </div>
+
+            <div class="selected-info" id="selectedInfo">
+                <h3>Selected Settlement</h3>
+                <p id="selectedName">None selected</p>
+                <div id="selectedRailways"></div>
+            </div>
+
+            <div class="controls">
+                <label>Select Year:</label>
+                <div class="year-display" id="yearDisplay">1890</div>
+                <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1890">
+                <div class="play-controls">
+                    <button id="playBtn">Play</button>
+                    <button id="resetBtn">Reset</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <h3>Statistics</h3>
+                <div class="stat-item">
+                    <span>Within 40 km:</span>
+                    <span id="totalCount" class="value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Connected by rail:</span>
+                    <span id="connectedCount" class="value connected">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>New this year:</span>
+                    <span id="newCount" class="value new">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>Pending/No shared rail:</span>
+                    <span id="pendingCount" class="value pending">0</span>
+                </div>
+            </div>
+
+            <div class="legend">
+                <h3>Legend</h3>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #e94560;"></div>
+                    <span>Selected Settlement</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #4ecca3;"></div>
+                    <span>Connected (within 40km)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #ffcc00;"></div>
+                    <span>Newly Connected This Year</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #888;"></div>
+                    <span>Within 40km (pending)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #444; width: 8px; height: 8px;"></div>
+                    <span>Other Settlements</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: transparent; border: 2px dashed #e94560;"></div>
+                    <span>40 km Radius</span>
+                </div>
+            </div>
+
+            <div class="settlement-list">
+                <h3>Nearby Settlements</h3>
+                <div id="settlementListItems"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let data = null;
+        let map = null;
+        let allMarkers = {};          // All settlement markers
+        let nearbyMarkers = {};       // Markers within 40km of selected
+        let connectionLines = [];     // Lines between connected settlements
+        let selectedMarker = null;
+        let radiusCircle = null;
+        let isPlaying = false;
+        let playInterval = null;
+        let currentSettlement = null;
+        let previousYear = null;
+
+        // Initialize map centered on Saskatchewan
+        function initMap() {
+            map = L.map('map').setView([52.0, -106.0], 6);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        // Load data
+        async function loadData() {
+            try {
+                console.log('Loading data...');
+                const response = await fetch('data/settlement_connections.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                data = await response.json();
+                console.log('Data loaded:', Object.keys(data.settlements).length, 'settlements');
+
+                initSettlementSelector();
+                addAllSettlementMarkers();
+
+                // Select Saskatoon by default
+                if (data.settlements['Saskatoon']) {
+                    selectSettlement('Saskatoon');
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('selectedName').textContent = 'Error loading data';
+                document.getElementById('selectedRailways').innerHTML =
+                    '<span style="color: #e94560;">Try: python -m http.server 8080</span>';
+            }
+        }
+
+        // Add small markers for ALL settlements
+        function addAllSettlementMarkers() {
+            Object.entries(data.settlements).forEach(([name, settlement]) => {
+                const marker = L.circleMarker([settlement.lat, settlement.lon], {
+                    radius: 3,
+                    fillColor: '#444',
+                    color: '#666',
+                    weight: 1,
+                    opacity: 0.6,
+                    fillOpacity: 0.6
+                }).addTo(map);
+
+                marker.bindPopup(`<b>${name}</b><br>Click to explore`);
+                marker.on('click', () => {
+                    selectSettlement(name);
+                });
+
+                allMarkers[name] = marker;
+            });
+        }
+
+        // Initialize settlement selector dropdown
+        function initSettlementSelector() {
+            const datalist = document.getElementById('settlementList');
+            const settlementNames = Object.keys(data.settlements).sort();
+
+            settlementNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                datalist.appendChild(option);
+            });
+
+            const searchInput = document.getElementById('settlementSearch');
+            searchInput.addEventListener('change', (e) => {
+                const name = e.target.value;
+                if (data.settlements[name]) {
+                    selectSettlement(name);
+                }
+            });
+
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const name = e.target.value;
+                    if (data.settlements[name]) {
+                        selectSettlement(name);
+                    }
+                }
+            });
+        }
+
+        // Select a settlement and update the map
+        function selectSettlement(name) {
+            currentSettlement = name;
+            previousYear = null;
+            const settlement = data.settlements[name];
+            const connections = data.connections[name] || [];
+
+            // Update search input
+            document.getElementById('settlementSearch').value = name;
+
+            // Update selected info with all railways
+            document.getElementById('selectedName').textContent = name;
+
+            let railwaysHTML = '<p style="margin-top: 10px;">Railways: ';
+            if (settlement.railways && settlement.railways.length > 0) {
+                const currentYear = parseInt(document.getElementById('yearSlider').value);
+                settlement.railways.forEach(r => {
+                    const isFuture = r.year > currentYear;
+                    railwaysHTML += `<span class="railway-tag ${isFuture ? 'future' : ''}">${r.railway} (${r.year})</span>`;
+                });
+            } else if (settlement.first_railway) {
+                railwaysHTML += `<span class="railway-tag">${settlement.first_railway} (${settlement.railway_arrives || '?'})</span>`;
+            } else {
+                railwaysHTML += '<span style="color: #666;">No railway</span>';
+            }
+            railwaysHTML += '</p>';
+            document.getElementById('selectedRailways').innerHTML = railwaysHTML;
+
+            // Clear existing nearby markers and lines
+            Object.values(nearbyMarkers).forEach(m => {
+                if (m.marker) map.removeLayer(m.marker);
+            });
+            nearbyMarkers = {};
+            connectionLines.forEach(line => map.removeLayer(line));
+            connectionLines = [];
+            if (selectedMarker) map.removeLayer(selectedMarker);
+            if (radiusCircle) map.removeLayer(radiusCircle);
+
+            // Reset all markers to default style
+            Object.entries(allMarkers).forEach(([n, marker]) => {
+                marker.setStyle({
+                    radius: 3,
+                    fillColor: '#444',
+                    color: '#666',
+                    weight: 1,
+                    opacity: 0.6,
+                    fillOpacity: 0.6
+                });
+            });
+
+            // Hide the selected settlement's background marker
+            if (allMarkers[name]) {
+                allMarkers[name].setStyle({ opacity: 0, fillOpacity: 0 });
+            }
+
+            // Center map on selected settlement
+            map.setView([settlement.lat, settlement.lon], 9);
+
+            // Add selected settlement marker (larger, red)
+            const selectedIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="background:#e94560; width:24px; height:24px; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(233,69,96,0.5);"></div>',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+
+            selectedMarker = L.marker([settlement.lat, settlement.lon], {icon: selectedIcon})
+                .addTo(map)
+                .bindPopup(`<b>${name}</b><br>First railway: ${settlement.railway_arrives || 'None'} (${settlement.first_railway || 'N/A'})`);
+
+            // Add 40km radius circle
+            radiusCircle = L.circle([settlement.lat, settlement.lon], {
+                radius: 40000,
+                color: '#e94560',
+                fillColor: '#e94560',
+                fillOpacity: 0.05,
+                dashArray: '10, 10',
+                weight: 2
+            }).addTo(map);
+
+            // Add larger markers for settlements within 40km
+            connections.forEach(conn => {
+                const connSettlement = data.settlements[conn.to];
+                if (!connSettlement) return;
+
+                // Hide background marker
+                if (allMarkers[conn.to]) {
+                    allMarkers[conn.to].setStyle({ opacity: 0, fillOpacity: 0 });
+                }
+
+                const marker = L.circleMarker([connSettlement.lat, connSettlement.lon], {
+                    radius: 10,
+                    fillColor: '#666',
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 0.8,
+                    fillOpacity: 0.8
+                }).addTo(map);
+
+                let railwayInfo = conn.shared_railway
+                    ? `Shared Railway: ${conn.shared_railway}<br>Connected: ${conn.connected_year}`
+                    : 'No shared railway';
+
+                if (conn.all_shared_railways) {
+                    railwayInfo += '<br>Also: ' + conn.all_shared_railways.slice(1).map(r =>
+                        `${r.railway} (${r.connected_year})`).join(', ');
+                }
+
+                marker.bindPopup(`
+                    <b>${conn.to}</b><br>
+                    Distance: ${conn.distance_km} km<br>
+                    ${railwayInfo}<br>
+                    <em>Click to explore</em>
+                `);
+
+                marker.on('click', () => {
+                    setTimeout(() => selectSettlement(conn.to), 100);
+                });
+
+                nearbyMarkers[conn.to] = {
+                    marker,
+                    data: conn,
+                    settlement: connSettlement
+                };
+            });
+
+            // Update for current year
+            updateYear(parseInt(document.getElementById('yearSlider').value));
+        }
+
+        // Update visualization for selected year
+        function updateYear(year) {
+            document.getElementById('yearDisplay').textContent = year;
+            document.getElementById('yearSlider').value = year;
+
+            if (!currentSettlement) return;
+
+            const connections = data.connections[currentSettlement] || [];
+            const selectedSettlement = data.settlements[currentSettlement];
+
+            // Update railway tags based on year
+            if (selectedSettlement.railways) {
+                let railwaysHTML = '<p style="margin-top: 10px;">Railways: ';
+                selectedSettlement.railways.forEach(r => {
+                    const isFuture = r.year > year;
+                    railwaysHTML += `<span class="railway-tag ${isFuture ? 'future' : ''}">${r.railway} (${r.year})</span>`;
+                });
+                railwaysHTML += '</p>';
+                document.getElementById('selectedRailways').innerHTML = railwaysHTML;
+            }
+
+            let connectedCount = 0;
+            let pendingCount = 0;
+            let newCount = 0;
+            let listHTML = '';
+
+            const connectedSettlements = [];
+            const newSettlements = [];
+            const pendingSettlements = [];
+
+            // Clear existing connection lines
+            connectionLines.forEach(line => map.removeLayer(line));
+            connectionLines = [];
+
+            // Check if selected settlement has railway by this year
+            const selectedHasRailway = selectedSettlement.railway_arrives && selectedSettlement.railway_arrives <= year;
+
+            connections.forEach(conn => {
+                const m = nearbyMarkers[conn.to];
+                if (!m) return;
+
+                const isConnected = conn.connected_year && conn.connected_year <= year && selectedHasRailway;
+                const isNewThisYear = conn.connected_year === year && selectedHasRailway;
+
+                if (isConnected) {
+                    connectedCount++;
+
+                    if (isNewThisYear) {
+                        newCount++;
+                        newSettlements.push(conn);
+                        // Yellow for new connections
+                        m.marker.setStyle({
+                            fillColor: '#ffcc00',
+                            color: '#fff',
+                            opacity: 1,
+                            fillOpacity: 1,
+                            radius: 12
+                        });
+                    } else {
+                        connectedSettlements.push(conn);
+                        // Green for established connections
+                        m.marker.setStyle({
+                            fillColor: '#4ecca3',
+                            color: '#fff',
+                            opacity: 1,
+                            fillOpacity: 0.9,
+                            radius: 10
+                        });
+                    }
+
+                    // Draw connection line
+                    const connSettlement = data.settlements[conn.to];
+                    const line = L.polyline(
+                        [[selectedSettlement.lat, selectedSettlement.lon],
+                         [connSettlement.lat, connSettlement.lon]],
+                        {
+                            color: isNewThisYear ? '#ffcc00' : '#4ecca3',
+                            weight: isNewThisYear ? 3 : 2,
+                            opacity: isNewThisYear ? 0.8 : 0.5,
+                            dashArray: isNewThisYear ? null : '5, 5'
+                        }
+                    ).addTo(map);
+                    connectionLines.push(line);
+                } else {
+                    pendingCount++;
+                    pendingSettlements.push(conn);
+                    m.marker.setStyle({
+                        fillColor: '#888',
+                        color: '#aaa',
+                        opacity: 0.6,
+                        fillOpacity: 0.6,
+                        radius: 8
+                    });
+                }
+            });
+
+            // Sort by distance
+            newSettlements.sort((a, b) => a.distance_km - b.distance_km);
+            connectedSettlements.sort((a, b) => a.distance_km - b.distance_km);
+            pendingSettlements.sort((a, b) => a.distance_km - b.distance_km);
+
+            // Build list HTML - new connections first (highlighted)
+            newSettlements.forEach(conn => {
+                listHTML += `
+                    <div class="settlement-item new-connection" onclick="selectSettlement('${conn.to}')">
+                        <div class="name">${conn.to}<span class="new-badge">NEW</span></div>
+                        <div class="details">
+                            ${conn.distance_km} km | ${conn.shared_railway} (${conn.connected_year})
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Then established connections
+            connectedSettlements.forEach(conn => {
+                listHTML += `
+                    <div class="settlement-item" onclick="selectSettlement('${conn.to}')">
+                        <div class="name">${conn.to}</div>
+                        <div class="details">
+                            ${conn.distance_km} km | ${conn.shared_railway} (${conn.connected_year})
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Then pending
+            pendingSettlements.forEach(conn => {
+                const reason = conn.shared_railway
+                    ? `Connects ${conn.connected_year}`
+                    : 'No shared railway';
+                listHTML += `
+                    <div class="settlement-item pending" onclick="selectSettlement('${conn.to}')">
+                        <div class="name">${conn.to}</div>
+                        <div class="details">
+                            ${conn.distance_km} km | ${reason}
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('totalCount').textContent = connections.length;
+            document.getElementById('connectedCount').textContent = connectedCount;
+            document.getElementById('newCount').textContent = newCount;
+            document.getElementById('pendingCount').textContent = pendingCount;
+
+            const listElement = document.getElementById('settlementListItems');
+            if (connections.length === 0) {
+                listElement.innerHTML = '<div class="no-connections">No settlements within 40 km</div>';
+            } else {
+                listElement.innerHTML = listHTML || '<div class="no-connections">No connected settlements yet</div>';
+            }
+
+            previousYear = year;
+        }
+
+        // Play animation
+        function togglePlay() {
+            if (isPlaying) {
+                clearInterval(playInterval);
+                document.getElementById('playBtn').textContent = 'Play';
+                isPlaying = false;
+            } else {
+                isPlaying = true;
+                document.getElementById('playBtn').textContent = 'Pause';
+                let year = parseInt(document.getElementById('yearSlider').value);
+
+                playInterval = setInterval(() => {
+                    year += 1;
+                    if (year > 1920) {
+                        year = 1882;
+                    }
+                    updateYear(year);
+                }, 800);
+            }
+        }
+
+        // Reset to 1882
+        function reset() {
+            if (isPlaying) {
+                togglePlay();
+            }
+            updateYear(1882);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            loadData();
+
+            document.getElementById('yearSlider').addEventListener('input', (e) => {
+                updateYear(parseInt(e.target.value));
+            });
+
+            document.getElementById('playBtn').addEventListener('click', togglePlay);
+            document.getElementById('resetBtn').addEventListener('click', reset);
+        });
+    </script>
+</body>
+</html>

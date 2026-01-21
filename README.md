@@ -24,7 +24,31 @@ An interactive map showing which settlements could be reached from Saskatoon wit
 | 1905 | 5 (added Warman, Langham, Aberdeen) |
 | 1910 | 11 (major expansion with GTPR) |
 
-### 2. Railway Network Timeline
+### 2. Settlement Explorer
+
+Select any of the 429 Saskatchewan settlements to discover which neighbours were reachable within one hour by train (40 km radius). Watch connectivity evolve from 1882 to 1920.
+
+**Features:**
+- Searchable dropdown with all 429 settlements
+- All settlements visible on map (click any to explore)
+- 40 km radius circle showing potential connections
+- Connection lines drawn between railway-connected settlements
+- Time slider (1882-1920) showing connectivity evolution
+- "New this year" highlighting for connections made in selected year
+- Color-coded markers:
+  - **Red**: Selected settlement
+  - **Green**: Connected by railway (within 40km)
+  - **Yellow**: Newly connected this year
+  - **Gray**: Within 40km but no shared railway yet
+  - **Dark gray dots**: All other settlements
+
+**Connection Logic:**
+Two settlements are "connected" when:
+1. Both are within 40 km of each other
+2. Both share the same railway line
+3. Both have received that railway by the selected year
+
+### 3. Railway Network Timeline
 
 Watch the four major railway companies expand across Saskatchewan year by year.
 
@@ -43,15 +67,86 @@ Watch the four major railway companies expand across Saskatchewan year by year.
 | CNoR | Yellow | 1899+ | Canadian Northern - Northerly competitor through Saskatoon |
 | GTPR | Purple | 1905+ | Grand Trunk Pacific - Third transcontinental via Saskatoon |
 
-## Data
+## Project Structure
 
-The `data/` folder contains JSON files extracted from the Urban Saskatchewan History project:
+```
+Sask_Railway_Visualizations/
+├── index.html                 # Home page with navigation cards
+├── one_hour_map.html          # Saskatoon corridor visualization
+├── settlement_explorer.html   # Settlement explorer visualization
+├── railway_timeline.html      # Railway network timeline
+├── data/
+│   ├── settlements.json           # 429 settlements with coordinates & railway info
+│   ├── settlement_connections.json # Pre-calculated connections for explorer
+│   ├── one_hour_corridor.json     # Saskatoon-specific corridor data
+│   └── railway_timeline.json      # Settlements by railway with years
+├── scripts/
+│   └── generate_connections.py    # Script to generate connection data
+└── README.md
+```
 
-| File | Description |
-|------|-------------|
-| `settlements.json` | All 429 settlements with coordinates, railway info, and distances from Saskatoon |
-| `one_hour_corridor.json` | 12 settlements within 40 km of Saskatoon with connection timeline |
-| `railway_timeline.json` | Settlements organized by railway company with arrival years |
+## Data Files
+
+| File | Records | Description |
+|------|---------|-------------|
+| `settlements.json` | 429 | All settlements with lat/lon, railway arrival year, first railway |
+| `settlement_connections.json` | 429 + 1,494 pairs | Settlement data plus pre-calculated connections within 40km |
+| `one_hour_corridor.json` | 12 | Settlements within 40 km of Saskatoon |
+| `railway_timeline.json` | 392 | Settlements organized by railway company |
+
+### Settlement Connections Data Structure
+
+The `settlement_connections.json` file contains:
+
+```json
+{
+  "settlements": {
+    "Saskatoon": {
+      "lat": 52.12,
+      "lon": -106.67,
+      "railway_arrives": 1890,
+      "first_railway": "QLSRSC",
+      "railways": [{"railway": "QLSRSC", "year": 1890}]
+    }
+  },
+  "connections": {
+    "Saskatoon": [
+      {
+        "to": "Osler",
+        "distance_km": 28.7,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1890,
+        "all_shared_railways": null
+      }
+    ]
+  }
+}
+```
+
+## Scripts
+
+### generate_connections.py
+
+Generates the `settlement_connections.json` file from source data.
+
+**Usage:**
+```bash
+python3 scripts/generate_connections.py
+```
+
+**Input files:**
+- `data/settlements.json` - Settlement coordinates and railway info
+- `data/railway_timeline.json` - Railway arrival years by settlement
+- `../KnowledgeGraph/one_hour_railway_connections_complete.csv` - Pre-calculated distance pairs
+
+**Output:**
+- `data/settlement_connections.json` - Combined connection data
+
+**Statistics (current data):**
+- Total settlements: 429
+- Connection pairs within 40km: 1,494
+- Railway-connected pairs: 850
+- Settlements with nearby connections: 391
 
 ## Methodology
 
@@ -60,10 +155,10 @@ The `data/` folder contains JSON files extracted from the Urban Saskatchewan His
 - 40 km threshold = approximately 1 hour travel at 40 km/h average speed (typical for branch lines with stops)
 
 ### Connection Logic
-A settlement is considered connected to Saskatoon by rail when:
-1. Railway has arrived at that settlement
-2. The railway line physically connects to Saskatoon
-3. Saskatoon has that railway connection
+A settlement pair is considered "railway connected" when:
+1. Distance between them is ≤ 40 km
+2. Both settlements share the same railway line
+3. `connected_year` = max(railway_arrives_settlement_1, railway_arrives_settlement_2)
 
 ### Saskatoon Railway Connections
 | Railway | Year | Notes |
@@ -83,10 +178,26 @@ The QLSRSC line (Regina-Saskatoon-Prince Albert) changed hands multiple times:
 
 This explains why the same settlements appear on different railway company maps at different times.
 
+## Running Locally
+
+Due to browser security restrictions, you need to serve the files via HTTP:
+
+```bash
+# Navigate to project directory
+cd Sask_Railway_Visualizations
+
+# Start a local server
+python3 -m http.server 8080
+
+# Open in browser
+open http://localhost:8080
+```
+
 ## Data Sources
 
 - **UrbanSaskHist - Final.xlsx**: Master settlement data with railway arrival dates
 - **settlement_coordinates.csv**: Geographic coordinates from 1921 census boundaries
+- **one_hour_railway_connections_complete.csv**: Pre-calculated settlement pairs within 40km
 - **CPR_map_1941_with_original_names.pdf**: CPR system map showing absorbed railways
 - **CNoR_Map_1906.pdf**: Canadian Northern Railway system map
 
@@ -96,6 +207,7 @@ Built with:
 - [Leaflet.js](https://leafletjs.com/) for interactive maps
 - [CARTO Dark Matter](https://carto.com/basemaps/) basemap tiles
 - Vanilla JavaScript (no frameworks)
+- Python 3 for data processing
 - GitHub Pages for hosting
 
 ## Related Projects
