@@ -340,6 +340,10 @@
                     <span>Other Settlements</span>
                 </div>
                 <div class="legend-item">
+                    <div class="legend-circle" style="background: #664400; border: 2px solid #ffaa00;"></div>
+                    <span>Multi-Railway Junction</span>
+                </div>
+                <div class="legend-item">
                     <div class="legend-circle" style="background: transparent; border: 2px dashed #e94560;"></div>
                     <span>40 km Radius</span>
                 </div>
@@ -358,6 +362,7 @@
         let map = null;
         let allMarkers = {};          // All settlement markers
         let nearbyMarkers = {};       // Markers within 40km of selected
+        let multiRailwayRings = {};   // Rings for multi-railway settlements
         let connectionLines = [];     // Lines between connected settlements
         let selectedMarker = null;
         let radiusCircle = null;
@@ -365,6 +370,18 @@
         let playInterval = null;
         let currentSettlement = null;
         let previousYear = null;
+
+        // Helper function to check if settlement has multiple railways
+        function hasMultipleRailways(settlementName) {
+            const s = data.settlements[settlementName];
+            return s && s.railways && s.railways.length > 1;
+        }
+
+        // Helper function to get railway count
+        function getRailwayCount(settlementName) {
+            const s = data.settlements[settlementName];
+            return (s && s.railways) ? s.railways.length : 0;
+        }
 
         // Initialize map centered on Saskatchewan
         function initMap() {
@@ -406,16 +423,21 @@
         // Add small markers for ALL settlements
         function addAllSettlementMarkers() {
             Object.entries(data.settlements).forEach(([name, settlement]) => {
+                const isMultiRailway = hasMultipleRailways(name);
+
                 const marker = L.circleMarker([settlement.lat, settlement.lon], {
-                    radius: 3,
-                    fillColor: '#444',
-                    color: '#666',
-                    weight: 1,
-                    opacity: 0.6,
+                    radius: isMultiRailway ? 5 : 3,
+                    fillColor: isMultiRailway ? '#664400' : '#444',
+                    color: isMultiRailway ? '#ffaa00' : '#666',
+                    weight: isMultiRailway ? 2 : 1,
+                    opacity: 0.7,
                     fillOpacity: 0.6
                 }).addTo(map);
 
-                marker.bindPopup(`<b>${name}</b><br>Click to explore`);
+                const railwayInfo = settlement.railways
+                    ? settlement.railways.map(r => `${r.railway} (${r.year})`).join(', ')
+                    : 'No railway data';
+                marker.bindPopup(`<b>${name}</b><br>${railwayInfo}<br><em>Click to explore</em>`);
                 marker.on('click', () => {
                     selectSettlement(name);
                 });
@@ -481,9 +503,10 @@
             railwaysHTML += '</p>';
             document.getElementById('selectedRailways').innerHTML = railwaysHTML;
 
-            // Clear existing nearby markers and lines
+            // Clear existing nearby markers, rings, and lines
             Object.values(nearbyMarkers).forEach(m => {
                 if (m.marker) map.removeLayer(m.marker);
+                if (m.ring) map.removeLayer(m.ring);
             });
             nearbyMarkers = {};
             connectionLines.forEach(line => map.removeLayer(line));
@@ -543,6 +566,9 @@
                     allMarkers[conn.to].setStyle({ opacity: 0, fillOpacity: 0 });
                 }
 
+                const isMultiRailway = hasMultipleRailways(conn.to);
+                const railwayCount = getRailwayCount(conn.to);
+
                 const marker = L.circleMarker([connSettlement.lat, connSettlement.lon], {
                     radius: 10,
                     fillColor: '#666',
@@ -551,6 +577,19 @@
                     opacity: 0.8,
                     fillOpacity: 0.8
                 }).addTo(map);
+
+                // Add outer ring for multi-railway settlements
+                let ring = null;
+                if (isMultiRailway) {
+                    ring = L.circleMarker([connSettlement.lat, connSettlement.lon], {
+                        radius: 15,
+                        fillColor: 'transparent',
+                        color: '#ffaa00',
+                        weight: 3,
+                        opacity: 0.9,
+                        fillOpacity: 0
+                    }).addTo(map);
+                }
 
                 let railwayInfo = conn.shared_railway
                     ? `Shared Railway: ${conn.shared_railway}<br>Connected: ${conn.connected_year}`
@@ -561,10 +600,16 @@
                         `${r.railway} (${r.connected_year})`).join(', ');
                 }
 
+                // Show all railways for this settlement
+                const allRailways = connSettlement.railways
+                    ? connSettlement.railways.map(r => `${r.railway} (${r.year})`).join(', ')
+                    : '';
+                const multiInfo = isMultiRailway ? `<br><b>Junction:</b> ${allRailways}` : '';
+
                 marker.bindPopup(`
-                    <b>${conn.to}</b><br>
+                    <b>${conn.to}</b>${isMultiRailway ? ' <span style="color:#ffaa00;">★</span>' : ''}<br>
                     Distance: ${conn.distance_km} km<br>
-                    ${railwayInfo}<br>
+                    ${railwayInfo}${multiInfo}<br>
                     <em>Click to explore</em>
                 `);
 
@@ -574,8 +619,10 @@
 
                 nearbyMarkers[conn.to] = {
                     marker,
+                    ring,
                     data: conn,
-                    settlement: connSettlement
+                    settlement: connSettlement,
+                    isMultiRailway
                 };
             });
 

@@ -33,6 +33,10 @@
         {
           "railway": "QLSRSC",
           "year": 1890
+        },
+        {
+          "railway": "CNoR",
+          "year": 1906
         }
       ]
     },
@@ -148,10 +152,10 @@
       "lat": 49.269485548575865,
       "lon": -102.289663027762,
       "railway_arrives": 1892,
-      "first_railway": "CNoR",
+      "first_railway": "CPR",
       "railways": [
         {
-          "railway": "CNoR",
+          "railway": "CPR",
           "year": 1892
         }
       ]
@@ -165,6 +169,18 @@
         {
           "railway": "CPR",
           "year": 1882
+        },
+        {
+          "railway": "QLSRSC",
+          "year": 1889
+        },
+        {
+          "railway": "CNoR",
+          "year": 1906
+        },
+        {
+          "railway": "GTPR",
+          "year": 1911
         }
       ]
     },
@@ -177,6 +193,14 @@
         {
           "railway": "CPR",
           "year": 1882
+        },
+        {
+          "railway": "CNoR",
+          "year": 1908
+        },
+        {
+          "railway": "GTPR",
+          "year": 1912
         }
       ]
     },
@@ -273,6 +297,14 @@
         {
           "railway": "QLSRSC",
           "year": 1890
+        },
+        {
+          "railway": "CNoR",
+          "year": 1905
+        },
+        {
+          "railway": "GTPR",
+          "year": 1908
         }
       ]
     },
@@ -285,6 +317,14 @@
         {
           "railway": "Other",
           "year": 1889
+        },
+        {
+          "railway": "CPR",
+          "year": 1890
+        },
+        {
+          "railway": "GTPR",
+          "year": 1908
         }
       ]
     },
@@ -406,21 +446,21 @@
     "Lebret": {
       "lat": 50.756858115766555,
       "lon": -103.69459668684404,
-      "railway_arrives": null,
-      "first_railway": null,
-      "railways": null
+      "railway_arrives": 1911,
+      "first_railway": "GTPR",
+      "railways": [
+        {
+          "railway": "GTPR",
+          "year": 1911
+        }
+      ]
     },
     "Langenburg": {
       "lat": 50.843916808230766,
       "lon": -101.70486149558924,
       "railway_arrives": 1888,
-      "first_railway": "Other",
-      "railways": [
-        {
-          "railway": "Other",
-          "year": 1888
-        }
-      ]
+      "first_railway": "M",
+      "railways": null
     },
     "Kamsack": {
       "lat": 51.55510288193992,
@@ -474,13 +514,8 @@
       "lat": 50.89455366589854,
       "lon": -101.89258768760224,
       "railway_arrives": 1887,
-      "first_railway": "Other",
-      "railways": [
-        {
-          "railway": "Other",
-          "year": 1887
-        }
-      ]
+      "first_railway": "M",
+      "railways": null
     },
     "Arcola": {
       "lat": 49.63567981485362,
@@ -510,13 +545,8 @@
       "lat": 50.93642264758799,
       "lon": -102.0445490894248,
       "railway_arrives": 1887,
-      "first_railway": "Other",
-      "railways": [
-        {
-          "railway": "Other",
-          "year": 1887
-        }
-      ]
+      "first_railway": "M",
+      "railways": null
     },
     "Edenwold": {
       "lat": 50.63497544186648,
@@ -625,13 +655,8 @@
       "lat": 51.04086309899965,
       "lon": -102.16414710318412,
       "railway_arrives": 1889,
-      "first_railway": "Other",
-      "railways": [
-        {
-          "railway": "Other",
-          "year": 1889
-        }
-      ]
+      "first_railway": "M",
+      "railways": null
     },
     "Rosthern": {
       "lat": 52.65584677144819,
@@ -661,34 +686,24 @@
       "lat": 49.141306175471335,
       "lon": -102.80912127240768,
       "railway_arrives": 1905,
-      "first_railway": "Other",
-      "railways": [
-        {
-          "railway": "Other",
-          "year": 1905
-        }
-      ]
+      "first_railway": "Technically",
+      "railways": null
     },
     "Fairlight": {
       "lat": 49.87745013275863,
       "lon": -101.67735176622774,
       "railway_arrives": 1905,
       "first_railway": "CPR",
-      "railways": [
-        {
-          "railway": "CPR",
-          "year": 1905
-        }
-      ]
+      "railways": null
     },
     "Dundurn": {
       "lat": 51.80864191632001,
       "lon": -106.50715802499818,
       "railway_arrives": 1889,
-      "first_railway": "GTPR",
+      "first_railway": "QLSRSC",
       "railways": [
         {
-          "railway": "GTPR",
+          "railway": "QLSRSC",
           "year": 1889
         }
       ]
@@ -745,6 +760,10 @@
         {
           "railway": "CPR",
           "year": 1893
+        },
+        {
+          "railway": "CNoR",
+          "year": 1910
         }
       ]
     },
@@ -801,12 +820,7 @@
       "lon": -101.52772548586162,
       "railway_arrives": 1905,
       "first_railway": "CPR",
-      "railways": [
-        {
-          "railway": "CPR",
-          "year": 1905
-        }
-      ]
+      "railways": null
     },
     "Domremy": {
       "lat": 52.78730803136134,
@@ -1205,10 +1219,10 @@
       "lat": 49.58580842076067,
       "lon": -101.84167986218284,
       "railway_arrives": 1901,
-      "first_railway": "Other",
+      "first_railway": "CPR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "CPR",
           "year": 1901
         }
       ]
@@ -1610,10 +1624,10 @@
       "lat": 52.692386693208974,
       "lon": -107.70576520887106,
       "railway_arrives": 1913,
-      "first_railway": "Other",
+      "first_railway": "CNoR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "CNoR",
           "year": 1913
         }
       ]
@@ -1893,10 +1907,10 @@
       "lat": 51.156682091623686,
       "lon": -105.93099423171051,
       "railway_arrives": 1890,
-      "first_railway": "CNoR",
+      "first_railway": "QLSRSC",
       "railways": [
         {
-          "railway": "CNoR",
+          "railway": "QLSRSC",
           "year": 1890
         }
       ]
@@ -1905,10 +1919,10 @@
       "lat": 51.76830376985612,
       "lon": -104.17759836401191,
       "railway_arrives": 1908,
-      "first_railway": "Other",
+      "first_railway": "CPR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "CPR",
           "year": 1908
         }
       ]
@@ -1966,12 +1980,7 @@
       "lon": -108.87165823190112,
       "railway_arrives": 1911,
       "first_railway": "CPR",
-      "railways": [
-        {
-          "railway": "CPR",
-          "year": 1911
-        }
-      ]
+      "railways": null
     },
     "St. Brieux": {
       "lat": 52.63431027264026,
@@ -2033,12 +2042,7 @@
       "lon": -109.01443435945852,
       "railway_arrives": 1911,
       "first_railway": "CPR",
-      "railways": [
-        {
-          "railway": "CPR",
-          "year": 1911
-        }
-      ]
+      "railways": null
     },
     "Kuroki": {
       "lat": 51.87097424485682,
@@ -2094,10 +2098,10 @@
       "lat": 52.26363264797592,
       "lon": -105.52132776339508,
       "railway_arrives": 1905,
-      "first_railway": "Other",
+      "first_railway": "CNoR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "CNoR",
           "year": 1905
         }
       ]
@@ -2147,6 +2151,10 @@
         {
           "railway": "CPR",
           "year": 1907
+        },
+        {
+          "railway": "GTPR",
+          "year": 1908
         }
       ]
     },
@@ -2282,21 +2290,16 @@
       "lon": -103.43316130550558,
       "railway_arrives": 1907,
       "first_railway": "CPR",
-      "railways": [
-        {
-          "railway": "CPR",
-          "year": 1907
-        }
-      ]
+      "railways": null
     },
     "Stenen": {
       "lat": 51.89901463806738,
       "lon": -102.37657049183711,
       "railway_arrives": 1912,
-      "first_railway": "Other",
+      "first_railway": "CNoR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "CNoR",
           "year": 1912
         }
       ]
@@ -2385,24 +2388,14 @@
       "lon": -107.22819511986022,
       "railway_arrives": 1908,
       "first_railway": "CPR",
-      "railways": [
-        {
-          "railway": "CPR",
-          "year": 1908
-        }
-      ]
+      "railways": null
     },
     "Insinger": {
       "lat": 51.522886072685985,
       "lon": -103.07702078521412,
       "railway_arrives": 1902,
-      "first_railway": "Other",
-      "railways": [
-        {
-          "railway": "Other",
-          "year": 1902
-        }
-      ]
+      "first_railway": "M",
+      "railways": null
     },
     "Broderick": {
       "lat": 51.48750657570486,
@@ -2493,12 +2486,7 @@
       "lon": -102.8392308200939,
       "railway_arrives": 1906,
       "first_railway": "CPR",
-      "railways": [
-        {
-          "railway": "CPR",
-          "year": 1906
-        }
-      ]
+      "railways": null
     },
     "Elstow": {
       "lat": 51.98927728701831,
@@ -2758,10 +2746,10 @@
       "lat": 51.406846791827405,
       "lon": -104.73153503595924,
       "railway_arrives": 1908,
-      "first_railway": "Other",
+      "first_railway": "GTPR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "GTPR",
           "year": 1908
         }
       ]
@@ -2998,10 +2986,10 @@
       "lat": 49.58403921641947,
       "lon": -105.65135869231138,
       "railway_arrives": 1912,
-      "first_railway": "Other",
+      "first_railway": "CPR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "CPR",
           "year": 1912
         }
       ]
@@ -3200,12 +3188,7 @@
       "lon": -109.15079482980433,
       "railway_arrives": 1908,
       "first_railway": "GTPR",
-      "railways": [
-        {
-          "railway": "GTPR",
-          "year": 1908
-        }
-      ]
+      "railways": null
     },
     "Lafleche": {
       "lat": 49.70739681659814,
@@ -3252,6 +3235,10 @@
         {
           "railway": "CPR",
           "year": 1907
+        },
+        {
+          "railway": "GTPR",
+          "year": 1910
         }
       ]
     },
@@ -3284,12 +3271,7 @@
       "lon": -105.96496871970724,
       "railway_arrives": 1912,
       "first_railway": "CNoR",
-      "railways": [
-        {
-          "railway": "CNoR",
-          "year": 1912
-        }
-      ]
+      "railways": null
     },
     "Raymore": {
       "lat": 51.40922957527319,
@@ -3332,12 +3314,7 @@
       "lon": -105.7471813983044,
       "railway_arrives": 1908,
       "first_railway": "GTPR",
-      "railways": [
-        {
-          "railway": "GTPR",
-          "year": 1908
-        }
-      ]
+      "railways": null
     },
     "Quinton": {
       "lat": 51.38404332736191,
@@ -3464,12 +3441,7 @@
       "lon": -106.21257447001469,
       "railway_arrives": 1913,
       "first_railway": "CPR",
-      "railways": [
-        {
-          "railway": "CPR",
-          "year": 1913
-        }
-      ]
+      "railways": null
     },
     "Glidden": {
       "lat": 51.23782290310072,
@@ -3614,10 +3586,10 @@
       "lat": 51.695868125804,
       "lon": -103.71216660859946,
       "railway_arrives": 1909,
-      "first_railway": "Other",
+      "first_railway": "CNoR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "CNoR",
           "year": 1909
         }
       ]
@@ -3675,12 +3647,7 @@
       "lon": -102.75622237561667,
       "railway_arrives": 1911,
       "first_railway": "CNoR",
-      "railways": [
-        {
-          "railway": "CNoR",
-          "year": 1911
-        }
-      ]
+      "railways": null
     },
     "Brock": {
       "lat": 51.44205116603705,
@@ -3771,12 +3738,7 @@
       "lon": -104.46623871105008,
       "railway_arrives": 1910,
       "first_railway": "CPR",
-      "railways": [
-        {
-          "railway": "CPR",
-          "year": 1910
-        }
-      ]
+      "railways": null
     },
     "Neville": {
       "lat": 49.969100692384195,
@@ -3964,10 +3926,10 @@
       "lat": 51.381001455432745,
       "lon": -109.98903092041016,
       "railway_arrives": 1911,
-      "first_railway": "Other",
+      "first_railway": "CNoR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "CNoR",
           "year": 1911
         }
       ]
@@ -4132,10 +4094,10 @@
       "lat": 53.35697676185928,
       "lon": -106.60558928348487,
       "railway_arrives": 1910,
-      "first_railway": "Other",
+      "first_railway": "CNoR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "CNoR",
           "year": 1910
         }
       ]
@@ -4217,12 +4179,7 @@
       "lon": -107.24375347257966,
       "railway_arrives": 1911,
       "first_railway": "CNoR",
-      "railways": [
-        {
-          "railway": "CNoR",
-          "year": 1911
-        }
-      ]
+      "railways": null
     },
     "Ceylon": {
       "lat": 49.4595664430355,
@@ -4712,10 +4669,10 @@
       "lat": 52.18227256090778,
       "lon": -108.68108004107906,
       "railway_arrives": 1912,
-      "first_railway": "Other",
+      "first_railway": "CPR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "CPR",
           "year": 1912
         }
       ]
@@ -4823,21 +4780,16 @@
       "lon": -108.8238606434778,
       "railway_arrives": 1911,
       "first_railway": "CPR",
-      "railways": [
-        {
-          "railway": "CPR",
-          "year": 1911
-        }
-      ]
+      "railways": null
     },
     "Smiley": {
       "lat": 51.63140977833466,
       "lon": -109.470719612912,
       "railway_arrives": 1913,
-      "first_railway": "Other",
+      "first_railway": "GTPR",
       "railways": [
         {
-          "railway": "Other",
+          "railway": "GTPR",
           "year": 1913
         }
       ]
@@ -5004,8 +4956,8 @@
       {
         "to": "Rock Haven",
         "distance_km": 38.6,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -5057,8 +5009,8 @@
       {
         "to": "Birch Hills",
         "distance_km": 31.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1906,
         "all_shared_railways": null
       }
     ],
@@ -5238,15 +5190,15 @@
       {
         "to": "Fairlight",
         "distance_km": 29.4,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Maryfield",
         "distance_km": 35.5,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -5354,8 +5306,8 @@
       {
         "to": "Windthorst",
         "distance_km": 35.2,
-        "shared_railway": "CPR",
-        "connected_year": 1906,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -5581,43 +5533,43 @@
       {
         "to": "Oxbow",
         "distance_km": 9.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1892,
         "all_shared_railways": null
       },
       {
         "to": "Frobisher",
         "distance_km": 12.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1892,
         "all_shared_railways": null
       },
       {
         "to": "Glen Ewen",
         "distance_km": 20.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1892,
         "all_shared_railways": null
       },
       {
         "to": "Lampman",
         "distance_km": 36.1,
-        "shared_railway": "CNoR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Carnduff",
         "distance_km": 37.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1892,
         "all_shared_railways": null
       },
       {
         "to": "Manor",
         "distance_km": 39.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1900,
         "all_shared_railways": null
       }
     ],
@@ -5646,22 +5598,22 @@
       {
         "to": "Lumsden",
         "distance_km": 28.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1889,
         "all_shared_railways": null
       },
       {
         "to": "Craven",
         "distance_km": 32.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1889,
         "all_shared_railways": null
       },
       {
         "to": "Edenwold",
         "distance_km": 33.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -5732,8 +5684,8 @@
       {
         "to": "Briercrest",
         "distance_km": 32.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -5776,8 +5728,8 @@
       {
         "to": "Windthorst",
         "distance_km": 34.5,
-        "shared_railway": "CPR",
-        "connected_year": 1906,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -6003,8 +5955,8 @@
       {
         "to": "Wauchope",
         "distance_km": 30.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1901,
         "all_shared_railways": null
       },
       {
@@ -6068,8 +6020,8 @@
       {
         "to": "Regina",
         "distance_km": 32.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1889,
         "all_shared_railways": null
       },
       {
@@ -6119,15 +6071,15 @@
       {
         "to": "Vanscoy",
         "distance_km": 24.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
         "to": "Clavet",
         "distance_km": 24.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -6140,36 +6092,36 @@
       {
         "to": "Langham",
         "distance_km": 33.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
         "to": "Aberdeen",
         "distance_km": 35.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
         "to": "Bradwell",
         "distance_km": 35.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
         "to": "Dundurn",
         "distance_km": 36.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1890,
         "all_shared_railways": null
       },
       {
         "to": "Delisle",
         "distance_km": 38.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -6184,29 +6136,29 @@
       {
         "to": "Springside",
         "distance_km": 23.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1902,
         "all_shared_railways": null
       },
       {
         "to": "Saltcoats",
         "distance_km": 29.3,
-        "shared_railway": "Other",
-        "connected_year": 1889,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Theodore",
         "distance_km": 38.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1902,
         "all_shared_railways": null
       },
       {
         "to": "Melville",
         "distance_km": 39.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       }
     ],
@@ -6242,8 +6194,8 @@
       {
         "to": "Alameda",
         "distance_km": 37.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1892,
         "all_shared_railways": null
       }
     ],
@@ -6258,15 +6210,15 @@
       {
         "to": "Fairlight",
         "distance_km": 25.0,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Maryfield",
         "distance_km": 26.4,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -6511,8 +6463,8 @@
       {
         "to": "Fairlight",
         "distance_km": 25.3,
-        "shared_railway": "CPR",
-        "connected_year": 1906,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -6546,15 +6498,15 @@
       {
         "to": "Maryfield",
         "distance_km": 36.7,
-        "shared_railway": "CPR",
-        "connected_year": 1906,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Wauchope",
         "distance_km": 38.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1906,
         "all_shared_railways": null
       },
       {
@@ -6731,15 +6683,15 @@
       {
         "to": "Churchbridge",
         "distance_km": 14.3,
-        "shared_railway": "Other",
-        "connected_year": 1888,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Bredenbury",
         "distance_km": 26.0,
-        "shared_railway": "Other",
-        "connected_year": 1888,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -6787,8 +6739,8 @@
       {
         "to": "Saltcoats",
         "distance_km": 38.9,
-        "shared_railway": "Other",
-        "connected_year": 1889,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -6986,22 +6938,22 @@
       {
         "to": "Bredenbury",
         "distance_km": 11.6,
-        "shared_railway": "Other",
-        "connected_year": 1887,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Langenburg",
         "distance_km": 14.3,
-        "shared_railway": "Other",
-        "connected_year": 1888,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Saltcoats",
         "distance_km": 25.0,
-        "shared_railway": "Other",
-        "connected_year": 1889,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -7123,8 +7075,8 @@
       {
         "to": "Alameda",
         "distance_km": 20.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1892,
         "all_shared_railways": null
       },
       {
@@ -7146,15 +7098,15 @@
       {
         "to": "Churchbridge",
         "distance_km": 11.6,
-        "shared_railway": "Other",
-        "connected_year": 1887,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Saltcoats",
         "distance_km": 14.3,
-        "shared_railway": "Other",
-        "connected_year": 1889,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -7174,8 +7126,8 @@
       {
         "to": "Langenburg",
         "distance_km": 26.0,
-        "shared_railway": "Other",
-        "connected_year": 1888,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -7232,8 +7184,8 @@
       {
         "to": "Regina",
         "distance_km": 33.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -7486,8 +7438,8 @@
       {
         "to": "Regina",
         "distance_km": 28.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1889,
         "all_shared_railways": null
       },
       {
@@ -7530,8 +7482,8 @@
       {
         "to": "Alameda",
         "distance_km": 9.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1892,
         "all_shared_railways": null
       },
       {
@@ -7627,15 +7579,15 @@
       {
         "to": "Bredenbury",
         "distance_km": 14.3,
-        "shared_railway": "Other",
-        "connected_year": 1889,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Churchbridge",
         "distance_km": 25.0,
-        "shared_railway": "Other",
-        "connected_year": 1889,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -7648,8 +7600,8 @@
       {
         "to": "Yorkton",
         "distance_km": 29.3,
-        "shared_railway": "Other",
-        "connected_year": 1889,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -7669,8 +7621,8 @@
       {
         "to": "Langenburg",
         "distance_km": 38.9,
-        "shared_railway": "Other",
-        "connected_year": 1889,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -7771,8 +7723,8 @@
       {
         "to": "Yorkton",
         "distance_km": 38.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1902,
         "all_shared_railways": null
       }
     ],
@@ -7810,29 +7762,29 @@
       {
         "to": "Maryfield",
         "distance_km": 11.7,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Fleming",
         "distance_km": 25.0,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Wawota",
         "distance_km": 25.3,
-        "shared_railway": "CPR",
-        "connected_year": 1906,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Moosomin",
         "distance_km": 29.4,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -7845,8 +7797,8 @@
       {
         "to": "Antler",
         "distance_km": 37.9,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -7854,36 +7806,36 @@
       {
         "to": "Hanley",
         "distance_km": 20.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1890,
         "all_shared_railways": null
       },
       {
         "to": "Clavet",
         "distance_km": 22.7,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Bradwell",
         "distance_km": 24.6,
-        "shared_railway": "GTPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Allan",
         "distance_km": 32.4,
-        "shared_railway": "GTPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Saskatoon",
         "distance_km": 36.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1890,
         "all_shared_railways": null
       },
       {
@@ -7903,8 +7855,8 @@
       {
         "to": "Kenaston",
         "distance_km": 37.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1889,
         "all_shared_railways": null
       },
       {
@@ -7926,8 +7878,8 @@
       {
         "to": "Canwood",
         "distance_km": 21.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1910,
         "all_shared_railways": null
       },
       {
@@ -8087,22 +8039,22 @@
       {
         "to": "Colgate",
         "distance_km": 29.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
         "to": "Griffin",
         "distance_km": 30.2,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Goodwater",
         "distance_km": 31.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -8122,8 +8074,8 @@
       {
         "to": "Radville",
         "distance_km": 39.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       }
     ],
@@ -8152,8 +8104,8 @@
       {
         "to": "Prince Albert",
         "distance_km": 31.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1906,
         "all_shared_railways": null
       }
     ],
@@ -8198,8 +8150,8 @@
       {
         "to": "Forward",
         "distance_km": 28.6,
-        "shared_railway": "CPR",
-        "connected_year": 1910,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -8314,29 +8266,29 @@
       {
         "to": "Fairlight",
         "distance_km": 11.7,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Fleming",
         "distance_km": 26.4,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Antler",
         "distance_km": 30.3,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Moosomin",
         "distance_km": 35.5,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -8349,8 +8301,8 @@
       {
         "to": "Wawota",
         "distance_km": 36.7,
-        "shared_railway": "CPR",
-        "connected_year": 1906,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -8628,8 +8580,8 @@
       {
         "to": "Leslie",
         "distance_km": 13.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
@@ -8686,22 +8638,22 @@
       {
         "to": "Wauchope",
         "distance_km": 27.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1901,
         "all_shared_railways": null
       },
       {
         "to": "Maryfield",
         "distance_km": 30.3,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Fairlight",
         "distance_km": 37.9,
-        "shared_railway": "CPR",
-        "connected_year": 1905,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -8751,8 +8703,8 @@
       {
         "to": "Forward",
         "distance_km": 39.4,
-        "shared_railway": "CPR",
-        "connected_year": 1910,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -9069,8 +9021,8 @@
       {
         "to": "Wauchope",
         "distance_km": 17.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1901,
         "all_shared_railways": null
       },
       {
@@ -9090,8 +9042,8 @@
       {
         "to": "Alameda",
         "distance_km": 39.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1900,
         "all_shared_railways": null
       }
     ],
@@ -9127,8 +9079,8 @@
       {
         "to": "Griffin",
         "distance_km": 29.2,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -9232,8 +9184,8 @@
       {
         "to": "Alameda",
         "distance_km": 12.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1892,
         "all_shared_railways": null
       },
       {
@@ -9400,8 +9352,8 @@
       {
         "to": "Girvin",
         "distance_km": 14.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1890,
         "all_shared_railways": null
       },
       {
@@ -9523,8 +9475,8 @@
       {
         "to": "Dundurn",
         "distance_km": 20.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1890,
         "all_shared_railways": null
       },
       {
@@ -9641,8 +9593,8 @@
       {
         "to": "Girvin",
         "distance_km": 12.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1903,
         "all_shared_railways": null
       },
       {
@@ -9713,8 +9665,8 @@
       {
         "to": "Griffin",
         "distance_km": 33.5,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -9866,8 +9818,8 @@
       {
         "to": "Moosejaw",
         "distance_km": 32.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -9910,8 +9862,8 @@
       {
         "to": "Griffin",
         "distance_km": 21.6,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -9998,22 +9950,22 @@
       {
         "to": "Manor",
         "distance_km": 17.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1901,
         "all_shared_railways": null
       },
       {
         "to": "Antler",
         "distance_km": 27.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1901,
         "all_shared_railways": null
       },
       {
         "to": "Carlyle",
         "distance_km": 30.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1901,
         "all_shared_railways": null
       },
       {
@@ -10033,8 +9985,8 @@
       {
         "to": "Wawota",
         "distance_km": 38.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1906,
         "all_shared_railways": null
       }
     ],
@@ -10345,8 +10297,8 @@
       {
         "to": "Stenen",
         "distance_km": 30.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -10463,8 +10415,8 @@
       {
         "to": "Griffin",
         "distance_km": 24.0,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -10549,8 +10501,8 @@
       {
         "to": "Bruno",
         "distance_km": 37.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
@@ -10621,8 +10573,8 @@
       {
         "to": "Dundurn",
         "distance_km": 37.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1889,
         "all_shared_railways": null
       }
     ],
@@ -10978,8 +10930,8 @@
       {
         "to": "Griffin",
         "distance_km": 19.4,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -11074,8 +11026,8 @@
       {
         "to": "Yorkton",
         "distance_km": 23.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1902,
         "all_shared_railways": null
       },
       {
@@ -11416,8 +11368,8 @@
       {
         "to": "Young",
         "distance_km": 25.9,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -11437,8 +11389,8 @@
       {
         "to": "Dundurn",
         "distance_km": 32.4,
-        "shared_railway": "GTPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -11539,8 +11491,8 @@
       {
         "to": "Griffin",
         "distance_km": 22.0,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -11590,8 +11542,8 @@
       {
         "to": "Windthorst",
         "distance_km": 36.5,
-        "shared_railway": "CPR",
-        "connected_year": 1906,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -11627,8 +11579,8 @@
       {
         "to": "Dundurn",
         "distance_km": 22.7,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -11641,8 +11593,8 @@
       {
         "to": "Saskatoon",
         "distance_km": 24.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -11773,50 +11725,50 @@
       {
         "to": "Speers",
         "distance_km": 10.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
         "to": "Ruddell",
         "distance_km": 14.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
         "to": "Maymont",
         "distance_km": 14.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
         "to": "Denholm",
         "distance_km": 20.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
         "to": "Fielding",
         "distance_km": 22.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
         "to": "Hafford",
         "distance_km": 24.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
         "to": "Radisson",
         "distance_km": 32.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       }
     ],
@@ -11846,8 +11798,8 @@
       {
         "to": "Bruno",
         "distance_km": 27.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
@@ -12227,8 +12179,8 @@
       {
         "to": "Bruno",
         "distance_km": 39.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       }
     ],
@@ -12461,8 +12413,8 @@
       {
         "to": "Saskatoon",
         "distance_km": 38.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1908,
         "all_shared_railways": null
       }
     ],
@@ -12528,8 +12480,8 @@
       {
         "to": "Leslie",
         "distance_km": 29.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
@@ -12600,8 +12552,8 @@
       {
         "to": "Saskatoon",
         "distance_km": 33.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
@@ -12753,8 +12705,8 @@
       {
         "to": "Saskatoon",
         "distance_km": 35.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
@@ -12869,8 +12821,8 @@
       {
         "to": "Leslie",
         "distance_km": 28.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
@@ -12948,8 +12900,8 @@
       {
         "to": "Richard",
         "distance_km": 32.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
@@ -13080,15 +13032,15 @@
       {
         "to": "Davidson",
         "distance_km": 12.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1903,
         "all_shared_railways": null
       },
       {
         "to": "Craik",
         "distance_km": 14.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "QLSRSC",
+        "connected_year": 1890,
         "all_shared_railways": null
       },
       {
@@ -13117,22 +13069,22 @@
       {
         "to": "Kandahar",
         "distance_km": 12.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
         "to": "Elfros",
         "distance_km": 22.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
         "to": "Dafoe",
         "distance_km": 24.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
@@ -13145,8 +13097,8 @@
       {
         "to": "Leslie",
         "distance_km": 33.0,
-        "shared_railway": "Other",
-        "connected_year": 1909,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -13159,8 +13111,8 @@
       {
         "to": "Jansen",
         "distance_km": 36.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1909,
         "all_shared_railways": null
       }
     ],
@@ -13189,8 +13141,8 @@
       {
         "to": "Richard",
         "distance_km": 22.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
@@ -13296,8 +13248,8 @@
       {
         "to": "Yorkton",
         "distance_km": 39.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       }
     ],
@@ -13421,22 +13373,22 @@
       {
         "to": "Cut Knife",
         "distance_km": 12.3,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Adanac",
         "distance_km": 28.0,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Wilkie",
         "distance_km": 31.1,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -13470,8 +13422,8 @@
       {
         "to": "Battleford",
         "distance_km": 38.6,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -13516,8 +13468,8 @@
       {
         "to": "Richard",
         "distance_km": 10.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
@@ -13588,8 +13540,8 @@
       {
         "to": "Richard",
         "distance_km": 14.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
@@ -13647,8 +13599,8 @@
       {
         "to": "Nokomis",
         "distance_km": 23.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -13682,8 +13634,8 @@
       {
         "to": "Young",
         "distance_km": 35.3,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -13705,8 +13657,8 @@
       {
         "to": "Rock Haven",
         "distance_km": 12.3,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -13719,8 +13671,8 @@
       {
         "to": "Adanac",
         "distance_km": 32.7,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -13883,15 +13835,15 @@
       {
         "to": "Humboldt",
         "distance_km": 27.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
         "to": "Howell",
         "distance_km": 28.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
@@ -13911,22 +13863,22 @@
       {
         "to": "Muenster",
         "distance_km": 37.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
         "to": "Lake Lenore",
         "distance_km": 39.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1921,
         "all_shared_railways": null
       },
       {
         "to": "Vonda",
         "distance_km": 39.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
@@ -14057,8 +14009,8 @@
       {
         "to": "Young",
         "distance_km": 21.5,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -14106,8 +14058,8 @@
       {
         "to": "Nokomis",
         "distance_km": 36.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -14136,15 +14088,15 @@
       {
         "to": "Semans",
         "distance_km": 22.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
         "to": "Venn",
         "distance_km": 23.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -14171,8 +14123,8 @@
       {
         "to": "Raymore",
         "distance_km": 35.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -14185,8 +14137,8 @@
       {
         "to": "Watrous",
         "distance_km": 36.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -14250,8 +14202,8 @@
       {
         "to": "Conquest",
         "distance_km": 32.8,
-        "shared_railway": "CNoR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -14343,8 +14295,8 @@
       {
         "to": "Conquest",
         "distance_km": 36.1,
-        "shared_railway": "CNoR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -14431,8 +14383,8 @@
       {
         "to": "Richard",
         "distance_km": 14.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
@@ -14538,8 +14490,8 @@
       {
         "to": "Stenen",
         "distance_km": 34.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -14727,8 +14679,8 @@
       {
         "to": "Bruno",
         "distance_km": 39.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1921,
         "all_shared_railways": null
       }
     ],
@@ -14757,8 +14709,8 @@
       {
         "to": "Bruno",
         "distance_km": 28.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1905,
         "all_shared_railways": null
       },
       {
@@ -14880,36 +14832,36 @@
       {
         "to": "Creelman",
         "distance_km": 19.4,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Halbrite",
         "distance_km": 21.6,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Heward",
         "distance_km": 22.0,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Fillmore",
         "distance_km": 24.0,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Stoughton",
         "distance_km": 29.2,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -14922,15 +14874,15 @@
       {
         "to": "Weyburn",
         "distance_km": 30.2,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Osage",
         "distance_km": 33.5,
-        "shared_railway": "CPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -14945,36 +14897,36 @@
       {
         "to": "Hyas",
         "distance_km": 8.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
         "to": "Sturgis",
         "distance_km": 12.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
         "to": "Norquay",
         "distance_km": 19.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
         "to": "Preeceville",
         "distance_km": 20.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
         "to": "Canora",
         "distance_km": 30.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -14987,8 +14939,8 @@
       {
         "to": "Buchanan",
         "distance_km": 34.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       }
     ],
@@ -15024,8 +14976,8 @@
       {
         "to": "Dundurn",
         "distance_km": 24.6,
-        "shared_railway": "GTPR",
-        "connected_year": 1907,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -15045,8 +14997,8 @@
       {
         "to": "Saskatoon",
         "distance_km": 35.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -15066,8 +15018,8 @@
       {
         "to": "Young",
         "distance_km": 38.8,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -15217,8 +15169,8 @@
       {
         "to": "Conquest",
         "distance_km": 33.9,
-        "shared_railway": "CNoR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -15261,8 +15213,8 @@
       {
         "to": "Richard",
         "distance_km": 20.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
@@ -15319,8 +15271,8 @@
       {
         "to": "Richard",
         "distance_km": 24.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
@@ -15457,8 +15409,8 @@
       {
         "to": "Perdue",
         "distance_km": 23.2,
-        "shared_railway": "CPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -16056,22 +16008,22 @@
       {
         "to": "Grenfell",
         "distance_km": 34.5,
-        "shared_railway": "CPR",
-        "connected_year": 1906,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Broadview",
         "distance_km": 35.2,
-        "shared_railway": "CPR",
-        "connected_year": 1906,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Kennedy",
         "distance_km": 36.5,
-        "shared_railway": "CPR",
-        "connected_year": 1906,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -16303,8 +16255,8 @@
       {
         "to": "Biggar",
         "distance_km": 35.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1910,
         "all_shared_railways": null
       }
     ],
@@ -16333,8 +16285,8 @@
       {
         "to": "Leipzig",
         "distance_km": 25.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -16354,8 +16306,8 @@
       {
         "to": "Rock Haven",
         "distance_km": 31.1,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -16645,8 +16597,8 @@
       {
         "to": "Dodsland",
         "distance_km": 12.5,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -16831,8 +16783,8 @@
       {
         "to": "Conquest",
         "distance_km": 33.3,
-        "shared_railway": "CNoR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -17078,8 +17030,8 @@
       {
         "to": "Stenen",
         "distance_km": 19.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -17150,8 +17102,8 @@
       {
         "to": "Conquest",
         "distance_km": 25.7,
-        "shared_railway": "CNoR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -17310,8 +17262,8 @@
       {
         "to": "Raymore",
         "distance_km": 14.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -17324,15 +17276,15 @@
       {
         "to": "Nokomis",
         "distance_km": 22.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
         "to": "Quinton",
         "distance_km": 22.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -17368,8 +17320,8 @@
       {
         "to": "Asquith",
         "distance_km": 23.2,
-        "shared_railway": "CPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -17447,8 +17399,8 @@
       {
         "to": "Unity",
         "distance_km": 23.2,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -17809,8 +17761,8 @@
       {
         "to": "Biggar",
         "distance_km": 38.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1910,
         "all_shared_railways": null
       },
       {
@@ -18243,8 +18195,8 @@
       {
         "to": "Wynyard",
         "distance_km": 36.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
@@ -18426,8 +18378,8 @@
       {
         "to": "Mazenod",
         "distance_km": 23.4,
-        "shared_railway": "CPR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -18484,43 +18436,43 @@
       {
         "to": "Verwood",
         "distance_km": 8.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
         "to": "Assiniboia",
         "distance_km": 24.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
         "to": "Viceroy",
         "distance_km": 25.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
         "to": "Horizon",
         "distance_km": 32.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
         "to": "Congress",
         "distance_km": 32.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1917,
         "all_shared_railways": null
       },
       {
         "to": "Vantage",
         "distance_km": 39.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1914,
         "all_shared_railways": null
       },
       {
@@ -18665,8 +18617,8 @@
       {
         "to": "Dodsland",
         "distance_km": 1.8,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -18772,8 +18724,8 @@
       {
         "to": "Mazenod",
         "distance_km": 29.3,
-        "shared_railway": "CPR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -19041,8 +18993,8 @@
       {
         "to": "Stenen",
         "distance_km": 12.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -19248,15 +19200,15 @@
       {
         "to": "Rock Haven",
         "distance_km": 28.0,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Cut Knife",
         "distance_km": 32.7,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -19269,8 +19221,8 @@
       {
         "to": "Leipzig",
         "distance_km": 39.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       }
     ],
@@ -19336,8 +19288,8 @@
       {
         "to": "Scott",
         "distance_km": 23.2,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -19415,8 +19367,8 @@
       {
         "to": "Mazenod",
         "distance_km": 31.2,
-        "shared_railway": "CPR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -19445,8 +19397,8 @@
       {
         "to": "Wynyard",
         "distance_km": 22.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -19547,15 +19499,15 @@
       {
         "to": "Springwater",
         "distance_km": 28.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
         "to": "Leney",
         "distance_km": 29.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1910,
         "all_shared_railways": null
       },
       {
@@ -19568,15 +19520,15 @@
       {
         "to": "Landis",
         "distance_km": 35.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1910,
         "all_shared_railways": null
       },
       {
         "to": "Kinley",
         "distance_km": 38.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1910,
         "all_shared_railways": null
       }
     ],
@@ -19700,8 +19652,8 @@
       {
         "to": "Ardill",
         "distance_km": 8.5,
-        "shared_railway": "CNoR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -19721,15 +19673,15 @@
       {
         "to": "Ettington",
         "distance_km": 12.1,
-        "shared_railway": "CNoR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Mitchellton",
         "distance_km": 18.4,
-        "shared_railway": "CNoR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -19749,8 +19701,8 @@
       {
         "to": "Palmer",
         "distance_km": 29.5,
-        "shared_railway": "CNoR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -19779,8 +19731,8 @@
       {
         "to": "Semans",
         "distance_km": 14.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -19807,8 +19759,8 @@
       {
         "to": "Nokomis",
         "distance_km": 35.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -19925,8 +19877,8 @@
       {
         "to": "Zelma",
         "distance_km": 14.1,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -19939,8 +19891,8 @@
       {
         "to": "Watrous",
         "distance_km": 21.5,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -19953,8 +19905,8 @@
       {
         "to": "Allan",
         "distance_km": 25.9,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -19967,22 +19919,22 @@
       {
         "to": "Venn",
         "distance_km": 35.3,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Meacham",
         "distance_km": 38.0,
-        "shared_railway": "GTPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Bradwell",
         "distance_km": 38.8,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -20004,8 +19956,8 @@
       {
         "to": "Semans",
         "distance_km": 22.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -20464,8 +20416,8 @@
       {
         "to": "Weyburn",
         "distance_km": 39.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -20494,8 +20446,8 @@
       {
         "to": "Forward",
         "distance_km": 14.1,
-        "shared_railway": "CPR",
-        "connected_year": 1910,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -20603,15 +20555,15 @@
       {
         "to": "Dodsland",
         "distance_km": 21.6,
-        "shared_railway": "CPR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Leipzig",
         "distance_km": 26.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -20668,15 +20620,15 @@
       {
         "to": "Vantage",
         "distance_km": 13.3,
-        "shared_railway": "CPR",
-        "connected_year": 1914,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Congress",
         "distance_km": 18.2,
-        "shared_railway": "CPR",
-        "connected_year": 1917,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -20689,8 +20641,8 @@
       {
         "to": "Limerick",
         "distance_km": 23.4,
-        "shared_railway": "CPR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -20710,22 +20662,22 @@
       {
         "to": "Expanse",
         "distance_km": 29.3,
-        "shared_railway": "CPR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Assiniboia",
         "distance_km": 30.4,
-        "shared_railway": "CPR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Lafleche",
         "distance_km": 31.2,
-        "shared_railway": "CPR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -20833,8 +20785,8 @@
       {
         "to": "Conquest",
         "distance_km": 36.1,
-        "shared_railway": "CNoR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -21052,8 +21004,8 @@
       {
         "to": "Biggar",
         "distance_km": 29.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1910,
         "all_shared_railways": null
       },
       {
@@ -21140,8 +21092,8 @@
       {
         "to": "Young",
         "distance_km": 14.1,
-        "shared_railway": "GTPR",
-        "connected_year": 1908,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -21286,8 +21238,8 @@
       {
         "to": "Saskatoon",
         "distance_km": 24.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
@@ -21351,29 +21303,29 @@
       {
         "to": "Foam Lake",
         "distance_km": 13.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
         "to": "Wadena",
         "distance_km": 28.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
         "to": "Margo",
         "distance_km": 29.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
         "to": "Wynyard",
         "distance_km": 33.0,
-        "shared_railway": "Other",
-        "connected_year": 1909,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -21409,8 +21361,8 @@
       {
         "to": "Forward",
         "distance_km": 20.0,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -21597,8 +21549,8 @@
       {
         "to": "Forward",
         "distance_km": 33.1,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -21662,8 +21614,8 @@
       {
         "to": "Alameda",
         "distance_km": 36.1,
-        "shared_railway": "CNoR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -21866,8 +21818,8 @@
       {
         "to": "Dodsland",
         "distance_km": 25.3,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -22063,22 +22015,22 @@
       {
         "to": "Khedive",
         "distance_km": 4.5,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Pangman",
         "distance_km": 14.1,
-        "shared_railway": "CPR",
-        "connected_year": 1910,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Amulet",
         "distance_km": 20.0,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -22098,22 +22050,22 @@
       {
         "to": "Yellow Grass",
         "distance_km": 28.6,
-        "shared_railway": "CPR",
-        "connected_year": 1910,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Ogema",
         "distance_km": 33.1,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Milestone",
         "distance_km": 39.4,
-        "shared_railway": "CPR",
-        "connected_year": 1910,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -22165,8 +22117,8 @@
       {
         "to": "Forward",
         "distance_km": 4.5,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -22230,8 +22182,8 @@
       {
         "to": "Mossbank",
         "distance_km": 18.4,
-        "shared_railway": "CNoR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -22330,8 +22282,8 @@
       {
         "to": "Mossbank",
         "distance_km": 29.5,
-        "shared_railway": "CNoR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -22412,8 +22364,8 @@
       {
         "to": "Weyburn",
         "distance_km": 29.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -22442,8 +22394,8 @@
       {
         "to": "Wynyard",
         "distance_km": 12.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
@@ -22767,15 +22719,15 @@
       {
         "to": "Marengo",
         "distance_km": 18.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
         "to": "Flaxcombe",
         "distance_km": 28.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -23020,8 +22972,8 @@
       {
         "to": "Dodsland",
         "distance_km": 37.2,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -23294,8 +23246,8 @@
       {
         "to": "Alsask",
         "distance_km": 28.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -23345,8 +23297,8 @@
       {
         "to": "Dodsland",
         "distance_km": 24.5,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -23542,8 +23494,8 @@
       {
         "to": "Biggar",
         "distance_km": 28.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -23593,22 +23545,22 @@
       {
         "to": "Shellbrook",
         "distance_km": 21.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1910,
         "all_shared_railways": null
       },
       {
         "to": "Parkside",
         "distance_km": 21.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
         "to": "Leask",
         "distance_km": 38.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       }
     ],
@@ -23857,8 +23809,8 @@
       {
         "to": "Alsask",
         "distance_km": 18.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -23915,15 +23867,15 @@
       {
         "to": "Macrorie",
         "distance_km": 24.6,
-        "shared_railway": "CNoR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Dinsmore",
         "distance_km": 25.7,
-        "shared_railway": "CNoR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -23936,43 +23888,43 @@
       {
         "to": "Harris",
         "distance_km": 32.8,
-        "shared_railway": "CNoR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Sovereign",
         "distance_km": 33.3,
-        "shared_railway": "CNoR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Tessier",
         "distance_km": 33.9,
-        "shared_railway": "CNoR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Zealandia",
         "distance_km": 36.1,
-        "shared_railway": "CNoR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Laura",
         "distance_km": 36.1,
-        "shared_railway": "CNoR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Wiseton",
         "distance_km": 37.3,
-        "shared_railway": "CNoR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -24066,8 +24018,8 @@
       {
         "to": "Weyburn",
         "distance_km": 31.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -24147,8 +24099,8 @@
       {
         "to": "Canwood",
         "distance_km": 21.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       },
       {
@@ -24177,8 +24129,8 @@
       {
         "to": "Mossbank",
         "distance_km": 12.1,
-        "shared_railway": "CNoR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -24263,8 +24215,8 @@
       {
         "to": "Wynyard",
         "distance_km": 24.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1909,
         "all_shared_railways": null
       },
       {
@@ -24353,8 +24305,8 @@
       {
         "to": "Stenen",
         "distance_km": 20.8,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -24594,8 +24546,8 @@
       {
         "to": "Stenen",
         "distance_km": 8.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -24715,8 +24667,8 @@
       {
         "to": "Young",
         "distance_km": 38.0,
-        "shared_railway": "GTPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -24745,8 +24697,8 @@
       {
         "to": "Readlyn",
         "distance_km": 24.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -24766,8 +24718,8 @@
       {
         "to": "Mazenod",
         "distance_km": 30.4,
-        "shared_railway": "CPR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -24831,8 +24783,8 @@
       {
         "to": "Readlyn",
         "distance_km": 32.1,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -24875,8 +24827,8 @@
       {
         "to": "Smiley",
         "distance_km": 35.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1913,
         "all_shared_railways": null
       }
     ],
@@ -24993,8 +24945,8 @@
       {
         "to": "Canwood",
         "distance_km": 38.0,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CNoR",
+        "connected_year": 1911,
         "all_shared_railways": null
       }
     ],
@@ -25067,8 +25019,8 @@
       {
         "to": "Readlyn",
         "distance_km": 25.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -25111,8 +25063,8 @@
       {
         "to": "Conquest",
         "distance_km": 24.6,
-        "shared_railway": "CNoR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -25625,8 +25577,8 @@
       {
         "to": "Leipzig",
         "distance_km": 13.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -25667,8 +25619,8 @@
       {
         "to": "Dodsland",
         "distance_km": 30.4,
-        "shared_railway": "CPR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -25704,8 +25656,8 @@
       {
         "to": "Readlyn",
         "distance_km": 8.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -25873,8 +25825,8 @@
       {
         "to": "Handel",
         "distance_km": 13.2,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -25894,15 +25846,15 @@
       {
         "to": "Wilkie",
         "distance_km": 25.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
         "to": "Kelfield",
         "distance_km": 26.4,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       },
       {
@@ -25915,8 +25867,8 @@
       {
         "to": "Adanac",
         "distance_km": 39.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1912,
         "all_shared_railways": null
       }
     ],
@@ -25980,8 +25932,8 @@
       {
         "to": "Conquest",
         "distance_km": 37.3,
-        "shared_railway": "CNoR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -26262,43 +26214,43 @@
       {
         "to": "Druid",
         "distance_km": 1.8,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Plenty",
         "distance_km": 12.5,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Kelfield",
         "distance_km": 21.6,
-        "shared_railway": "CPR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Stranraer",
         "distance_km": 24.5,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Kerrobert",
         "distance_km": 25.3,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
         "to": "Handel",
         "distance_km": 30.4,
-        "shared_railway": "CPR",
-        "connected_year": 1912,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -26318,8 +26270,8 @@
       {
         "to": "Herschel",
         "distance_km": 37.2,
-        "shared_railway": "CPR",
-        "connected_year": 1911,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       }
     ],
@@ -26355,8 +26307,8 @@
       {
         "to": "Loverna",
         "distance_km": 35.9,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "GTPR",
+        "connected_year": 1913,
         "all_shared_railways": null
       },
       {
@@ -26431,8 +26383,8 @@
       {
         "to": "Mazenod",
         "distance_km": 13.3,
-        "shared_railway": "CPR",
-        "connected_year": 1914,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -26487,8 +26439,8 @@
       {
         "to": "Readlyn",
         "distance_km": 39.6,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1914,
         "all_shared_railways": null
       }
     ],
@@ -26503,8 +26455,8 @@
       {
         "to": "Mossbank",
         "distance_km": 8.5,
-        "shared_railway": "CNoR",
-        "connected_year": 1913,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -26582,8 +26534,8 @@
       {
         "to": "Mazenod",
         "distance_km": 18.2,
-        "shared_railway": "CPR",
-        "connected_year": 1917,
+        "shared_railway": null,
+        "connected_year": null,
         "all_shared_railways": null
       },
       {
@@ -26631,8 +26583,8 @@
       {
         "to": "Readlyn",
         "distance_km": 32.7,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1917,
         "all_shared_railways": null
       },
       {
