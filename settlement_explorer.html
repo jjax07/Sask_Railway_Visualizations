@@ -425,19 +425,34 @@
             Object.entries(data.settlements).forEach(([name, settlement]) => {
                 const isMultiRailway = hasMultipleRailways(name);
 
+                // Add outer ring first for multi-railway settlements (so it's behind)
+                if (isMultiRailway) {
+                    const ring = L.circleMarker([settlement.lat, settlement.lon], {
+                        radius: 8,
+                        fillColor: 'transparent',
+                        color: '#ffaa00',
+                        weight: 2,
+                        opacity: 0.9,
+                        fillOpacity: 0
+                    }).addTo(map);
+                    // Store ring reference for later cleanup if needed
+                    ring.isBackgroundRing = true;
+                }
+
                 const marker = L.circleMarker([settlement.lat, settlement.lon], {
                     radius: isMultiRailway ? 5 : 3,
-                    fillColor: isMultiRailway ? '#664400' : '#444',
-                    color: isMultiRailway ? '#ffaa00' : '#666',
+                    fillColor: isMultiRailway ? '#995500' : '#444',
+                    color: isMultiRailway ? '#ffcc00' : '#666',
                     weight: isMultiRailway ? 2 : 1,
-                    opacity: 0.7,
-                    fillOpacity: 0.6
+                    opacity: isMultiRailway ? 1 : 0.7,
+                    fillOpacity: isMultiRailway ? 0.9 : 0.6
                 }).addTo(map);
 
                 const railwayInfo = settlement.railways
                     ? settlement.railways.map(r => `${r.railway} (${r.year})`).join(', ')
                     : 'No railway data';
-                marker.bindPopup(`<b>${name}</b><br>${railwayInfo}<br><em>Click to explore</em>`);
+                const junctionLabel = isMultiRailway ? '<b style="color:#ffaa00;">★ Railway Junction</b><br>' : '';
+                marker.bindPopup(`<b>${name}</b><br>${junctionLabel}${railwayInfo}<br><em>Click to explore</em>`);
                 marker.on('click', () => {
                     selectSettlement(name);
                 });
