@@ -41,12 +41,26 @@ Select any of the 429 Saskatchewan settlements to discover which neighbours were
   - **Yellow**: Newly connected this year
   - **Gray**: Within 40km but no shared railway yet
   - **Dark gray dots**: All other settlements
+  - **Orange ring**: Multi-railway junction (served by 2+ railways)
 
 **Connection Logic:**
 Two settlements are "connected" when:
 1. Both are within 40 km of each other
 2. Both share the same railway line
 3. Both have received that railway by the selected year
+
+**Multi-Railway Junctions:**
+Eight major settlements were served by multiple railway companies, indicated by orange rings:
+| Settlement | Railways |
+|------------|----------|
+| Saskatoon | QLSRSC (1890), CNoR (1905), GTPR (1908) |
+| Regina | CPR (1882), QLSRSC (1889), CNoR (1906), GTPR (1911) |
+| Moose Jaw | CPR (1882), CNoR (1908), GTPR (1912) |
+| Prince Albert | QLSRSC (1890), CNoR (1906) |
+| Yorkton | Other (1889), CPR (1890), GTPR (1908) |
+| Weyburn | CPR (1893), CNoR (1910) |
+| Nokomis | CPR (1907), GTPR (1908) |
+| Biggar | CPR (1907), GTPR (1910) |
 
 ### 3. Railway Network Timeline
 
@@ -81,7 +95,8 @@ Sask_Railway_Visualizations/
 │   ├── one_hour_corridor.json     # Saskatoon-specific corridor data
 │   └── railway_timeline.json      # Settlements by railway with years
 ├── scripts/
-│   └── generate_connections.py    # Script to generate connection data
+│   ├── generate_connections.py    # Script to generate connection data
+│   └── update_multi_railways.py   # Cross-reference multi-railway data
 └── README.md
 ```
 
@@ -142,11 +157,28 @@ python3 scripts/generate_connections.py
 **Output:**
 - `data/settlement_connections.json` - Combined connection data
 
+### update_multi_railways.py
+
+Cross-references railway data from the UrbanSaskHist spreadsheet with `railway_timeline.json` to identify settlements served by multiple railways.
+
+**Usage:**
+```bash
+python3 scripts/update_multi_railways.py
+```
+
+**Input files:**
+- `../KnowledgeGraph/UrbanSaskHist_Update_Jan_2026.xlsx` - Spreadsheet with Railway_lines column
+- `data/railway_timeline.json` - Existing railway timeline data
+
+**Output:**
+- Updates `data/railway_timeline.json` with multi-railway entries
+
 **Statistics (current data):**
 - Total settlements: 429
 - Connection pairs within 40km: 1,494
-- Railway-connected pairs: 850
+- Railway-connected pairs: 857
 - Settlements with nearby connections: 391
+- Settlements with multiple railways: 8
 
 ## Methodology
 
@@ -196,6 +228,7 @@ open http://localhost:8080
 ## Data Sources
 
 - **UrbanSaskHist - Final.xlsx**: Master settlement data with railway arrival dates
+- **UrbanSaskHist_Update_Jan_2026.xlsx**: Updated spreadsheet with Railway_lines column for multi-railway data
 - **settlement_coordinates.csv**: Geographic coordinates from 1921 census boundaries
 - **one_hour_railway_connections_complete.csv**: Pre-calculated settlement pairs within 40km
 - **CPR_map_1941_with_original_names.pdf**: CPR system map showing absorbed railways
