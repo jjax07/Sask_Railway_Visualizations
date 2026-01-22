@@ -42,6 +42,7 @@ RAILWAY_ALIASES = {
 KNOWN_RAILWAY_YEARS = {
     # Saskatoon - major junction
     ('Saskatoon', 'QLSRSC'): 1890,
+    ('Saskatoon', 'CPR'): 1896,
     ('Saskatoon', 'CNoR'): 1905,
     ('Saskatoon', 'GTPR'): 1908,
 

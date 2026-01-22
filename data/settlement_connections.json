@@ -299,6 +299,10 @@
           "year": 1890
         },
         {
+          "railway": "CPR",
+          "year": 1896
+        },
+        {
           "railway": "CNoR",
           "year": 1905
         },
@@ -6057,15 +6061,15 @@
       {
         "to": "Sutherland",
         "distance_km": 4.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {
         "to": "Warman",
         "distance_km": 21.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1902,
         "all_shared_railways": null
       },
       {
@@ -13770,8 +13774,8 @@
       {
         "to": "Saskatoon",
         "distance_km": 21.5,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1902,
         "all_shared_railways": null
       },
       {
@@ -18299,8 +18303,8 @@
       {
         "to": "Saskatoon",
         "distance_km": 4.3,
-        "shared_railway": null,
-        "connected_year": null,
+        "shared_railway": "CPR",
+        "connected_year": 1908,
         "all_shared_railways": null
       },
       {

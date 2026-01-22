@@ -41,7 +41,7 @@ Select any of the 429 Saskatchewan settlements to discover which neighbours were
   - **Yellow**: Newly connected this year
   - **Gray**: Within 40km but no shared railway yet
   - **Dark gray dots**: All other settlements
-  - **Orange ring**: Multi-railway junction (served by 2+ railways)
+  - **Orange diamond**: Multi-railway junction (served by 2+ railways)
 
 **Connection Logic:**
 Two settlements are "connected" when:
@@ -50,10 +50,10 @@ Two settlements are "connected" when:
 3. Both have received that railway by the selected year
 
 **Multi-Railway Junctions:**
-Eight major settlements were served by multiple railway companies, indicated by orange rings:
+Eight major settlements were served by multiple railway companies, indicated by orange diamond markers:
 | Settlement | Railways |
 |------------|----------|
-| Saskatoon | QLSRSC (1890), CNoR (1905), GTPR (1908) |
+| Saskatoon | QLSRSC (1890), CPR (1896), CNoR (1905), GTPR (1908) |
 | Regina | CPR (1882), QLSRSC (1889), CNoR (1906), GTPR (1911) |
 | Moose Jaw | CPR (1882), CNoR (1908), GTPR (1912) |
 | Prince Albert | QLSRSC (1890), CNoR (1906) |
@@ -96,7 +96,11 @@ Sask_Railway_Visualizations/
 │   └── railway_timeline.json      # Settlements by railway with years
 ├── scripts/
 │   ├── generate_connections.py    # Script to generate connection data
-│   └── update_multi_railways.py   # Cross-reference multi-railway data
+│   ├── update_multi_railways.py   # Cross-reference multi-railway data
+│   └── create_data_issues_doc.py  # Generate Word doc for data consultation
+├── Historical_Railway_Data_By_Settlement.xlsx  # GIS comparison data
+├── Saskatchewan_Railway_Data_Issues.docx       # Data issues for consultation
+├── KNOWN_ISSUES.md            # Outstanding issues and testing checklist
 └── README.md
 ```
 
@@ -228,7 +232,9 @@ open http://localhost:8080
 ## Data Sources
 
 - **UrbanSaskHist - Final.xlsx**: Master settlement data with railway arrival dates
-- **UrbanSaskHist_Update_Jan_2026.xlsx**: Updated spreadsheet with Railway_lines column for multi-railway data
+- **UrbanSaskHist_Update_Jan_2026.xlsx**: Updated spreadsheet with Railway_lines column for multi-railway data (cleaned January 2026)
+- **Historical GIS Railway Data (doi-10.5683-sp2-uccfvq)**: Canadian Historical GIS Partnership railway network data, used to cross-reference and correct arrival dates
+- **Historical_Railway_Data_By_Settlement.xlsx**: Comparison spreadsheet showing GIS vs. original data with discrepancies
 - **settlement_coordinates.csv**: Geographic coordinates from 1921 census boundaries
 - **one_hour_railway_connections_complete.csv**: Pre-calculated settlement pairs within 40km
 - **CPR_map_1941_with_original_names.pdf**: CPR system map showing absorbed railways
@@ -258,3 +264,4 @@ This project is for academic research purposes.
 ---
 
 *Created January 2026*
+*Last updated: January 22, 2026*

@@ -340,7 +340,7 @@
                     <span>Other Settlements</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #664400; border: 2px solid #ffaa00;"></div>
+                    <div style="width:12px; height:12px; background:#ffaa00; transform:rotate(45deg); border:2px solid #fff; margin-right:10px;"></div>
                     <span>Multi-Railway Junction</span>
                 </div>
                 <div class="legend-item">
@@ -362,7 +362,6 @@
         let map = null;
         let allMarkers = {};          // All settlement markers
         let nearbyMarkers = {};       // Markers within 40km of selected
-        let multiRailwayRings = {};   // Rings for multi-railway settlements
         let connectionLines = [];     // Lines between connected settlements
         let selectedMarker = null;
         let radiusCircle = null;
@@ -424,34 +423,33 @@
         function addAllSettlementMarkers() {
             Object.entries(data.settlements).forEach(([name, settlement]) => {
                 const isMultiRailway = hasMultipleRailways(name);
+                let marker;
 
-                // Add outer ring first for multi-railway settlements (so it's behind)
                 if (isMultiRailway) {
-                    const ring = L.circleMarker([settlement.lat, settlement.lon], {
-                        radius: 8,
-                        fillColor: 'transparent',
-                        color: '#ffaa00',
-                        weight: 2,
-                        opacity: 0.9,
-                        fillOpacity: 0
+                    // Diamond shape for multi-railway junctions
+                    const diamondIcon = L.divIcon({
+                        className: 'multi-railway-marker',
+                        html: '<div style="width:12px; height:12px; background:#ffaa00; transform:rotate(45deg); border:2px solid #fff;"></div>',
+                        iconSize: [12, 12],
+                        iconAnchor: [6, 6]
+                    });
+                    marker = L.marker([settlement.lat, settlement.lon], {icon: diamondIcon}).addTo(map);
+                } else {
+                    // Circle for regular settlements
+                    marker = L.circleMarker([settlement.lat, settlement.lon], {
+                        radius: 3,
+                        fillColor: '#444',
+                        color: '#666',
+                        weight: 1,
+                        opacity: 0.7,
+                        fillOpacity: 0.6
                     }).addTo(map);
-                    // Store ring reference for later cleanup if needed
-                    ring.isBackgroundRing = true;
                 }
-
-                const marker = L.circleMarker([settlement.lat, settlement.lon], {
-                    radius: isMultiRailway ? 5 : 3,
-                    fillColor: isMultiRailway ? '#995500' : '#444',
-                    color: isMultiRailway ? '#ffcc00' : '#666',
-                    weight: isMultiRailway ? 2 : 1,
-                    opacity: isMultiRailway ? 1 : 0.7,
-                    fillOpacity: isMultiRailway ? 0.9 : 0.6
-                }).addTo(map);
 
                 const railwayInfo = settlement.railways
                     ? settlement.railways.map(r => `${r.railway} (${r.year})`).join(', ')
                     : 'No railway data';
-                const junctionLabel = isMultiRailway ? '<b style="color:#ffaa00;">★ Railway Junction</b><br>' : '';
+                const junctionLabel = isMultiRailway ? '<b style="color:#ffaa00;">◆ Railway Junction</b><br>' : '';
                 marker.bindPopup(`<b>${name}</b><br>${junctionLabel}${railwayInfo}<br><em>Click to explore</em>`);
                 marker.on('click', () => {
                     selectSettlement(name);
@@ -529,21 +527,33 @@
             if (selectedMarker) map.removeLayer(selectedMarker);
             if (radiusCircle) map.removeLayer(radiusCircle);
 
-            // Reset all markers to default style
+            // Reset all markers to default style and visibility
             Object.entries(allMarkers).forEach(([n, marker]) => {
-                marker.setStyle({
-                    radius: 3,
-                    fillColor: '#444',
-                    color: '#666',
-                    weight: 1,
-                    opacity: 0.6,
-                    fillOpacity: 0.6
-                });
+                const isMultiRailway = hasMultipleRailways(n);
+                if (isMultiRailway) {
+                    // divIcon markers - use setOpacity
+                    marker.setOpacity(1);
+                } else {
+                    // circleMarkers - use setStyle
+                    marker.setStyle({
+                        radius: 3,
+                        fillColor: '#444',
+                        color: '#666',
+                        weight: 1,
+                        opacity: 0.7,
+                        fillOpacity: 0.6
+                    });
+                }
             });
 
             // Hide the selected settlement's background marker
             if (allMarkers[name]) {
-                allMarkers[name].setStyle({ opacity: 0, fillOpacity: 0 });
+                const isMultiRailway = hasMultipleRailways(name);
+                if (isMultiRailway) {
+                    allMarkers[name].setOpacity(0);
+                } else {
+                    allMarkers[name].setStyle({ opacity: 0, fillOpacity: 0 });
+                }
             }
 
             // Center map on selected settlement
@@ -560,6 +570,11 @@
             selectedMarker = L.marker([settlement.lat, settlement.lon], {icon: selectedIcon})
                 .addTo(map)
                 .bindPopup(`<b>${name}</b><br>First railway: ${settlement.railway_arrives || 'None'} (${settlement.first_railway || 'N/A'})`);
+
+            // Make selected marker clickable to re-select/re-center
+            selectedMarker.on('click', () => {
+                selectSettlement(name);
+            });
 
             // Add 40km radius circle
             radiusCircle = L.circle([settlement.lat, settlement.lon], {
