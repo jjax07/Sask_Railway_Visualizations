@@ -6,7 +6,8 @@ The following data cleanup work was completed by cross-referencing the original 
 
 ### Cleanup Summary
 - **Starting discrepancies:** 272
-- **Remaining discrepancies:** 39 (requiring manual historical research)
+- **Resolved discrepancies:** 261
+- **Remaining discrepancies:** 11 (requiring further historical research)
 
 ### Changes Made to UrbanSaskHist_Update_Jan_2026.xlsx
 1. **SOO → CPR:** 4 entries corrected (SOO Line was a CPR subsidiary)
@@ -14,6 +15,9 @@ The following data cleanup work was completed by cross-referencing the original 
 3. **Missing railways added:** 114 settlements received additional railway data from GIS
 4. **Missing data filled:** 35 entries with no original data received GIS year and railway
 5. **Typo fixes:** GPTR → GTPR corrections
+6. **GIS-based corrections:** 15 additional settlements corrected based on likelihood analysis
+7. **M&NW settlements confirmed:** 6 settlements with M&NW as first railway confirmed correct
+8. **No GIS coverage settlements:** 20 settlements confirmed using original data
 
 ### New Data File Created
 - `Historical_Railway_Data_By_Settlement.xlsx` - Comparison spreadsheet showing:
@@ -24,12 +28,18 @@ The following data cleanup work was completed by cross-referencing the original 
 
 ## Remaining Data Issues
 
-### 1. Remaining Discrepancies (39 entries)
-After cleanup, 39 discrepancies remain that require manual historical research:
-- Year differences greater than 2 years between GIS and original data
-- Railways in original data not found in GIS (e.g., M&NW, some CPR/CNoR branches)
+### 1. Remaining Discrepancies (11 entries)
+After cleanup, 11 discrepancies remain that require further historical research:
 
-**Resolution:** Review `Historical_Railway_Data_By_Settlement.xlsx` discrepancy column and research individually.
+**Year differences needing research:**
+- Lebret, Macoun, Morse, Hudson Bay Jct, Sutherland
+
+**Railway verification needed:**
+- Rosthern (operator history - CPR/CNoR on QLSRSC line)
+- Weyburn, Warman, Pangman, Mazenod (CPR/CNoR verification)
+- Lockwood (no data in either source)
+
+**Resolution:** Review `Historical_Railway_Data_By_Settlement.xlsx` - entries marked with `Further_research_needed` column.
 
 ### 2. CPR Takeover of QLSRSC Line
 The QLSRSC (Qu'Appelle, Long Lake & Saskatchewan Railway) was leased by CPR from 1896-1906. Settlements on this line should potentially show both QLSRSC and CPR service during this period.
@@ -59,7 +69,7 @@ Settlements showing "Missing in GIS" discrepancies may have correct original dat
 ### Settlement Explorer (`settlement_explorer.html`)
 
 - [x] **Saskatoon:** Verified connections match `one_hour_map.html` (after fixing CPR data)
-- [ ] **Battleford:** Should show North Battleford (5.3km) as connected - *Note: GIS shows CNoR reached Battleford in 1905, not CPR in 1888 as original data claimed*
+- [ ] **Battleford:** Should show North Battleford (5.3km) as connected via CNoR (1905) - *Data corrected from CPR 1888 to CNoR 1905*
 - [ ] **Remote settlements:** Select a settlement with no nearby connections, verify informative message displays
 - [ ] **Time slider:** Connections should appear/disappear based on year
 - [ ] **Play animation:** Should progress smoothly through years
@@ -90,7 +100,7 @@ The visualization assumes two settlements are "connected" if they share the same
 40km = 1 hour assumes 40 km/h average speed, which was typical for branch lines with stops. Main line express trains were faster; some branch lines were slower.
 
 ### 3. Multi-Railway Detection
-Only 8 settlements are currently identified as multi-railway junctions. More may exist but aren't captured in the spreadsheet data or `KNOWN_RAILWAY_YEARS`.
+Currently 7 settlements are identified as multi-railway junctions in the visualization. More may exist but aren't captured in the `KNOWN_RAILWAY_YEARS` dictionary in `update_multi_railways.py`.
 
 ### 4. Railway Name Variations
 The spreadsheet contains various spellings/abbreviations:

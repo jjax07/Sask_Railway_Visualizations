@@ -53,11 +53,11 @@ Two settlements are "connected" when:
 Eight major settlements were served by multiple railway companies, indicated by orange diamond markers:
 | Settlement | Railways |
 |------------|----------|
-| Saskatoon | QLSRSC (1890), CPR (1896), CNoR (1905), GTPR (1908) |
+| Saskatoon | QLSRSC (1889), CPR (1896), CNoR (1905), GTPR (1908) |
 | Regina | CPR (1882), QLSRSC (1889), CNoR (1906), GTPR (1911) |
 | Moose Jaw | CPR (1882), CNoR (1908), GTPR (1912) |
 | Prince Albert | QLSRSC (1890), CNoR (1906) |
-| Yorkton | Other (1889), CPR (1890), GTPR (1908) |
+| Yorkton | Other/M&NW (1889), GTPR (1908), CNoR |
 | Weyburn | CPR (1893), CNoR (1910) |
 | Nokomis | CPR (1907), GTPR (1908) |
 | Biggar | CPR (1907), GTPR (1910) |
@@ -123,9 +123,9 @@ The `settlement_connections.json` file contains:
     "Saskatoon": {
       "lat": 52.12,
       "lon": -106.67,
-      "railway_arrives": 1890,
+      "railway_arrives": 1889,
       "first_railway": "QLSRSC",
-      "railways": [{"railway": "QLSRSC", "year": 1890}]
+      "railways": [{"railway": "QLSRSC", "year": 1889}]
     }
   },
   "connections": {
@@ -134,7 +134,7 @@ The `settlement_connections.json` file contains:
         "to": "Osler",
         "distance_km": 28.7,
         "shared_railway": "QLSRSC",
-        "connected_year": 1890,
+        "connected_year": 1889,
         "all_shared_railways": null
       }
     ]
@@ -199,7 +199,7 @@ A settlement pair is considered "railway connected" when:
 ### Saskatoon Railway Connections
 | Railway | Year | Notes |
 |---------|------|-------|
-| QLSRSC | 1890 | First railway to Saskatoon |
+| QLSRSC | 1889 | First railway to Saskatoon |
 | CPR | 1896 | Took over QLSRSC line |
 | CNoR | 1905 | Canadian Northern expansion |
 | GTPR | 1908 | Grand Trunk Pacific main line |
