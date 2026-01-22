@@ -27,7 +27,7 @@
       "lat": 51.99398557852127,
       "lon": -106.3695301541517,
       "distance_km": 24.8,
-      "railway_arrives": 1908,
+      "railway_arrives": 1907,
       "first_railway": "GTPR",
       "connected_to_saskatoon": 1908
     },
@@ -45,7 +45,7 @@
       "lat": 52.3591651831185,
       "lon": -106.95704594249544,
       "distance_km": 33.0,
-      "railway_arrives": 1904,
+      "railway_arrives": 1905,
       "first_railway": "CNoR",
       "connected_to_saskatoon": 1905
     },
@@ -81,7 +81,7 @@
       "lat": 52.34090922208426,
       "lon": -106.77322600097465,
       "distance_km": 25.5,
-      "railway_arrives": null,
+      "railway_arrives": 1905,
       "first_railway": null,
       "connected_to_saskatoon": null
     },

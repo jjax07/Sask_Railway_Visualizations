@@ -2,10 +2,38 @@
   "QLSRSC": [
     {
       "name": "Craven",
-      "year": 1885
+      "year": 1887
+    },
+    {
+      "name": "Lumsden",
+      "year": 1887
+    },
+    {
+      "name": "Aylesbury",
+      "year": 1889
+    },
+    {
+      "name": "Bethune",
+      "year": 1889
+    },
+    {
+      "name": "Bladworth",
+      "year": 1889
     },
     {
       "name": "Chamberlain",
+      "year": 1889
+    },
+    {
+      "name": "Craik",
+      "year": 1889
+    },
+    {
+      "name": "Davidson",
+      "year": 1889
+    },
+    {
+      "name": "Disley",
       "year": 1889
     },
     {
@@ -13,11 +41,19 @@
       "year": 1889
     },
     {
-      "name": "Kenaston",
+      "name": "Findlater",
       "year": 1889
     },
     {
-      "name": "Lumsden",
+      "name": "Girvin",
+      "year": 1889
+    },
+    {
+      "name": "Hanley",
+      "year": 1889
+    },
+    {
+      "name": "Kenaston",
       "year": 1889
     },
     {
@@ -25,27 +61,15 @@
       "year": 1889
     },
     {
-      "name": "Bethune",
-      "year": 1890
-    },
-    {
-      "name": "Craik",
-      "year": 1890
+      "name": "Saskatoon",
+      "year": 1889
     },
     {
       "name": "Duck Lake",
       "year": 1890
     },
     {
-      "name": "Girvin",
-      "year": 1890
-    },
-    {
       "name": "Hague",
-      "year": 1890
-    },
-    {
-      "name": "Hanley",
       "year": 1890
     },
     {
@@ -59,20 +83,12 @@
     {
       "name": "Rosthern",
       "year": 1890
-    },
-    {
-      "name": "Saskatoon",
-      "year": 1890
-    },
-    {
-      "name": "Davidson",
-      "year": 1903
     }
   ],
   "CPR": [
     {
-      "name": "Pense",
-      "year": 1881
+      "name": "Balgonie",
+      "year": 1882
     },
     {
       "name": "Belle Plaine",
@@ -83,7 +99,19 @@
       "year": 1882
     },
     {
+      "name": "Carmichael",
+      "year": 1882
+    },
+    {
       "name": "Caron",
+      "year": 1882
+    },
+    {
+      "name": "Chaplin",
+      "year": 1882
+    },
+    {
+      "name": "Ernfold",
       "year": 1882
     },
     {
@@ -91,11 +119,27 @@
       "year": 1882
     },
     {
-      "name": "Fort Qu'Appelle",
+      "name": "Grand Coulee",
+      "year": 1882
+    },
+    {
+      "name": "Grenfell",
+      "year": 1882
+    },
+    {
+      "name": "Gull Lake",
+      "year": 1882
+    },
+    {
+      "name": "Herbert",
       "year": 1882
     },
     {
       "name": "Indian Head",
+      "year": 1882
+    },
+    {
+      "name": "McLean",
       "year": 1882
     },
     {
@@ -107,7 +151,23 @@
       "year": 1882
     },
     {
+      "name": "Mortlach",
+      "year": 1882
+    },
+    {
+      "name": "North Regina",
+      "year": 1882
+    },
+    {
       "name": "Parkbeg",
+      "year": 1882
+    },
+    {
+      "name": "Pense",
+      "year": 1882
+    },
+    {
+      "name": "Piapot",
       "year": 1882
     },
     {
@@ -127,7 +187,15 @@
       "year": 1882
     },
     {
+      "name": "Sintaluta",
+      "year": 1882
+    },
+    {
       "name": "Swift Current",
+      "year": 1882
+    },
+    {
+      "name": "Tompkins",
       "year": 1882
     },
     {
@@ -139,6 +207,10 @@
       "year": 1882
     },
     {
+      "name": "Webb",
+      "year": 1882
+    },
+    {
       "name": "Whitewood",
       "year": 1882
     },
@@ -147,7 +219,7 @@
       "year": 1882
     },
     {
-      "name": "Gull Lake",
+      "name": "Hatton",
       "year": 1883
     },
     {
@@ -159,55 +231,15 @@
       "year": 1883
     },
     {
-      "name": "McLean",
-      "year": 1883
-    },
-    {
-      "name": "Tompkins",
-      "year": 1883
-    },
-    {
-      "name": "Webb",
-      "year": 1883
-    },
-    {
-      "name": "Grenfell",
-      "year": 1884
-    },
-    {
-      "name": "Battleford",
-      "year": 1888
-    },
-    {
-      "name": "Findlater",
-      "year": 1889
-    },
-    {
-      "name": "Bladworth",
-      "year": 1890
-    },
-    {
-      "name": "Yorkton",
-      "year": 1890
+      "name": "Alameda",
+      "year": 1892
     },
     {
       "name": "Carievale",
-      "year": 1891
+      "year": 1892
     },
     {
       "name": "Carnduff",
-      "year": 1891
-    },
-    {
-      "name": "Glen Ewen",
-      "year": 1891
-    },
-    {
-      "name": "Oxbow",
-      "year": 1891
-    },
-    {
-      "name": "Alameda",
       "year": 1892
     },
     {
@@ -223,6 +255,18 @@
       "year": 1892
     },
     {
+      "name": "Glen Ewen",
+      "year": 1892
+    },
+    {
+      "name": "Oxbow",
+      "year": 1892
+    },
+    {
+      "name": "Roche Percee",
+      "year": 1892
+    },
+    {
       "name": "Drinkwater",
       "year": 1893
     },
@@ -231,11 +275,35 @@
       "year": 1893
     },
     {
+      "name": "Lang",
+      "year": 1893
+    },
+    {
+      "name": "McTaggart",
+      "year": 1893
+    },
+    {
+      "name": "Midale",
+      "year": 1893
+    },
+    {
       "name": "Milestone",
       "year": 1893
     },
     {
+      "name": "North Portal",
+      "year": 1893
+    },
+    {
+      "name": "Rouleau",
+      "year": 1893
+    },
+    {
       "name": "Weyburn",
+      "year": 1893
+    },
+    {
+      "name": "Wilcox",
       "year": 1893
     },
     {
@@ -247,15 +315,7 @@
       "year": 1896
     },
     {
-      "name": "Sintaluta",
-      "year": 1898
-    },
-    {
       "name": "Antler",
-      "year": 1900
-    },
-    {
-      "name": "Arcola",
       "year": 1900
     },
     {
@@ -263,16 +323,20 @@
       "year": 1900
     },
     {
-      "name": "Carlyle",
-      "year": 1901
+      "name": "Redvers",
+      "year": 1900
     },
     {
       "name": "Wauchope",
+      "year": 1900
+    },
+    {
+      "name": "Arcola",
       "year": 1901
     },
     {
-      "name": "Esterhazy",
-      "year": 1902
+      "name": "Carlyle",
+      "year": 1901
     },
     {
       "name": "Morse",
@@ -291,47 +355,23 @@
       "year": 1902
     },
     {
-      "name": "Welwyn",
-      "year": 1902
-    },
-    {
-      "name": "Wilcox",
-      "year": 1902
-    },
-    {
-      "name": "Balcarres",
-      "year": 1903
-    },
-    {
-      "name": "Dubuc",
-      "year": 1903
-    },
-    {
-      "name": "Kronau",
-      "year": 1903
-    },
-    {
-      "name": "Osage",
-      "year": 1903
-    },
-    {
-      "name": "Rocanville",
-      "year": 1903
-    },
-    {
-      "name": "Stockholm",
-      "year": 1903
-    },
-    {
-      "name": "Tantallon",
-      "year": 1903
-    },
-    {
       "name": "Abernethy",
       "year": 1904
     },
     {
+      "name": "Balcarres",
+      "year": 1904
+    },
+    {
       "name": "Creelman",
+      "year": 1904
+    },
+    {
+      "name": "Dubuc",
+      "year": 1904
+    },
+    {
+      "name": "Esterhazy",
       "year": 1904
     },
     {
@@ -351,10 +391,6 @@
       "year": 1904
     },
     {
-      "name": "Herbert",
-      "year": 1904
-    },
-    {
       "name": "Heward",
       "year": 1904
     },
@@ -367,11 +403,15 @@
       "year": 1904
     },
     {
-      "name": "Lipton",
+      "name": "Kronau",
       "year": 1904
     },
     {
-      "name": "Mortlach",
+      "name": "Lemberg",
+      "year": 1904
+    },
+    {
+      "name": "Lipton",
       "year": 1904
     },
     {
@@ -379,7 +419,23 @@
       "year": 1904
     },
     {
+      "name": "Osage",
+      "year": 1904
+    },
+    {
+      "name": "Rocanville",
+      "year": 1904
+    },
+    {
+      "name": "Sedley",
+      "year": 1904
+    },
+    {
       "name": "Sheho",
+      "year": 1904
+    },
+    {
+      "name": "Stockholm",
       "year": 1904
     },
     {
@@ -387,19 +443,35 @@
       "year": 1904
     },
     {
+      "name": "Tantallon",
+      "year": 1904
+    },
+    {
       "name": "Tyvan",
       "year": 1904
+    },
+    {
+      "name": "Welwyn",
+      "year": 1904
+    },
+    {
+      "name": "Bulyea",
+      "year": 1905
     },
     {
       "name": "Cupar",
       "year": 1905
     },
     {
-      "name": "Ernfold",
+      "name": "Dysart",
       "year": 1905
     },
     {
-      "name": "Lemberg",
+      "name": "Earl Grey",
+      "year": 1905
+    },
+    {
+      "name": "Markinch",
       "year": 1905
     },
     {
@@ -409,14 +481,6 @@
     {
       "name": "Strasbourg",
       "year": 1905
-    },
-    {
-      "name": "Dysart",
-      "year": 1906
-    },
-    {
-      "name": "Govan",
-      "year": 1906
     },
     {
       "name": "Kennedy",
@@ -431,10 +495,6 @@
       "year": 1906
     },
     {
-      "name": "Biggar",
-      "year": 1907
-    },
-    {
       "name": "Drake",
       "year": 1907
     },
@@ -447,6 +507,10 @@
       "year": 1907
     },
     {
+      "name": "Govan",
+      "year": 1907
+    },
+    {
       "name": "Lanigan",
       "year": 1907
     },
@@ -455,15 +519,23 @@
       "year": 1907
     },
     {
+      "name": "Adanac",
+      "year": 1908
+    },
+    {
+      "name": "Biggar",
+      "year": 1908
+    },
+    {
+      "name": "Bridgeford",
+      "year": 1908
+    },
+    {
       "name": "Brownlee",
       "year": 1908
     },
     {
       "name": "Colonsay",
-      "year": 1908
-    },
-    {
-      "name": "Earl Grey",
       "year": 1908
     },
     {
@@ -475,15 +547,7 @@
       "year": 1908
     },
     {
-      "name": "Glenside",
-      "year": 1908
-    },
-    {
       "name": "Guernsey",
-      "year": 1908
-    },
-    {
-      "name": "Hawarden",
       "year": 1908
     },
     {
@@ -491,11 +555,7 @@
       "year": 1908
     },
     {
-      "name": "Loreburn",
-      "year": 1908
-    },
-    {
-      "name": "Outlook",
+      "name": "Marquis",
       "year": 1908
     },
     {
@@ -503,15 +563,15 @@
       "year": 1908
     },
     {
-      "name": "Piapot",
-      "year": 1908
-    },
-    {
-      "name": "Strongfield",
-      "year": 1908
-    },
-    {
       "name": "Sutherland",
+      "year": 1908
+    },
+    {
+      "name": "Tugaske",
+      "year": 1908
+    },
+    {
+      "name": "Viscount",
       "year": 1908
     },
     {
@@ -523,14 +583,6 @@
       "year": 1908
     },
     {
-      "name": "Adanac",
-      "year": 1909
-    },
-    {
-      "name": "Bridgeford",
-      "year": 1909
-    },
-    {
       "name": "Broderick",
       "year": 1909
     },
@@ -539,15 +591,15 @@
       "year": 1909
     },
     {
-      "name": "Denzil",
-      "year": 1909
-    },
-    {
       "name": "Elbow",
       "year": 1909
     },
     {
-      "name": "Evesham",
+      "name": "Glenside",
+      "year": 1909
+    },
+    {
+      "name": "Hawarden",
       "year": 1909
     },
     {
@@ -559,31 +611,23 @@
       "year": 1909
     },
     {
-      "name": "Marquis",
+      "name": "Loreburn",
       "year": 1909
     },
     {
-      "name": "Pelley",
+      "name": "Outlook",
       "year": 1909
     },
     {
-      "name": "Senlac",
+      "name": "Strongfield",
       "year": 1909
     },
     {
-      "name": "Tugaske",
-      "year": 1909
-    },
-    {
-      "name": "Viscount",
-      "year": 1909
-    },
-    {
-      "name": "Druid",
+      "name": "Evesham",
       "year": 1910
     },
     {
-      "name": "Kerrobert",
+      "name": "Khedive",
       "year": 1910
     },
     {
@@ -591,15 +635,7 @@
       "year": 1910
     },
     {
-      "name": "Pangman",
-      "year": 1910
-    },
-    {
-      "name": "Plenty",
-      "year": 1910
-    },
-    {
-      "name": "Silton",
+      "name": "Senlac",
       "year": 1910
     },
     {
@@ -607,15 +643,27 @@
       "year": 1911
     },
     {
+      "name": "Ardath",
+      "year": 1911
+    },
+    {
       "name": "Bounty",
       "year": 1911
     },
     {
-      "name": "Bulyea",
+      "name": "Cabri",
+      "year": 1911
+    },
+    {
+      "name": "Denzil",
       "year": 1911
     },
     {
       "name": "Dilke",
+      "year": 1911
+    },
+    {
+      "name": "Druid",
       "year": 1911
     },
     {
@@ -635,7 +683,7 @@
       "year": 1911
     },
     {
-      "name": "Khedive",
+      "name": "Kerrobert",
       "year": 1911
     },
     {
@@ -651,11 +699,11 @@
       "year": 1911
     },
     {
-      "name": "Neville",
+      "name": "Ogema",
       "year": 1911
     },
     {
-      "name": "Ogema",
+      "name": "Pangman",
       "year": 1911
     },
     {
@@ -667,7 +715,19 @@
       "year": 1911
     },
     {
+      "name": "Plenty",
+      "year": 1911
+    },
+    {
+      "name": "Regina Beach",
+      "year": 1911
+    },
+    {
       "name": "Salvador",
+      "year": 1911
+    },
+    {
+      "name": "Silton",
       "year": 1911
     },
     {
@@ -675,7 +735,15 @@
       "year": 1911
     },
     {
+      "name": "Sovereign",
+      "year": 1911
+    },
+    {
       "name": "Stranraer",
+      "year": 1911
+    },
+    {
+      "name": "Success",
       "year": 1911
     },
     {
@@ -684,10 +752,6 @@
     },
     {
       "name": "Assiniboia",
-      "year": 1912
-    },
-    {
-      "name": "Cabri",
       "year": 1912
     },
     {
@@ -703,19 +767,15 @@
       "year": 1912
     },
     {
-      "name": "Leader",
-      "year": 1912
-    },
-    {
       "name": "Leipzig",
       "year": 1912
     },
     {
-      "name": "Readlyn",
+      "name": "Neville",
       "year": 1912
     },
     {
-      "name": "Regina Beach",
+      "name": "Readlyn",
       "year": 1912
     },
     {
@@ -731,23 +791,7 @@
       "year": 1913
     },
     {
-      "name": "Aneroid",
-      "year": 1913
-    },
-    {
       "name": "Bromhead",
-      "year": 1913
-    },
-    {
-      "name": "Cadillac",
-      "year": 1913
-    },
-    {
-      "name": "Hazenmore",
-      "year": 1913
-    },
-    {
-      "name": "Kincaid",
       "year": 1913
     },
     {
@@ -759,6 +803,10 @@
       "year": 1913
     },
     {
+      "name": "Leader",
+      "year": 1913
+    },
+    {
       "name": "Lemsford",
       "year": 1913
     },
@@ -767,11 +815,11 @@
       "year": 1913
     },
     {
-      "name": "Meyronne",
+      "name": "Portreeve",
       "year": 1913
     },
     {
-      "name": "Ponteix",
+      "name": "Prelate",
       "year": 1913
     },
     {
@@ -783,7 +831,15 @@
       "year": 1913
     },
     {
+      "name": "Tramping Lake",
+      "year": 1913
+    },
+    {
       "name": "Tribune",
+      "year": 1913
+    },
+    {
+      "name": "Vantage",
       "year": 1913
     },
     {
@@ -792,6 +848,18 @@
     },
     {
       "name": "Admiral",
+      "year": 1914
+    },
+    {
+      "name": "Aneroid",
+      "year": 1914
+    },
+    {
+      "name": "Cadillac",
+      "year": 1914
+    },
+    {
+      "name": "Congress",
       "year": 1914
     },
     {
@@ -811,7 +879,23 @@
       "year": 1914
     },
     {
+      "name": "Hazenmore",
+      "year": 1914
+    },
+    {
+      "name": "Kincaid",
+      "year": 1914
+    },
+    {
       "name": "Major",
+      "year": 1914
+    },
+    {
+      "name": "Meyronne",
+      "year": 1914
+    },
+    {
+      "name": "Ponteix",
       "year": 1914
     },
     {
@@ -827,24 +911,12 @@
       "year": 1914
     },
     {
-      "name": "Vantage",
-      "year": 1914
-    },
-    {
       "name": "Vidora",
       "year": 1914
     },
     {
-      "name": "Prelate",
-      "year": 1915
-    },
-    {
-      "name": "Congress",
-      "year": 1917
-    },
-    {
       "name": "Naicam",
-      "year": 1920
+      "year": 1921
     },
     {
       "name": "Burstall",
@@ -853,59 +925,11 @@
   ],
   "CNoR": [
     {
-      "name": "Togo",
-      "year": 1903
-    },
-    {
-      "name": "Beatty",
-      "year": 1904
-    },
-    {
-      "name": "Canora",
-      "year": 1904
-    },
-    {
-      "name": "Humboldt",
-      "year": 1904
-    },
-    {
       "name": "Kamsack",
       "year": 1904
     },
     {
-      "name": "Langham",
-      "year": 1904
-    },
-    {
-      "name": "Margo",
-      "year": 1904
-    },
-    {
-      "name": "Melfort",
-      "year": 1904
-    },
-    {
-      "name": "Muenster",
-      "year": 1904
-    },
-    {
-      "name": "Star City",
-      "year": 1904
-    },
-    {
-      "name": "Tisdale",
-      "year": 1904
-    },
-    {
-      "name": "Veregin",
-      "year": 1904
-    },
-    {
-      "name": "Wadena",
-      "year": 1904
-    },
-    {
-      "name": "Watson",
+      "name": "Togo",
       "year": 1904
     },
     {
@@ -913,7 +937,19 @@
       "year": 1905
     },
     {
+      "name": "Battleford",
+      "year": 1905
+    },
+    {
+      "name": "Beatty",
+      "year": 1905
+    },
+    {
       "name": "Birch Hills",
+      "year": 1905
+    },
+    {
+      "name": "Borden",
       "year": 1905
     },
     {
@@ -922,6 +958,22 @@
     },
     {
       "name": "Buchanan",
+      "year": 1905
+    },
+    {
+      "name": "Canora",
+      "year": 1905
+    },
+    {
+      "name": "Dalmeny",
+      "year": 1905
+    },
+    {
+      "name": "Dana",
+      "year": 1905
+    },
+    {
+      "name": "Delmas",
       "year": 1905
     },
     {
@@ -941,11 +993,23 @@
       "year": 1905
     },
     {
+      "name": "Humboldt",
+      "year": 1905
+    },
+    {
       "name": "Invermay",
       "year": 1905
     },
     {
       "name": "Kinistino",
+      "year": 1905
+    },
+    {
+      "name": "Kuroki",
+      "year": 1905
+    },
+    {
+      "name": "Langham",
       "year": 1905
     },
     {
@@ -961,11 +1025,23 @@
       "year": 1905
     },
     {
+      "name": "Margo",
+      "year": 1905
+    },
+    {
       "name": "Marshall",
       "year": 1905
     },
     {
       "name": "Maymont",
+      "year": 1905
+    },
+    {
+      "name": "Melfort",
+      "year": 1905
+    },
+    {
+      "name": "Muenster",
       "year": 1905
     },
     {
@@ -985,6 +1061,10 @@
       "year": 1905
     },
     {
+      "name": "Rama",
+      "year": 1905
+    },
+    {
       "name": "Ruddell",
       "year": 1905
     },
@@ -997,7 +1077,15 @@
       "year": 1905
     },
     {
-      "name": "Tate",
+      "name": "Star City",
+      "year": 1905
+    },
+    {
+      "name": "Tisdale",
+      "year": 1905
+    },
+    {
+      "name": "Veregin",
       "year": 1905
     },
     {
@@ -1005,7 +1093,15 @@
       "year": 1905
     },
     {
+      "name": "Wadena",
+      "year": 1905
+    },
+    {
       "name": "Waseca",
+      "year": 1905
+    },
+    {
+      "name": "Watson",
       "year": 1905
     },
     {
@@ -1013,7 +1109,15 @@
       "year": 1905
     },
     {
-      "name": "Borden",
+      "name": "Arran",
+      "year": 1906
+    },
+    {
+      "name": "Kipling",
+      "year": 1906
+    },
+    {
+      "name": "Pelley",
       "year": 1906
     },
     {
@@ -1021,12 +1125,12 @@
       "year": 1906
     },
     {
-      "name": "Rama",
+      "name": "Regina",
       "year": 1906
     },
     {
-      "name": "Regina",
-      "year": 1906
+      "name": "Glenavon",
+      "year": 1907
     },
     {
       "name": "Kendal",
@@ -1041,15 +1145,11 @@
       "year": 1907
     },
     {
-      "name": "Arran",
-      "year": 1908
+      "name": "Vibank",
+      "year": 1907
     },
     {
       "name": "Delisle",
-      "year": 1908
-    },
-    {
-      "name": "Delmas",
       "year": 1908
     },
     {
@@ -1057,19 +1157,11 @@
       "year": 1908
     },
     {
-      "name": "Hepburn",
-      "year": 1908
-    },
-    {
-      "name": "Kipling",
+      "name": "Laura",
       "year": 1908
     },
     {
       "name": "Moosejaw",
-      "year": 1908
-    },
-    {
-      "name": "Punnichy",
       "year": 1908
     },
     {
@@ -1081,31 +1173,11 @@
       "year": 1908
     },
     {
-      "name": "Vibank",
+      "name": "Zealandia",
       "year": 1908
     },
     {
-      "name": "Brock",
-      "year": 1909
-    },
-    {
-      "name": "Laird",
-      "year": 1909
-    },
-    {
-      "name": "Laura",
-      "year": 1909
-    },
-    {
       "name": "Leslie",
-      "year": 1909
-    },
-    {
-      "name": "MacNutt",
-      "year": 1909
-    },
-    {
-      "name": "McGee",
       "year": 1909
     },
     {
@@ -1113,15 +1185,7 @@
       "year": 1909
     },
     {
-      "name": "Waldheim",
-      "year": 1909
-    },
-    {
-      "name": "Zealandia",
-      "year": 1909
-    },
-    {
-      "name": "Blaine Lake",
+      "name": "Brock",
       "year": 1910
     },
     {
@@ -1129,19 +1193,7 @@
       "year": 1910
     },
     {
-      "name": "Canwood",
-      "year": 1910
-    },
-    {
-      "name": "Ceylon",
-      "year": 1910
-    },
-    {
-      "name": "Edam",
-      "year": 1910
-    },
-    {
-      "name": "Flaxcombe",
+      "name": "Hepburn",
       "year": 1910
     },
     {
@@ -1149,11 +1201,23 @@
       "year": 1910
     },
     {
+      "name": "Hyas",
+      "year": 1910
+    },
+    {
       "name": "Kindersley",
       "year": 1910
     },
     {
-      "name": "Meota",
+      "name": "Laird",
+      "year": 1910
+    },
+    {
+      "name": "MacNutt",
+      "year": 1910
+    },
+    {
+      "name": "McGee",
       "year": 1910
     },
     {
@@ -1161,11 +1225,31 @@
       "year": 1910
     },
     {
+      "name": "Norquay",
+      "year": 1910
+    },
+    {
+      "name": "Parkside",
+      "year": 1910
+    },
+    {
+      "name": "Preeceville",
+      "year": 1910
+    },
+    {
       "name": "Shellbrook",
       "year": 1910
     },
     {
-      "name": "Weyburn",
+      "name": "Stenen",
+      "year": 1910
+    },
+    {
+      "name": "Sturgis",
+      "year": 1910
+    },
+    {
+      "name": "Waldheim",
       "year": 1910
     },
     {
@@ -1173,7 +1257,27 @@
       "year": 1911
     },
     {
+      "name": "Avonlea",
+      "year": 1911
+    },
+    {
+      "name": "Bengough",
+      "year": 1911
+    },
+    {
+      "name": "Blaine Lake",
+      "year": 1911
+    },
+    {
       "name": "Briercrest",
+      "year": 1911
+    },
+    {
+      "name": "Canwood",
+      "year": 1911
+    },
+    {
+      "name": "Ceylon",
       "year": 1911
     },
     {
@@ -1181,7 +1285,11 @@
       "year": 1911
     },
     {
-      "name": "Ettington",
+      "name": "Edam",
+      "year": 1911
+    },
+    {
+      "name": "Flaxcombe",
       "year": 1911
     },
     {
@@ -1189,11 +1297,11 @@
       "year": 1911
     },
     {
-      "name": "Hyas",
+      "name": "Leask",
       "year": 1911
     },
     {
-      "name": "Leask",
+      "name": "Macrorie",
       "year": 1911
     },
     {
@@ -1205,23 +1313,11 @@
       "year": 1911
     },
     {
-      "name": "Midale",
-      "year": 1911
-    },
-    {
-      "name": "Norquay",
-      "year": 1911
-    },
-    {
-      "name": "Parkside",
+      "name": "Meota",
       "year": 1911
     },
     {
       "name": "Radville",
-      "year": 1911
-    },
-    {
-      "name": "Sturgis",
       "year": 1911
     },
     {
@@ -1233,19 +1329,11 @@
       "year": 1911
     },
     {
-      "name": "Bengough",
-      "year": 1912
+      "name": "Wroxton",
+      "year": 1911
     },
     {
-      "name": "Hafford",
-      "year": 1912
-    },
-    {
-      "name": "Macrorie",
-      "year": 1912
-    },
-    {
-      "name": "Mervin",
+      "name": "Ardill",
       "year": 1912
     },
     {
@@ -1253,24 +1341,12 @@
       "year": 1912
     },
     {
-      "name": "Preeceville",
+      "name": "Rhein",
       "year": 1912
     },
     {
-      "name": "Sovereign",
+      "name": "Stornoway",
       "year": 1912
-    },
-    {
-      "name": "Stenen",
-      "year": 1912
-    },
-    {
-      "name": "Ardill",
-      "year": 1913
-    },
-    {
-      "name": "Avonlea",
-      "year": 1913
     },
     {
       "name": "Denholm",
@@ -1285,7 +1361,15 @@
       "year": 1913
     },
     {
+      "name": "Ettington",
+      "year": 1913
+    },
+    {
       "name": "Gravelbourg",
+      "year": 1913
+    },
+    {
+      "name": "Hafford",
       "year": 1913
     },
     {
@@ -1309,7 +1393,7 @@
       "year": 1913
     },
     {
-      "name": "St. Brieux",
+      "name": "Spring Valley",
       "year": 1913
     },
     {
@@ -1317,15 +1401,7 @@
       "year": 1913
     },
     {
-      "name": "Central Butte",
-      "year": 1914
-    },
-    {
-      "name": "Dunblane",
-      "year": 1914
-    },
-    {
-      "name": "Lawson",
+      "name": "Mervin",
       "year": 1914
     },
     {
@@ -1333,11 +1409,27 @@
       "year": 1914
     },
     {
+      "name": "Dunblane",
+      "year": 1915
+    },
+    {
       "name": "Eston",
       "year": 1915
     },
     {
       "name": "Plato",
+      "year": 1915
+    },
+    {
+      "name": "Richlea",
+      "year": 1915
+    },
+    {
+      "name": "St. Brieux",
+      "year": 1915
+    },
+    {
+      "name": "Willowbrook",
       "year": 1915
     },
     {
@@ -1375,7 +1467,27 @@
       "year": 1907
     },
     {
+      "name": "Birmingham",
+      "year": 1907
+    },
+    {
       "name": "Bradwell",
+      "year": 1907
+    },
+    {
+      "name": "Clavet",
+      "year": 1907
+    },
+    {
+      "name": "Fenwood",
+      "year": 1907
+    },
+    {
+      "name": "Goodeve",
+      "year": 1907
+    },
+    {
+      "name": "Hubbard",
       "year": 1907
     },
     {
@@ -1383,7 +1495,15 @@
       "year": 1907
     },
     {
+      "name": "Melville",
+      "year": 1907
+    },
+    {
       "name": "Spy Hill",
+      "year": 1907
+    },
+    {
+      "name": "Waldron",
       "year": 1907
     },
     {
@@ -1391,23 +1511,15 @@
       "year": 1907
     },
     {
-      "name": "Birmingham",
+      "name": "Zelma",
+      "year": 1907
+    },
+    {
+      "name": "Cavell",
       "year": 1908
     },
     {
-      "name": "Clavet",
-      "year": 1908
-    },
-    {
-      "name": "Fenwood",
-      "year": 1908
-    },
-    {
-      "name": "Goodeve",
-      "year": 1908
-    },
-    {
-      "name": "Hubbard",
+      "name": "Jasmin",
       "year": 1908
     },
     {
@@ -1435,11 +1547,11 @@
       "year": 1908
     },
     {
-      "name": "Melville",
+      "name": "Nokomis",
       "year": 1908
     },
     {
-      "name": "Nokomis",
+      "name": "Punnichy",
       "year": 1908
     },
     {
@@ -1463,6 +1575,10 @@
       "year": 1908
     },
     {
+      "name": "Tate",
+      "year": 1908
+    },
+    {
       "name": "Venn",
       "year": 1908
     },
@@ -1471,19 +1587,11 @@
       "year": 1908
     },
     {
-      "name": "Zelma",
-      "year": 1908
-    },
-    {
-      "name": "Cavell",
-      "year": 1909
-    },
-    {
       "name": "Biggar",
       "year": 1910
     },
     {
-      "name": "Cudworth",
+      "name": "B\u2014 Say\u2014 Tah",
       "year": 1911
     },
     {
@@ -1495,6 +1603,10 @@
       "year": 1911
     },
     {
+      "name": "Fort Qu'Appelle",
+      "year": 1911
+    },
+    {
       "name": "Lebret",
       "year": 1911
     },
@@ -1503,23 +1615,31 @@
       "year": 1911
     },
     {
+      "name": "Otthon",
+      "year": 1911
+    },
+    {
       "name": "Regina",
       "year": 1911
     },
     {
-      "name": "Wakaw",
+      "name": "Rock Haven",
       "year": 1911
+    },
+    {
+      "name": "Cudworth",
+      "year": 1912
     },
     {
       "name": "Moosejaw",
       "year": 1912
     },
     {
-      "name": "Springwater",
+      "name": "Wakaw",
       "year": 1912
     },
     {
-      "name": "Domremy",
+      "name": "Central Butte",
       "year": 1913
     },
     {
@@ -1535,18 +1655,46 @@
       "year": 1913
     },
     {
+      "name": "Springwater",
+      "year": 1913
+    },
+    {
+      "name": "Domremy",
+      "year": 1914
+    },
+    {
+      "name": "Lawson",
+      "year": 1914
+    },
+    {
       "name": "Riverhurst",
-      "year": 1917
+      "year": 1914
     }
   ],
   "Other": [
+    {
+      "name": "Bredenbury",
+      "year": 1888
+    },
+    {
+      "name": "Churchbridge",
+      "year": 1888
+    },
+    {
+      "name": "Langenburg",
+      "year": 1888
+    },
+    {
+      "name": "Saltcoats",
+      "year": 1888
+    },
     {
       "name": "Yorkton",
       "year": 1889
     },
     {
-      "name": "Rouleau",
-      "year": 1901
+      "name": "Insinger",
+      "year": 1902
     },
     {
       "name": "Hodgeville",
