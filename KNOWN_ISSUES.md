@@ -69,19 +69,20 @@ Settlements showing "Missing in GIS" discrepancies may have correct original dat
 ### Settlement Explorer (`settlement_explorer.html`)
 
 - [x] **Saskatoon:** Verified connections match `one_hour_map.html` (after fixing CPR data)
-- [ ] **Battleford:** Should show North Battleford (5.3km) as connected via CNoR (1905) - *Data corrected from CPR 1888 to CNoR 1905*
-- [ ] **Remote settlements:** Select a settlement with no nearby connections, verify informative message displays
-- [ ] **Time slider:** Connections should appear/disappear based on year
-- [ ] **Play animation:** Should progress smoothly through years
-- [ ] **Search:** Typing partial name should filter dropdown
+- [x] **Battleford:** North Battleford (5.3km) connected via CNoR (1905) ✓
+- [x] **Remote settlements:** Verified - settlements with no shared railway show "no shared railway" message ✓
+- [x] **Time slider:** Connections appear/disappear correctly based on year ✓
+- [x] **Play animation:** Progresses smoothly through years ✓
+- [x] **Search:** Typing partial name filters dropdown correctly ✓
 - [x] **Click to select:** Fixed - clicking any settlement dot now works (was blocked by multi-railway ring overlay)
 - [x] **Multi-railway markers:** Changed from orange rings to orange diamond-shaped markers for better click interaction
 
 ### Railway Timeline (`railway_timeline.html`)
 
-- [ ] **Animation:** Year progression should be smooth
-- [ ] **Railway toggles:** Each railway can be shown/hidden independently
-- [ ] **Bar chart:** Should update as animation progresses
+- [x] **Animation:** Year progression smooth, stops at 1920 (no loop) ✓
+- [x] **Railway toggles:** Each railway can be shown/hidden independently ✓
+- [x] **Bar chart:** Updates as animation progresses ✓
+- [x] **Marker size:** Reduced to radius 3 for cleaner visualization ✓
 
 ### One-Hour Map (`one_hour_map.html`)
 

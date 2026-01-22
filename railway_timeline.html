@@ -340,9 +340,10 @@
             // Create markers for all settlements
             Object.keys(data).forEach(railway => {
                 markers[railway] = [];
+
                 data[railway].forEach(s => {
                     const marker = L.circleMarker([s.lat, s.lon], {
-                        radius: 6,
+                        radius: 3,
                         fillColor: railwayColors[railway],
                         color: '#fff',
                         weight: 1,
@@ -461,7 +462,10 @@
                 playInterval = setInterval(() => {
                     year++;
                     if (year > 1920) {
-                        year = 1882;
+                        clearInterval(playInterval);
+                        document.getElementById('playBtn').textContent = 'Play';
+                        isPlaying = false;
+                        return;
                     }
                     updateYear(year);
                 }, 300);
