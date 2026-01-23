@@ -269,6 +269,18 @@
             font-style: italic;
             padding: 20px 0;
         }
+        /* Diamond markers for multi-railway junctions */
+        .diamond-marker {
+            background: transparent !important;
+            border: none !important;
+        }
+        .diamond {
+            width: 8px;
+            height: 8px;
+            transform: rotate(45deg);
+            border: 2px solid #888;
+            transition: all 0.2s;
+        }
     </style>
 </head>
 <body>
@@ -377,28 +389,28 @@
 
             <div class="legend">
                 <div class="legend-item">
+                    <div class="legend-circle" style="background: #e94560;"></div>
+                    <span>CPR settlement</span>
+                </div>
+                <div class="legend-item">
                     <div class="legend-circle" style="background: #4ecca3;"></div>
-                    <span>Connected settlement (size = degree)</span>
+                    <span>QLSRSC settlement</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #ffd93d;"></div>
+                    <span>CNoR settlement</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #6c5ce7;"></div>
+                    <span>GTPR settlement</span>
+                </div>
+                <div class="legend-item">
+                    <div style="width:10px; height:10px; background:#e94560; transform:rotate(45deg); margin-right:8px;"></div>
+                    <span>Multi-railway junction</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-circle" style="background: #666;"></div>
-                    <span>Isolated settlement (no railway)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-line" style="background: #e94560;"></div>
-                    <span>CPR connection</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-line" style="background: #4ecca3;"></div>
-                    <span>QLSRSC connection</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-line" style="background: #ffd93d;"></div>
-                    <span>CNoR connection</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-line" style="background: #6c5ce7;"></div>
-                    <span>GTPR connection</span>
+                    <span>Isolated (no railway yet)</span>
                 </div>
             </div>
         </div>
@@ -498,17 +510,55 @@
             console.log('Generated', edges.length, 'unique edges');
         }
 
+        // Helper to get first railway color for a settlement
+        function getFirstRailwayColor(settlement) {
+            if (!settlement.railways || settlement.railways.length === 0) {
+                return '#666';  // No railway - gray
+            }
+            let railway = settlement.first_railway;
+            if (!['CPR', 'QLSRSC', 'CNoR', 'GTPR'].includes(railway)) {
+                railway = 'Other';
+            }
+            return railwayColors[railway] || '#666';
+        }
+
+        // Helper to check if settlement has multiple railways
+        function isMultiRailway(settlement) {
+            return settlement.railways && settlement.railways.length > 1;
+        }
+
         // Create node markers for all settlements
         function createNodeMarkers() {
             Object.entries(data.settlements).forEach(([name, settlement]) => {
-                const marker = L.circleMarker([settlement.lat, settlement.lon], {
-                    radius: 4,
-                    fillColor: '#666',
-                    color: '#888',
-                    weight: 1,
-                    opacity: 0.8,
-                    fillOpacity: 0.6
-                }).addTo(map);
+                const multiRailway = isMultiRailway(settlement);
+                const firstColor = getFirstRailwayColor(settlement);
+                let marker;
+
+                if (multiRailway) {
+                    // Diamond marker for multi-railway junctions
+                    const diamondIcon = L.divIcon({
+                        className: 'diamond-marker',
+                        html: `<div class="diamond" style="background: #666; border-color: #888;" data-name="${name}"></div>`,
+                        iconSize: [12, 12],
+                        iconAnchor: [6, 6]
+                    });
+                    marker = L.marker([settlement.lat, settlement.lon], {icon: diamondIcon}).addTo(map);
+                    marker.isMultiRailway = true;
+                } else {
+                    // Circle marker for single-railway settlements
+                    marker = L.circleMarker([settlement.lat, settlement.lon], {
+                        radius: 4,
+                        fillColor: '#666',
+                        color: '#888',
+                        weight: 1,
+                        opacity: 0.8,
+                        fillOpacity: 0.6
+                    }).addTo(map);
+                    marker.isMultiRailway = false;
+                }
+
+                // Store first railway color for later use
+                marker.firstRailwayColor = firstColor;
 
                 // Hover tooltip
                 marker.bindTooltip(name, {
@@ -592,38 +642,67 @@
                 const degree = nodeDegrees[name];
                 const settlement = data.settlements[name];
                 const hasRailway = settlement.railway_arrives && settlement.railway_arrives <= year;
+                const railwayColor = marker.firstRailwayColor;
 
-                if (degree > 0) {
-                    connectedCount++;
-                    // Size scales with degree: 4px base + 0.8px per connection, max 12px
-                    const radius = Math.min(4 + degree * 0.8, 12);
-                    marker.setStyle({
-                        radius: radius,
-                        fillColor: '#4ecca3',
-                        color: '#fff',
-                        weight: 1,
-                        fillOpacity: 0.8
-                    });
-                } else if (hasRailway) {
-                    // Has railway but no visible connections (edges might be filtered)
-                    isolatedCount++;
-                    marker.setStyle({
-                        radius: 4,
-                        fillColor: '#888',
-                        color: '#aaa',
-                        weight: 1,
-                        fillOpacity: 0.6
-                    });
+                if (marker.isMultiRailway) {
+                    // Diamond marker - update via DOM
+                    const diamond = document.querySelector(`.diamond[data-name="${name}"]`);
+                    if (diamond) {
+                        if (degree > 0) {
+                            connectedCount++;
+                            const size = Math.min(8 + degree * 0.6, 14);
+                            diamond.style.width = size + 'px';
+                            diamond.style.height = size + 'px';
+                            diamond.style.background = railwayColor;
+                            diamond.style.borderColor = '#fff';
+                            diamond.style.opacity = '1';
+                        } else if (hasRailway) {
+                            isolatedCount++;
+                            diamond.style.width = '8px';
+                            diamond.style.height = '8px';
+                            diamond.style.background = '#888';
+                            diamond.style.borderColor = '#aaa';
+                            diamond.style.opacity = '0.6';
+                        } else {
+                            isolatedCount++;
+                            diamond.style.width = '6px';
+                            diamond.style.height = '6px';
+                            diamond.style.background = '#444';
+                            diamond.style.borderColor = '#666';
+                            diamond.style.opacity = '0.4';
+                        }
+                    }
                 } else {
-                    // No railway yet
-                    isolatedCount++;
-                    marker.setStyle({
-                        radius: 3,
-                        fillColor: '#444',
-                        color: '#666',
-                        weight: 1,
-                        fillOpacity: 0.4
-                    });
+                    // Circle marker - update via setStyle
+                    if (degree > 0) {
+                        connectedCount++;
+                        const radius = Math.min(4 + degree * 0.8, 12);
+                        marker.setStyle({
+                            radius: radius,
+                            fillColor: railwayColor,
+                            color: '#fff',
+                            weight: 1,
+                            fillOpacity: 0.8
+                        });
+                    } else if (hasRailway) {
+                        isolatedCount++;
+                        marker.setStyle({
+                            radius: 4,
+                            fillColor: '#888',
+                            color: '#aaa',
+                            weight: 1,
+                            fillOpacity: 0.6
+                        });
+                    } else {
+                        isolatedCount++;
+                        marker.setStyle({
+                            radius: 3,
+                            fillColor: '#444',
+                            color: '#666',
+                            weight: 1,
+                            fillOpacity: 0.4
+                        });
+                    }
                 }
             });
 
