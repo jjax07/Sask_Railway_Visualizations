@@ -362,7 +362,10 @@
                 playInterval = setInterval(() => {
                     year += 5;
                     if (year > 1920) {
-                        year = 1890;
+                        clearInterval(playInterval);
+                        document.getElementById('playBtn').textContent = 'Play';
+                        isPlaying = false;
+                        return;
                     }
                     updateYear(year);
                 }, 1500);

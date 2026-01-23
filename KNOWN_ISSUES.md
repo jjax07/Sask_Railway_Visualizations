@@ -86,8 +86,8 @@ Settlements showing "Missing in GIS" discrepancies may have correct original dat
 
 ### One-Hour Map (`one_hour_map.html`)
 
-- [ ] **Saskatoon-centered:** 40km radius should show correct settlements
-- [ ] **Time slider:** 5-year increments from 1890-1920
+- [x] **Saskatoon-centered:** 40km radius shows 12 settlements, 11 reachable by rail (Dalmeny has no railway) ✓
+- [x] **Time slider:** 5-year increments from 1890-1920, Play stops at 1920 ✓
 
 ## Known Limitations
 
@@ -144,6 +144,11 @@ Some entries may be missed if they use unexpected abbreviations.
 
 **Fix:** Added `('Saskatoon', 'CPR'): 1896` to `scripts/update_multi_railways.py`.
 
+### 3. One-Hour Map Play Animation Loop
+**Problem:** Play animation looped continuously instead of stopping at 1920.
+
+**Fix:** Updated `one_hour_map.html` to stop animation at 1920, matching the behavior of `railway_timeline.html`.
+
 ---
 
-*Last updated: January 22, 2026*
+*Last updated: January 23, 2026*
