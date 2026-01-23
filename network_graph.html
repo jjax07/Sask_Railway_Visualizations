@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Railway Network Graph</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -53,15 +54,66 @@
             display: flex;
             height: calc(100vh - 160px);
         }
-        #map {
+        .view-container {
             flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
+            transition: opacity 0.5s;
+        }
+        #graph {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a2e;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        #graph.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #map.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
         .sidebar {
             width: 320px;
             background: #16213e;
             padding: 20px;
             overflow-y: auto;
+        }
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .view-toggle button {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e94560;
+            background: transparent;
+            color: #e94560;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .view-toggle button.active {
+            background: #e94560;
+            color: #fff;
+        }
+        .view-toggle button:hover:not(.active) {
+            background: rgba(233, 69, 96, 0.2);
         }
         .controls {
             margin-bottom: 20px;
@@ -191,54 +243,6 @@
             color: #4ecca3;
             font-weight: bold;
         }
-        .settlement-details {
-            display: none;
-        }
-        .settlement-details.active {
-            display: block;
-        }
-        .settlement-details .settlement-name {
-            color: #e94560;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        .settlement-details .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px solid #1a1a2e;
-            font-size: 13px;
-        }
-        .settlement-details .detail-row .label {
-            color: #888;
-        }
-        .settlement-details .detail-row .value {
-            color: #ccc;
-        }
-        .settlement-details .railways-list {
-            margin-top: 10px;
-        }
-        .settlement-details .railway-tag {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            margin: 2px;
-            color: #1a1a2e;
-            font-weight: bold;
-        }
-        .settlement-details .connections-list {
-            margin-top: 10px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        .settlement-details .connection-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            font-size: 12px;
-            color: #aaa;
-        }
         .legend {
             margin-top: 15px;
             padding-top: 10px;
@@ -263,13 +267,45 @@
             border-radius: 50%;
             margin-right: 8px;
         }
-        .no-selection {
-            text-align: center;
-            color: #666;
-            font-style: italic;
-            padding: 20px 0;
+        .legend-diamond {
+            width: 10px;
+            height: 10px;
+            transform: rotate(45deg);
+            margin-right: 8px;
         }
-        /* Diamond markers for multi-railway junctions */
+        /* D3 Graph styles */
+        .node {
+            cursor: pointer;
+            transition: r 0.3s;
+        }
+        .node:hover {
+            stroke: #fff;
+            stroke-width: 2px;
+        }
+        .node-diamond {
+            cursor: pointer;
+        }
+        .node-diamond:hover {
+            stroke: #fff;
+            stroke-width: 2px;
+        }
+        .link {
+            stroke-opacity: 0.6;
+            transition: stroke-opacity 0.3s;
+        }
+        .tooltip {
+            position: absolute;
+            background: #16213e;
+            border: 1px solid #e94560;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+        /* Leaflet marker styles */
         .diamond-marker {
             background: transparent !important;
             border: none !important;
@@ -286,7 +322,7 @@
 <body>
     <div class="header">
         <h1>Railway Network Graph</h1>
-        <p>Interactive network graph showing all 429 Saskatchewan settlements as nodes and railway connections as edges. Watch the network grow from 1882 to 1920.</p>
+        <p>Interactive network graph showing all 429 Saskatchewan settlements as nodes and railway connections as edges. Toggle between Geographic and Network views.</p>
     </div>
     <div class="nav">
         <a href="index.html">Home</a>
@@ -296,8 +332,16 @@
         <a href="network_graph.html">Network Graph</a>
     </div>
     <div class="container">
-        <div id="map"></div>
+        <div class="view-container">
+            <div id="map"></div>
+            <svg id="graph"></svg>
+        </div>
         <div class="sidebar">
+            <div class="view-toggle">
+                <button id="geoBtn" class="active">Geographic</button>
+                <button id="forceBtn">Network</button>
+            </div>
+
             <div class="controls">
                 <label>Year:</label>
                 <div class="year-display" id="yearDisplay">1882</div>
@@ -368,25 +412,6 @@
                 </ol>
             </div>
 
-            <div class="section settlement-details" id="settlementDetails">
-                <h3>SETTLEMENT DETAILS</h3>
-                <div class="settlement-name" id="detailName">-</div>
-                <div class="detail-row">
-                    <span class="label">Connections:</span>
-                    <span class="value" id="detailDegree">0</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">First Railway:</span>
-                    <span class="value" id="detailFirstRailway">-</span>
-                </div>
-                <div class="railways-list" id="detailRailways"></div>
-                <div class="connections-list" id="detailConnections"></div>
-            </div>
-
-            <div class="section" id="noSelection">
-                <div class="no-selection">Click a node to see details</div>
-            </div>
-
             <div class="legend">
                 <div class="legend-item">
                     <div class="legend-circle" style="background: #e94560;"></div>
@@ -405,7 +430,7 @@
                     <span>GTPR settlement</span>
                 </div>
                 <div class="legend-item">
-                    <div style="width:10px; height:10px; background:#e94560; transform:rotate(45deg); margin-right:8px;"></div>
+                    <div class="legend-diamond" style="background: #e94560;"></div>
                     <span>Multi-railway junction</span>
                 </div>
                 <div class="legend-item">
@@ -415,21 +440,10 @@
             </div>
         </div>
     </div>
+    <div class="tooltip" id="tooltip"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Global state
-        let data = null;
-        let map = null;
-        let edges = [];           // Unique edge array
-        let edgePolylines = [];   // Leaflet polylines for edges
-        let nodeMarkers = {};     // Settlement name -> marker
-        let nodeDegrees = {};     // Settlement name -> current degree
-        let highlightLayer = null;
-        let selectedNode = null;
-        let isPlaying = false;
-        let playInterval = null;
-
         // Railway colors
         const railwayColors = {
             CPR: '#e94560',
@@ -439,36 +453,77 @@
             Other: '#888'
         };
 
-        // Railway visibility state
+        // State
+        let data = null;
+        let currentView = 'geo';  // 'geo' or 'force'
         let visibleRailways = {CPR: true, QLSRSC: true, CNoR: true, GTPR: true, Other: true};
+        let isPlaying = false;
+        let playInterval = null;
+        let nodeDegrees = {};
 
-        // Initialize map
-        function initMap() {
-            map = L.map('map').setView([52.0, -106.0], 6);
+        // Leaflet state
+        let map = null;
+        let leafletMarkers = {};
+        let leafletEdges = [];
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        // D3 state
+        let svg, d3Nodes = [], d3Links = [];
+        let nodeElements, linkElements;
+        let graphWidth, graphHeight;
+
+        // ==================== INITIALIZATION ====================
+
+        function init() {
+            initLeaflet();
+            initD3();
+            loadData();
+            setupEventListeners();
+        }
+
+        function initLeaflet() {
+            map = L.map('map', {
+                center: [52.0, -106.0],
+                zoom: 6
+            });
+
+            // Use CartoDB Voyager (lighter, more muted than dark theme)
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
                 subdomains: 'abcd',
                 maxZoom: 19
             }).addTo(map);
-
-            // Create custom pane for highlights with higher z-index
-            map.createPane('highlightPane');
-            map.getPane('highlightPane').style.zIndex = 450;
-
-            highlightLayer = L.layerGroup({pane: 'highlightPane'}).addTo(map);
         }
 
-        // Load data
+        function initD3() {
+            svg = d3.select('#graph');
+            const container = document.querySelector('.view-container');
+            graphWidth = container.clientWidth;
+            graphHeight = container.clientHeight;
+            svg.attr('width', graphWidth).attr('height', graphHeight);
+
+            // Add zoom behavior
+            const zoom = d3.zoom()
+                .scaleExtent([0.3, 4])
+                .on('zoom', (event) => {
+                    svg.select('g').attr('transform', event.transform);
+                });
+            svg.call(zoom);
+
+            // Create main group
+            svg.append('g');
+        }
+
+        // ==================== DATA LOADING ====================
+
         async function loadData() {
             try {
                 const response = await fetch('data/settlement_connections.json');
                 data = await response.json();
                 console.log('Data loaded:', Object.keys(data.settlements).length, 'settlements');
 
-                generateUniqueEdges();
-                createNodeMarkers();
-                createEdgePolylines();
+                processDataForD3();
+                createLeafletMarkers();
+                createD3Elements();
                 updateVisualization();
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -476,176 +531,295 @@
             }
         }
 
-        // Generate unique edges from adjacency list
-        function generateUniqueEdges() {
-            const edgeSet = new Set();
-            edges = [];
+        function getFirstRailway(settlement) {
+            if (!settlement.railways || settlement.railways.length === 0) {
+                return 'Other';
+            }
+            let railway = settlement.first_railway;
+            if (!['CPR', 'QLSRSC', 'CNoR', 'GTPR'].includes(railway)) {
+                return 'Other';
+            }
+            return railway;
+        }
 
+        function isMultiRailway(settlement) {
+            return settlement.railways && settlement.railways.length > 1;
+        }
+
+        function processDataForD3() {
+            // Build nodes array
+            d3Nodes = Object.entries(data.settlements).map(([name, s]) => ({
+                id: name,
+                lat: s.lat,
+                lon: s.lon,
+                railway_arrives: s.railway_arrives,
+                first_railway: getFirstRailway(s),
+                isMultiRailway: isMultiRailway(s),
+                railways: s.railways,
+                geoX: 0,
+                geoY: 0,
+                forceX: 0,
+                forceY: 0
+            }));
+
+            // Calculate geographic positions for D3 view
+            const lats = d3Nodes.map(n => n.lat);
+            const lons = d3Nodes.map(n => n.lon);
+            const latExtent = [Math.min(...lats), Math.max(...lats)];
+            const lonExtent = [Math.min(...lons), Math.max(...lons)];
+            const padding = 60;
+
+            d3Nodes.forEach(node => {
+                node.geoX = padding + ((node.lon - lonExtent[0]) / (lonExtent[1] - lonExtent[0])) * (graphWidth - padding * 2);
+                node.geoY = padding + ((latExtent[1] - node.lat) / (latExtent[1] - latExtent[0])) * (graphHeight - padding * 2);
+            });
+
+            // Build links array (unique edges)
+            const linkSet = new Set();
+            d3Links = [];
             Object.entries(data.connections).forEach(([from, connections]) => {
                 connections.forEach(conn => {
-                    // Only include edges with shared railway (railway-connected pairs)
                     if (!conn.shared_railway || !conn.connected_year) return;
-
-                    // Create sorted key to deduplicate
                     const key = [from, conn.to].sort().join('|');
-                    if (edgeSet.has(key)) return;
-                    edgeSet.add(key);
+                    if (linkSet.has(key)) return;
+                    linkSet.add(key);
 
-                    // Normalize railway name to known categories
                     let railway = conn.shared_railway;
                     if (!['CPR', 'QLSRSC', 'CNoR', 'GTPR'].includes(railway)) {
                         railway = 'Other';
                     }
 
-                    edges.push({
-                        from: from,
-                        to: conn.to,
-                        distance_km: conn.distance_km,
+                    d3Links.push({
+                        source: from,
+                        target: conn.to,
                         railway: railway,
                         connected_year: conn.connected_year
                     });
                 });
             });
 
-            console.log('Generated', edges.length, 'unique edges');
+            // Run force simulation to get force-directed positions
+            const simulation = d3.forceSimulation(d3Nodes)
+                .force('link', d3.forceLink(d3Links).id(d => d.id).distance(25).strength(0.5))
+                .force('charge', d3.forceManyBody().strength(-40))
+                .force('center', d3.forceCenter(graphWidth / 2, graphHeight / 2))
+                .force('collision', d3.forceCollide().radius(6))
+                .stop();
+
+            // Run simulation iterations
+            for (let i = 0; i < 300; i++) simulation.tick();
+
+            // Store force positions
+            d3Nodes.forEach(node => {
+                node.forceX = node.x;
+                node.forceY = node.y;
+            });
+
+            console.log(`Processed ${d3Nodes.length} nodes, ${d3Links.length} links`);
         }
 
-        // Helper to get first railway color for a settlement
-        function getFirstRailwayColor(settlement) {
-            if (!settlement.railways || settlement.railways.length === 0) {
-                return '#666';  // No railway - gray
-            }
-            let railway = settlement.first_railway;
-            if (!['CPR', 'QLSRSC', 'CNoR', 'GTPR'].includes(railway)) {
-                railway = 'Other';
-            }
-            return railwayColors[railway] || '#666';
-        }
+        // ==================== LEAFLET MARKERS ====================
 
-        // Helper to check if settlement has multiple railways
-        function isMultiRailway(settlement) {
-            return settlement.railways && settlement.railways.length > 1;
-        }
+        function createLeafletMarkers() {
+            // Create edges first (so they're behind nodes)
+            d3Links.forEach(link => {
+                const source = data.settlements[link.source.id || link.source];
+                const target = data.settlements[link.target.id || link.target];
+                if (!source || !target) return;
 
-        // Create node markers for all settlements
-        function createNodeMarkers() {
+                const polyline = L.polyline(
+                    [[source.lat, source.lon], [target.lat, target.lon]],
+                    {
+                        color: railwayColors[link.railway],
+                        weight: 2,
+                        opacity: 0
+                    }
+                ).addTo(map);
+
+                polyline.linkData = link;
+                leafletEdges.push(polyline);
+            });
+
+            // Create node markers
             Object.entries(data.settlements).forEach(([name, settlement]) => {
+                const firstRailway = getFirstRailway(settlement);
                 const multiRailway = isMultiRailway(settlement);
-                const firstColor = getFirstRailwayColor(settlement);
+                const color = railwayColors[firstRailway] || '#666';
                 let marker;
 
                 if (multiRailway) {
                     // Diamond marker for multi-railway junctions
                     const diamondIcon = L.divIcon({
                         className: 'diamond-marker',
-                        html: `<div class="diamond" style="background: #666; border-color: #888;" data-name="${name}"></div>`,
+                        html: `<div class="diamond" style="background: ${color}; border-color: #fff;" data-name="${name}"></div>`,
                         iconSize: [12, 12],
                         iconAnchor: [6, 6]
                     });
                     marker = L.marker([settlement.lat, settlement.lon], {icon: diamondIcon}).addTo(map);
-                    marker.isMultiRailway = true;
                 } else {
-                    // Circle marker for single-railway settlements
                     marker = L.circleMarker([settlement.lat, settlement.lon], {
                         radius: 4,
-                        fillColor: '#666',
-                        color: '#888',
+                        fillColor: color,
+                        color: '#fff',
                         weight: 1,
                         opacity: 0.8,
                         fillOpacity: 0.6
                     }).addTo(map);
-                    marker.isMultiRailway = false;
                 }
 
-                // Store first railway color for later use
-                marker.firstRailwayColor = firstColor;
-
-                // Hover tooltip
                 marker.bindTooltip(name, {
                     permanent: false,
                     direction: 'top',
                     offset: [0, -5]
                 });
 
-                // Click handler
-                marker.on('click', () => selectNode(name));
+                marker.settlementData = {
+                    name,
+                    firstRailway,
+                    multiRailway,
+                    railway_arrives: settlement.railway_arrives
+                };
 
-                // Hover handlers for edge highlighting
-                marker.on('mouseover', () => highlightNodeEdges(name));
-                marker.on('mouseout', () => clearHighlights());
-
-                nodeMarkers[name] = marker;
+                leafletMarkers[name] = marker;
                 nodeDegrees[name] = 0;
             });
-
-            console.log('Created', Object.keys(nodeMarkers).length, 'node markers');
         }
 
-        // Create edge polylines (all hidden initially)
-        function createEdgePolylines() {
-            edges.forEach((edge, index) => {
-                const fromSettlement = data.settlements[edge.from];
-                const toSettlement = data.settlements[edge.to];
+        // ==================== D3 ELEMENTS ====================
 
-                if (!fromSettlement || !toSettlement) return;
+        function createD3Elements() {
+            const g = svg.select('g');
 
-                const polyline = L.polyline(
-                    [[fromSettlement.lat, fromSettlement.lon], [toSettlement.lat, toSettlement.lon]],
-                    {
-                        color: railwayColors[edge.railway] || '#888',
-                        weight: 2,
-                        opacity: 0  // Hidden initially
-                    }
-                ).addTo(map);
+            // Create links
+            linkElements = g.selectAll('.link')
+                .data(d3Links)
+                .enter()
+                .append('line')
+                .attr('class', 'link')
+                .attr('stroke', d => railwayColors[d.railway])
+                .attr('stroke-width', 2)
+                .attr('x1', d => d.source.geoX)
+                .attr('y1', d => d.source.geoY)
+                .attr('x2', d => d.target.geoX)
+                .attr('y2', d => d.target.geoY);
 
-                // Store edge metadata
-                polyline.edgeData = edge;
-                polyline.edgeIndex = index;
+            // Create circle nodes
+            const circleNodes = d3Nodes.filter(d => !d.isMultiRailway);
+            nodeElements = g.selectAll('.node')
+                .data(circleNodes)
+                .enter()
+                .append('circle')
+                .attr('class', 'node')
+                .attr('r', 4)
+                .attr('cx', d => d.geoX)
+                .attr('cy', d => d.geoY)
+                .attr('fill', d => railwayColors[d.first_railway] || '#666')
+                .on('mouseover', showTooltip)
+                .on('mouseout', hideTooltip);
 
-                edgePolylines.push(polyline);
-            });
-
-            console.log('Created', edgePolylines.length, 'edge polylines');
+            // Create diamond nodes for multi-railway
+            const diamondNodes = d3Nodes.filter(d => d.isMultiRailway);
+            g.selectAll('.node-diamond')
+                .data(diamondNodes)
+                .enter()
+                .append('rect')
+                .attr('class', 'node-diamond')
+                .attr('width', 10)
+                .attr('height', 10)
+                .attr('x', d => d.geoX - 5)
+                .attr('y', d => d.geoY - 5)
+                .attr('transform', d => `rotate(45, ${d.geoX}, ${d.geoY})`)
+                .attr('fill', d => railwayColors[d.first_railway] || '#666')
+                .on('mouseover', showTooltip)
+                .on('mouseout', hideTooltip);
         }
 
-        // Update visualization for current year and filters
+        // ==================== VIEW SWITCHING ====================
+
+        function switchView(view) {
+            if (view === currentView) return;
+            currentView = view;
+
+            document.getElementById('geoBtn').classList.toggle('active', view === 'geo');
+            document.getElementById('forceBtn').classList.toggle('active', view === 'force');
+            document.getElementById('map').classList.toggle('hidden', view === 'force');
+            document.getElementById('graph').classList.toggle('active', view === 'force');
+
+            if (view === 'force') {
+                animateToForce();
+            }
+        }
+
+        function animateToForce() {
+            const duration = 800;
+
+            // Animate circle nodes
+            svg.selectAll('.node')
+                .transition()
+                .duration(duration)
+                .attr('cx', d => d.forceX)
+                .attr('cy', d => d.forceY);
+
+            // Animate diamond nodes
+            svg.selectAll('.node-diamond')
+                .transition()
+                .duration(duration)
+                .attr('x', d => d.forceX - 5)
+                .attr('y', d => d.forceY - 5)
+                .attr('transform', d => `rotate(45, ${d.forceX}, ${d.forceY})`);
+
+            // Animate links
+            linkElements
+                .transition()
+                .duration(duration)
+                .attr('x1', d => d.source.forceX)
+                .attr('y1', d => d.source.forceY)
+                .attr('x2', d => d.target.forceX)
+                .attr('y2', d => d.target.forceY);
+        }
+
+        // ==================== VISUALIZATION UPDATE ====================
+
         function updateVisualization() {
             const year = parseInt(document.getElementById('yearSlider').value);
             document.getElementById('yearDisplay').textContent = year;
 
-            // Reset all node degrees
-            Object.keys(nodeDegrees).forEach(name => {
-                nodeDegrees[name] = 0;
-            });
+            // Reset degrees
+            Object.keys(nodeDegrees).forEach(name => nodeDegrees[name] = 0);
 
             let visibleEdgeCount = 0;
+            let connectedCount = 0;
+            let isolatedCount = 0;
 
-            // Update edge visibility and count degrees
-            edgePolylines.forEach(polyline => {
-                const edge = polyline.edgeData;
-                const isVisible = edge.connected_year <= year && visibleRailways[edge.railway];
-
+            // Update Leaflet edges
+            leafletEdges.forEach(polyline => {
+                const link = polyline.linkData;
+                const isVisible = link.connected_year <= year && visibleRailways[link.railway];
                 polyline.setStyle({ opacity: isVisible ? 0.6 : 0 });
 
                 if (isVisible) {
                     visibleEdgeCount++;
-                    nodeDegrees[edge.from]++;
-                    nodeDegrees[edge.to]++;
+                    const sourceId = link.source.id || link.source;
+                    const targetId = link.target.id || link.target;
+                    nodeDegrees[sourceId]++;
+                    nodeDegrees[targetId]++;
                 }
             });
 
-            // Update node styles based on degree
-            let connectedCount = 0;
-            let isolatedCount = 0;
+            // Update D3 links
+            linkElements.attr('stroke-opacity', d => {
+                const isVisible = d.connected_year <= year && visibleRailways[d.railway];
+                return isVisible ? 0.6 : 0;
+            });
 
-            Object.entries(nodeMarkers).forEach(([name, marker]) => {
+            // Update Leaflet markers
+            Object.entries(leafletMarkers).forEach(([name, marker]) => {
                 const degree = nodeDegrees[name];
-                const settlement = data.settlements[name];
-                const hasRailway = settlement.railway_arrives && settlement.railway_arrives <= year;
-                const railwayColor = marker.firstRailwayColor;
+                const sData = marker.settlementData;
+                const hasRailway = sData.railway_arrives && sData.railway_arrives <= year;
+                const color = railwayColors[sData.firstRailway] || '#666';
 
-                if (marker.isMultiRailway) {
-                    // Diamond marker - update via DOM
+                if (sData.multiRailway) {
                     const diamond = document.querySelector(`.diamond[data-name="${name}"]`);
                     if (diamond) {
                         if (degree > 0) {
@@ -653,7 +827,7 @@
                             const size = Math.min(8 + degree * 0.6, 14);
                             diamond.style.width = size + 'px';
                             diamond.style.height = size + 'px';
-                            diamond.style.background = railwayColor;
+                            diamond.style.background = color;
                             diamond.style.borderColor = '#fff';
                             diamond.style.opacity = '1';
                         } else if (hasRailway) {
@@ -673,13 +847,12 @@
                         }
                     }
                 } else {
-                    // Circle marker - update via setStyle
                     if (degree > 0) {
                         connectedCount++;
                         const radius = Math.min(4 + degree * 0.8, 12);
                         marker.setStyle({
                             radius: radius,
-                            fillColor: railwayColor,
+                            fillColor: color,
                             color: '#fff',
                             weight: 1,
                             fillOpacity: 0.8
@@ -706,8 +879,56 @@
                 }
             });
 
-            // Update statistics
-            const totalNodes = Object.keys(nodeMarkers).length;
+            // Update D3 nodes
+            svg.selectAll('.node')
+                .attr('r', d => {
+                    const degree = nodeDegrees[d.id];
+                    if (degree > 0) return Math.min(4 + degree * 0.5, 12);
+                    if (d.railway_arrives && d.railway_arrives <= year) return 4;
+                    return 3;
+                })
+                .attr('fill', d => {
+                    const degree = nodeDegrees[d.id];
+                    const hasRailway = d.railway_arrives && d.railway_arrives <= year;
+                    if (degree > 0) return railwayColors[d.first_railway] || '#888';
+                    if (hasRailway) return '#888';
+                    return '#444';
+                })
+                .attr('opacity', d => {
+                    const degree = nodeDegrees[d.id];
+                    if (degree > 0) return 1;
+                    if (d.railway_arrives && d.railway_arrives <= year) return 0.6;
+                    return 0.3;
+                });
+
+            // Update D3 diamond nodes
+            svg.selectAll('.node-diamond')
+                .attr('width', d => {
+                    const degree = nodeDegrees[d.id];
+                    if (degree > 0) return Math.min(8 + degree * 0.4, 14);
+                    return 8;
+                })
+                .attr('height', d => {
+                    const degree = nodeDegrees[d.id];
+                    if (degree > 0) return Math.min(8 + degree * 0.4, 14);
+                    return 8;
+                })
+                .attr('fill', d => {
+                    const degree = nodeDegrees[d.id];
+                    const hasRailway = d.railway_arrives && d.railway_arrives <= year;
+                    if (degree > 0) return railwayColors[d.first_railway] || '#888';
+                    if (hasRailway) return '#888';
+                    return '#444';
+                })
+                .attr('opacity', d => {
+                    const degree = nodeDegrees[d.id];
+                    if (degree > 0) return 1;
+                    if (d.railway_arrives && d.railway_arrives <= year) return 0.6;
+                    return 0.3;
+                });
+
+            // Update stats
+            const totalNodes = Object.keys(leafletMarkers).length;
             const possibleEdges = (totalNodes * (totalNodes - 1)) / 2;
             const density = possibleEdges > 0 ? ((visibleEdgeCount / possibleEdges) * 100).toFixed(2) : 0;
 
@@ -716,16 +937,9 @@
             document.getElementById('connectedCount').textContent = connectedCount;
             document.getElementById('isolatedCount').textContent = isolatedCount;
 
-            // Update top hubs
             updateTopHubs();
-
-            // Update selected node details if any
-            if (selectedNode) {
-                updateNodeDetails(selectedNode);
-            }
         }
 
-        // Update top hubs list
         function updateTopHubs() {
             const sorted = Object.entries(nodeDegrees)
                 .filter(([name, degree]) => degree > 0)
@@ -733,114 +947,29 @@
                 .slice(0, 5);
 
             const hubsHtml = sorted.map(([name, degree], i) =>
-                `<li onclick="selectNode('${name}')">
-                    <span class="name">${i + 1}. ${name}</span>
-                    <span class="degree">${degree}</span>
-                </li>`
+                `<li><span class="name">${i + 1}. ${name}</span><span class="degree">${degree}</span></li>`
             ).join('');
 
             document.getElementById('topHubs').innerHTML = hubsHtml || '<li><span class="name">No connected nodes</span></li>';
         }
 
-        // Select a node and show details
-        function selectNode(name) {
-            selectedNode = name;
+        // ==================== TOOLTIPS ====================
 
-            // Show details panel, hide no-selection message
-            document.getElementById('settlementDetails').classList.add('active');
-            document.getElementById('noSelection').style.display = 'none';
-
-            // Center map on node
-            const settlement = data.settlements[name];
-            map.setView([settlement.lat, settlement.lon], 8);
-
-            // Update details
-            updateNodeDetails(name);
-
-            // Highlight the selected node
-            nodeMarkers[name].setStyle({
-                color: '#ffcc00',
-                weight: 3
-            });
+        function showTooltip(event, d) {
+            const tooltip = document.getElementById('tooltip');
+            const railways = d.railways ? d.railways.map(r => `${r.railway} (${r.year})`).join(', ') : 'None';
+            tooltip.innerHTML = `<strong>${d.id}</strong><br>Railways: ${railways}<br>Connections: ${nodeDegrees[d.id] || 0}`;
+            tooltip.style.left = (event.pageX + 10) + 'px';
+            tooltip.style.top = (event.pageY - 10) + 'px';
+            tooltip.style.opacity = 1;
         }
 
-        // Update node details panel
-        function updateNodeDetails(name) {
-            const settlement = data.settlements[name];
-            const degree = nodeDegrees[name];
-            const year = parseInt(document.getElementById('yearSlider').value);
-
-            document.getElementById('detailName').textContent = name;
-            document.getElementById('detailDegree').textContent = degree;
-            document.getElementById('detailFirstRailway').textContent =
-                settlement.first_railway ? `${settlement.first_railway} (${settlement.railway_arrives})` : 'None';
-
-            // Railways list
-            let railwaysHtml = '';
-            if (settlement.railways) {
-                settlement.railways.forEach(r => {
-                    const color = railwayColors[r.railway] || railwayColors.Other;
-                    const opacity = r.year <= year ? 1 : 0.5;
-                    railwaysHtml += `<span class="railway-tag" style="background: ${color}; opacity: ${opacity}">${r.railway} (${r.year})</span>`;
-                });
-            }
-            document.getElementById('detailRailways').innerHTML = railwaysHtml;
-
-            // Connections list
-            const connections = data.connections[name] || [];
-            const visibleConnections = connections.filter(conn => {
-                if (!conn.connected_year || conn.connected_year > year) return false;
-                let railway = conn.shared_railway;
-                if (!['CPR', 'QLSRSC', 'CNoR', 'GTPR'].includes(railway)) railway = 'Other';
-                return visibleRailways[railway];
-            });
-
-            let connectionsHtml = '';
-            visibleConnections.sort((a, b) => a.distance_km - b.distance_km).forEach(conn => {
-                connectionsHtml += `<div class="connection-item">
-                    <span>${conn.to}</span>
-                    <span>${conn.distance_km} km</span>
-                </div>`;
-            });
-            document.getElementById('detailConnections').innerHTML = connectionsHtml || '<div class="connection-item"><span>No connections</span></div>';
+        function hideTooltip() {
+            document.getElementById('tooltip').style.opacity = 0;
         }
 
-        // Highlight edges connected to a node
-        function highlightNodeEdges(name) {
-            clearHighlights();
+        // ==================== RAILWAY TOGGLES ====================
 
-            const year = parseInt(document.getElementById('yearSlider').value);
-            const fromSettlement = data.settlements[name];
-
-            edgePolylines.forEach(polyline => {
-                const edge = polyline.edgeData;
-                if ((edge.from === name || edge.to === name) &&
-                    edge.connected_year <= year &&
-                    visibleRailways[edge.railway]) {
-
-                    const toName = edge.from === name ? edge.to : edge.from;
-                    const toSettlement = data.settlements[toName];
-
-                    const highlightLine = L.polyline(
-                        [[fromSettlement.lat, fromSettlement.lon], [toSettlement.lat, toSettlement.lon]],
-                        {
-                            color: '#ffffff',
-                            weight: 4,
-                            opacity: 0.8,
-                            pane: 'highlightPane'
-                        }
-                    );
-                    highlightLayer.addLayer(highlightLine);
-                }
-            });
-        }
-
-        // Clear highlight layer
-        function clearHighlights() {
-            highlightLayer.clearLayers();
-        }
-
-        // Toggle railway visibility
         function toggleRailway(railway) {
             visibleRailways[railway] = !visibleRailways[railway];
             const toggle = document.querySelector(`.railway-toggle[data-railway="${railway}"]`);
@@ -849,7 +978,8 @@
             updateVisualization();
         }
 
-        // Play animation
+        // ==================== ANIMATION ====================
+
         function togglePlay() {
             if (isPlaying) {
                 clearInterval(playInterval);
@@ -874,39 +1004,41 @@
             }
         }
 
-        // Reset to 1882
         function reset() {
             if (isPlaying) togglePlay();
             document.getElementById('yearSlider').value = 1882;
             updateVisualization();
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            initMap();
-            loadData();
+        // ==================== EVENT LISTENERS ====================
 
-            // Year slider
+        function setupEventListeners() {
+            document.getElementById('geoBtn').addEventListener('click', () => switchView('geo'));
+            document.getElementById('forceBtn').addEventListener('click', () => switchView('force'));
             document.getElementById('yearSlider').addEventListener('input', updateVisualization);
-
-            // Play/Reset buttons
             document.getElementById('playBtn').addEventListener('click', togglePlay);
             document.getElementById('resetBtn').addEventListener('click', reset);
 
-            // Railway toggles
             document.querySelectorAll('.railway-toggle').forEach(toggle => {
                 toggle.addEventListener('click', (e) => {
-                    // Prevent checkbox default so we control it
                     if (e.target.tagName !== 'INPUT') {
                         e.preventDefault();
                     }
                     toggleRailway(toggle.dataset.railway);
                 });
             });
-        });
 
-        // Make selectNode available globally for onclick handlers
-        window.selectNode = selectNode;
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                const container = document.querySelector('.view-container');
+                graphWidth = container.clientWidth;
+                graphHeight = container.clientHeight;
+                svg.attr('width', graphWidth).attr('height', graphHeight);
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
