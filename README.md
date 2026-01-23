@@ -83,34 +83,38 @@ Watch the four major railway companies expand across Saskatchewan year by year.
 
 ### 4. Network Graph
 
-Interactive network graph visualization showing all 429 Saskatchewan settlements as nodes and approximately 857 railway connections as edges.
+Interactive network graph visualization showing all 429 Saskatchewan settlements as nodes and approximately 1,121 railway connections as edges. Toggle between Geographic and Network views to explore the data differently.
+
+**View Modes:**
+- **Geographic View**: Nodes positioned by lat/lon on a light CartoDB Voyager basemap (distinct from Railway Timeline's dark map)
+- **Network View**: Force-directed layout on dark background - nodes arranged by connectivity, revealing network structure that geography obscures (hubs cluster in center, isolated nodes drift to edges)
 
 **Features:**
-- All settlements displayed as nodes on the map
+- Toggle between Geographic and Network views with animated transitions
 - Node size scales with degree (number of connections)
+- Nodes colored by first railway (CPR=red, QLSRSC=green, CNoR=yellow, GTPR=purple)
+- Multi-railway junctions shown as diamonds (e.g., Saskatoon, Regina, Moose Jaw)
 - Railway connections shown as colored edges
 - Time slider (1882-1920) to watch network grow
-- Filter by railway company (CPR, QLSRSC, CNoR, GTPR)
+- Filter by railway company
 - Network statistics panel (edges, density, connected/isolated nodes)
 - Top hubs ranking by connectivity
-- Hover highlighting shows all connections for a node
-- Click to see settlement details and connection list
 - Play animation to watch network evolve
 
 **Network Statistics (by 1920):**
 | Metric | Value |
 |--------|-------|
 | Total Nodes | 429 settlements |
-| Railway-Connected Edges | ~857 |
-| Connected Settlements | ~391 |
-| Isolated Settlements | ~38 |
+| Railway-Connected Edges | 1,121 |
+| Connected Settlements | ~420 |
+| Isolated Settlements | ~8 |
 
 **Color Scheme:**
-- Nodes: Green (#4ecca3) for connected, gray for isolated
-- CPR edges: Red (#e94560)
-- QLSRSC edges: Green (#4ecca3)
-- CNoR edges: Yellow (#ffd93d)
-- GTPR edges: Purple (#6c5ce7)
+- CPR: Red (#e94560)
+- QLSRSC: Green (#4ecca3)
+- CNoR: Yellow (#ffd93d)
+- GTPR: Purple (#6c5ce7)
+- Other/No railway: Gray (#888)
 
 ## Project Structure
 
