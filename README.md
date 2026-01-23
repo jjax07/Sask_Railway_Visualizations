@@ -81,6 +81,37 @@ Watch the four major railway companies expand across Saskatchewan year by year.
 | CNoR | Yellow | 1899+ | Canadian Northern - Northerly competitor through Saskatoon |
 | GTPR | Purple | 1905+ | Grand Trunk Pacific - Third transcontinental via Saskatoon |
 
+### 4. Network Graph
+
+Interactive network graph visualization showing all 429 Saskatchewan settlements as nodes and approximately 857 railway connections as edges.
+
+**Features:**
+- All settlements displayed as nodes on the map
+- Node size scales with degree (number of connections)
+- Railway connections shown as colored edges
+- Time slider (1882-1920) to watch network grow
+- Filter by railway company (CPR, QLSRSC, CNoR, GTPR)
+- Network statistics panel (edges, density, connected/isolated nodes)
+- Top hubs ranking by connectivity
+- Hover highlighting shows all connections for a node
+- Click to see settlement details and connection list
+- Play animation to watch network evolve
+
+**Network Statistics (by 1920):**
+| Metric | Value |
+|--------|-------|
+| Total Nodes | 429 settlements |
+| Railway-Connected Edges | ~857 |
+| Connected Settlements | ~391 |
+| Isolated Settlements | ~38 |
+
+**Color Scheme:**
+- Nodes: Green (#4ecca3) for connected, gray for isolated
+- CPR edges: Red (#e94560)
+- QLSRSC edges: Green (#4ecca3)
+- CNoR edges: Yellow (#ffd93d)
+- GTPR edges: Purple (#6c5ce7)
+
 ## Project Structure
 
 ```
@@ -89,6 +120,7 @@ Sask_Railway_Visualizations/
 ├── one_hour_map.html          # Saskatoon corridor visualization
 ├── settlement_explorer.html   # Settlement explorer visualization
 ├── railway_timeline.html      # Railway network timeline
+├── network_graph.html         # Network graph visualization
 ├── data/
 │   ├── settlements.json           # 429 settlements with coordinates & railway info
 │   ├── settlement_connections.json # Pre-calculated connections for explorer

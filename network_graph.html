@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Network Graph</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #aaa;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .nav {
+            background: #0f3460;
+            padding: 10px;
+            text-align: center;
+        }
+        .nav a {
+            color: #e94560;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 15px;
+            border: 1px solid #e94560;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        .nav a:hover {
+            background: #e94560;
+            color: #fff;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 160px);
+        }
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+        .sidebar {
+            width: 320px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        .controls label {
+            display: block;
+            margin-bottom: 10px;
+            color: #e94560;
+            font-weight: bold;
+        }
+        .year-display {
+            font-size: 48px;
+            text-align: center;
+            color: #e94560;
+            margin: 10px 0;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .play-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .play-controls button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .play-controls button:hover {
+            background: #ff6b6b;
+        }
+        .section {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .section h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e94560;
+            padding-bottom: 5px;
+            font-size: 14px;
+        }
+        .railway-toggles {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .railway-toggle {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+            transition: background 0.2s;
+        }
+        .railway-toggle:hover {
+            background: #1a1a2e;
+        }
+        .railway-toggle.inactive {
+            opacity: 0.4;
+        }
+        .railway-toggle input {
+            margin-right: 8px;
+            accent-color: #e94560;
+        }
+        .railway-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 6px;
+        }
+        .railway-toggle span {
+            font-size: 12px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .stat-box {
+            background: #1a1a2e;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4ecca3;
+        }
+        .stat-box .label {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .top-hubs {
+            list-style: none;
+        }
+        .top-hubs li {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #1a1a2e;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .top-hubs li:hover {
+            background: #1a1a2e;
+            margin: 0 -5px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .top-hubs .name {
+            color: #ccc;
+        }
+        .top-hubs .degree {
+            color: #4ecca3;
+            font-weight: bold;
+        }
+        .settlement-details {
+            display: none;
+        }
+        .settlement-details.active {
+            display: block;
+        }
+        .settlement-details .settlement-name {
+            color: #e94560;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .settlement-details .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #1a1a2e;
+            font-size: 13px;
+        }
+        .settlement-details .detail-row .label {
+            color: #888;
+        }
+        .settlement-details .detail-row .value {
+            color: #ccc;
+        }
+        .settlement-details .railways-list {
+            margin-top: 10px;
+        }
+        .settlement-details .railway-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin: 2px;
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+        .settlement-details .connections-list {
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .settlement-details .connection-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 12px;
+            color: #aaa;
+        }
+        .legend {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #1a1a2e;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 11px;
+            color: #888;
+            margin: 5px 0;
+        }
+        .legend-line {
+            width: 20px;
+            height: 3px;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        .legend-circle {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .no-selection {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Railway Network Graph</h1>
+        <p>Interactive network graph showing all 429 Saskatchewan settlements as nodes and railway connections as edges. Watch the network grow from 1882 to 1920.</p>
+    </div>
+    <div class="nav">
+        <a href="index.html">Home</a>
+        <a href="one_hour_map.html">Saskatoon Corridor</a>
+        <a href="settlement_explorer.html">Settlement Explorer</a>
+        <a href="railway_timeline.html">Railway Timeline</a>
+        <a href="network_graph.html">Network Graph</a>
+    </div>
+    <div class="container">
+        <div id="map"></div>
+        <div class="sidebar">
+            <div class="controls">
+                <label>Year:</label>
+                <div class="year-display" id="yearDisplay">1882</div>
+                <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1882">
+                <div class="play-controls">
+                    <button id="playBtn">Play</button>
+                    <button id="resetBtn">Reset</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>RAILWAYS</h3>
+                <div class="railway-toggles">
+                    <label class="railway-toggle" data-railway="CPR">
+                        <input type="checkbox" checked>
+                        <div class="railway-color" style="background: #e94560;"></div>
+                        <span>CPR</span>
+                    </label>
+                    <label class="railway-toggle" data-railway="QLSRSC">
+                        <input type="checkbox" checked>
+                        <div class="railway-color" style="background: #4ecca3;"></div>
+                        <span>QLSRSC</span>
+                    </label>
+                    <label class="railway-toggle" data-railway="CNoR">
+                        <input type="checkbox" checked>
+                        <div class="railway-color" style="background: #ffd93d;"></div>
+                        <span>CNoR</span>
+                    </label>
+                    <label class="railway-toggle" data-railway="GTPR">
+                        <input type="checkbox" checked>
+                        <div class="railway-color" style="background: #6c5ce7;"></div>
+                        <span>GTPR</span>
+                    </label>
+                    <label class="railway-toggle" data-railway="Other">
+                        <input type="checkbox" checked>
+                        <div class="railway-color" style="background: #888;"></div>
+                        <span>Other</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>NETWORK STATS</h3>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="value" id="edgeCount">0</div>
+                        <div class="label">Edges</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="value" id="densityValue">0%</div>
+                        <div class="label">Density</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="value" id="connectedCount">0</div>
+                        <div class="label">Connected</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="value" id="isolatedCount">0</div>
+                        <div class="label">Isolated</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>TOP HUBS</h3>
+                <ol class="top-hubs" id="topHubs">
+                    <li><span class="name">Loading...</span></li>
+                </ol>
+            </div>
+
+            <div class="section settlement-details" id="settlementDetails">
+                <h3>SETTLEMENT DETAILS</h3>
+                <div class="settlement-name" id="detailName">-</div>
+                <div class="detail-row">
+                    <span class="label">Connections:</span>
+                    <span class="value" id="detailDegree">0</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">First Railway:</span>
+                    <span class="value" id="detailFirstRailway">-</span>
+                </div>
+                <div class="railways-list" id="detailRailways"></div>
+                <div class="connections-list" id="detailConnections"></div>
+            </div>
+
+            <div class="section" id="noSelection">
+                <div class="no-selection">Click a node to see details</div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #4ecca3;"></div>
+                    <span>Connected settlement (size = degree)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-circle" style="background: #666;"></div>
+                    <span>Isolated settlement (no railway)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #e94560;"></div>
+                    <span>CPR connection</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #4ecca3;"></div>
+                    <span>QLSRSC connection</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #ffd93d;"></div>
+                    <span>CNoR connection</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line" style="background: #6c5ce7;"></div>
+                    <span>GTPR connection</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Global state
+        let data = null;
+        let map = null;
+        let edges = [];           // Unique edge array
+        let edgePolylines = [];   // Leaflet polylines for edges
+        let nodeMarkers = {};     // Settlement name -> marker
+        let nodeDegrees = {};     // Settlement name -> current degree
+        let highlightLayer = null;
+        let selectedNode = null;
+        let isPlaying = false;
+        let playInterval = null;
+
+        // Railway colors
+        const railwayColors = {
+            CPR: '#e94560',
+            QLSRSC: '#4ecca3',
+            CNoR: '#ffd93d',
+            GTPR: '#6c5ce7',
+            Other: '#888'
+        };
+
+        // Railway visibility state
+        let visibleRailways = {CPR: true, QLSRSC: true, CNoR: true, GTPR: true, Other: true};
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([52.0, -106.0], 6);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Create custom pane for highlights with higher z-index
+            map.createPane('highlightPane');
+            map.getPane('highlightPane').style.zIndex = 450;
+
+            highlightLayer = L.layerGroup({pane: 'highlightPane'}).addTo(map);
+        }
+
+        // Load data
+        async function loadData() {
+            try {
+                const response = await fetch('data/settlement_connections.json');
+                data = await response.json();
+                console.log('Data loaded:', Object.keys(data.settlements).length, 'settlements');
+
+                generateUniqueEdges();
+                createNodeMarkers();
+                createEdgePolylines();
+                updateVisualization();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('topHubs').innerHTML = '<li>Error loading data. Try: python -m http.server 8080</li>';
+            }
+        }
+
+        // Generate unique edges from adjacency list
+        function generateUniqueEdges() {
+            const edgeSet = new Set();
+            edges = [];
+
+            Object.entries(data.connections).forEach(([from, connections]) => {
+                connections.forEach(conn => {
+                    // Only include edges with shared railway (railway-connected pairs)
+                    if (!conn.shared_railway || !conn.connected_year) return;
+
+                    // Create sorted key to deduplicate
+                    const key = [from, conn.to].sort().join('|');
+                    if (edgeSet.has(key)) return;
+                    edgeSet.add(key);
+
+                    // Normalize railway name to known categories
+                    let railway = conn.shared_railway;
+                    if (!['CPR', 'QLSRSC', 'CNoR', 'GTPR'].includes(railway)) {
+                        railway = 'Other';
+                    }
+
+                    edges.push({
+                        from: from,
+                        to: conn.to,
+                        distance_km: conn.distance_km,
+                        railway: railway,
+                        connected_year: conn.connected_year
+                    });
+                });
+            });
+
+            console.log('Generated', edges.length, 'unique edges');
+        }
+
+        // Create node markers for all settlements
+        function createNodeMarkers() {
+            Object.entries(data.settlements).forEach(([name, settlement]) => {
+                const marker = L.circleMarker([settlement.lat, settlement.lon], {
+                    radius: 4,
+                    fillColor: '#666',
+                    color: '#888',
+                    weight: 1,
+                    opacity: 0.8,
+                    fillOpacity: 0.6
+                }).addTo(map);
+
+                // Hover tooltip
+                marker.bindTooltip(name, {
+                    permanent: false,
+                    direction: 'top',
+                    offset: [0, -5]
+                });
+
+                // Click handler
+                marker.on('click', () => selectNode(name));
+
+                // Hover handlers for edge highlighting
+                marker.on('mouseover', () => highlightNodeEdges(name));
+                marker.on('mouseout', () => clearHighlights());
+
+                nodeMarkers[name] = marker;
+                nodeDegrees[name] = 0;
+            });
+
+            console.log('Created', Object.keys(nodeMarkers).length, 'node markers');
+        }
+
+        // Create edge polylines (all hidden initially)
+        function createEdgePolylines() {
+            edges.forEach((edge, index) => {
+                const fromSettlement = data.settlements[edge.from];
+                const toSettlement = data.settlements[edge.to];
+
+                if (!fromSettlement || !toSettlement) return;
+
+                const polyline = L.polyline(
+                    [[fromSettlement.lat, fromSettlement.lon], [toSettlement.lat, toSettlement.lon]],
+                    {
+                        color: railwayColors[edge.railway] || '#888',
+                        weight: 2,
+                        opacity: 0  // Hidden initially
+                    }
+                ).addTo(map);
+
+                // Store edge metadata
+                polyline.edgeData = edge;
+                polyline.edgeIndex = index;
+
+                edgePolylines.push(polyline);
+            });
+
+            console.log('Created', edgePolylines.length, 'edge polylines');
+        }
+
+        // Update visualization for current year and filters
+        function updateVisualization() {
+            const year = parseInt(document.getElementById('yearSlider').value);
+            document.getElementById('yearDisplay').textContent = year;
+
+            // Reset all node degrees
+            Object.keys(nodeDegrees).forEach(name => {
+                nodeDegrees[name] = 0;
+            });
+
+            let visibleEdgeCount = 0;
+
+            // Update edge visibility and count degrees
+            edgePolylines.forEach(polyline => {
+                const edge = polyline.edgeData;
+                const isVisible = edge.connected_year <= year && visibleRailways[edge.railway];
+
+                polyline.setStyle({ opacity: isVisible ? 0.6 : 0 });
+
+                if (isVisible) {
+                    visibleEdgeCount++;
+                    nodeDegrees[edge.from]++;
+                    nodeDegrees[edge.to]++;
+                }
+            });
+
+            // Update node styles based on degree
+            let connectedCount = 0;
+            let isolatedCount = 0;
+
+            Object.entries(nodeMarkers).forEach(([name, marker]) => {
+                const degree = nodeDegrees[name];
+                const settlement = data.settlements[name];
+                const hasRailway = settlement.railway_arrives && settlement.railway_arrives <= year;
+
+                if (degree > 0) {
+                    connectedCount++;
+                    // Size scales with degree: 4px base + 0.8px per connection, max 12px
+                    const radius = Math.min(4 + degree * 0.8, 12);
+                    marker.setStyle({
+                        radius: radius,
+                        fillColor: '#4ecca3',
+                        color: '#fff',
+                        weight: 1,
+                        fillOpacity: 0.8
+                    });
+                } else if (hasRailway) {
+                    // Has railway but no visible connections (edges might be filtered)
+                    isolatedCount++;
+                    marker.setStyle({
+                        radius: 4,
+                        fillColor: '#888',
+                        color: '#aaa',
+                        weight: 1,
+                        fillOpacity: 0.6
+                    });
+                } else {
+                    // No railway yet
+                    isolatedCount++;
+                    marker.setStyle({
+                        radius: 3,
+                        fillColor: '#444',
+                        color: '#666',
+                        weight: 1,
+                        fillOpacity: 0.4
+                    });
+                }
+            });
+
+            // Update statistics
+            const totalNodes = Object.keys(nodeMarkers).length;
+            const possibleEdges = (totalNodes * (totalNodes - 1)) / 2;
+            const density = possibleEdges > 0 ? ((visibleEdgeCount / possibleEdges) * 100).toFixed(2) : 0;
+
+            document.getElementById('edgeCount').textContent = visibleEdgeCount;
+            document.getElementById('densityValue').textContent = density + '%';
+            document.getElementById('connectedCount').textContent = connectedCount;
+            document.getElementById('isolatedCount').textContent = isolatedCount;
+
+            // Update top hubs
+            updateTopHubs();
+
+            // Update selected node details if any
+            if (selectedNode) {
+                updateNodeDetails(selectedNode);
+            }
+        }
+
+        // Update top hubs list
+        function updateTopHubs() {
+            const sorted = Object.entries(nodeDegrees)
+                .filter(([name, degree]) => degree > 0)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const hubsHtml = sorted.map(([name, degree], i) =>
+                `<li onclick="selectNode('${name}')">
+                    <span class="name">${i + 1}. ${name}</span>
+                    <span class="degree">${degree}</span>
+                </li>`
+            ).join('');
+
+            document.getElementById('topHubs').innerHTML = hubsHtml || '<li><span class="name">No connected nodes</span></li>';
+        }
+
+        // Select a node and show details
+        function selectNode(name) {
+            selectedNode = name;
+
+            // Show details panel, hide no-selection message
+            document.getElementById('settlementDetails').classList.add('active');
+            document.getElementById('noSelection').style.display = 'none';
+
+            // Center map on node
+            const settlement = data.settlements[name];
+            map.setView([settlement.lat, settlement.lon], 8);
+
+            // Update details
+            updateNodeDetails(name);
+
+            // Highlight the selected node
+            nodeMarkers[name].setStyle({
+                color: '#ffcc00',
+                weight: 3
+            });
+        }
+
+        // Update node details panel
+        function updateNodeDetails(name) {
+            const settlement = data.settlements[name];
+            const degree = nodeDegrees[name];
+            const year = parseInt(document.getElementById('yearSlider').value);
+
+            document.getElementById('detailName').textContent = name;
+            document.getElementById('detailDegree').textContent = degree;
+            document.getElementById('detailFirstRailway').textContent =
+                settlement.first_railway ? `${settlement.first_railway} (${settlement.railway_arrives})` : 'None';
+
+            // Railways list
+            let railwaysHtml = '';
+            if (settlement.railways) {
+                settlement.railways.forEach(r => {
+                    const color = railwayColors[r.railway] || railwayColors.Other;
+                    const opacity = r.year <= year ? 1 : 0.5;
+                    railwaysHtml += `<span class="railway-tag" style="background: ${color}; opacity: ${opacity}">${r.railway} (${r.year})</span>`;
+                });
+            }
+            document.getElementById('detailRailways').innerHTML = railwaysHtml;
+
+            // Connections list
+            const connections = data.connections[name] || [];
+            const visibleConnections = connections.filter(conn => {
+                if (!conn.connected_year || conn.connected_year > year) return false;
+                let railway = conn.shared_railway;
+                if (!['CPR', 'QLSRSC', 'CNoR', 'GTPR'].includes(railway)) railway = 'Other';
+                return visibleRailways[railway];
+            });
+
+            let connectionsHtml = '';
+            visibleConnections.sort((a, b) => a.distance_km - b.distance_km).forEach(conn => {
+                connectionsHtml += `<div class="connection-item">
+                    <span>${conn.to}</span>
+                    <span>${conn.distance_km} km</span>
+                </div>`;
+            });
+            document.getElementById('detailConnections').innerHTML = connectionsHtml || '<div class="connection-item"><span>No connections</span></div>';
+        }
+
+        // Highlight edges connected to a node
+        function highlightNodeEdges(name) {
+            clearHighlights();
+
+            const year = parseInt(document.getElementById('yearSlider').value);
+            const fromSettlement = data.settlements[name];
+
+            edgePolylines.forEach(polyline => {
+                const edge = polyline.edgeData;
+                if ((edge.from === name || edge.to === name) &&
+                    edge.connected_year <= year &&
+                    visibleRailways[edge.railway]) {
+
+                    const toName = edge.from === name ? edge.to : edge.from;
+                    const toSettlement = data.settlements[toName];
+
+                    const highlightLine = L.polyline(
+                        [[fromSettlement.lat, fromSettlement.lon], [toSettlement.lat, toSettlement.lon]],
+                        {
+                            color: '#ffffff',
+                            weight: 4,
+                            opacity: 0.8,
+                            pane: 'highlightPane'
+                        }
+                    );
+                    highlightLayer.addLayer(highlightLine);
+                }
+            });
+        }
+
+        // Clear highlight layer
+        function clearHighlights() {
+            highlightLayer.clearLayers();
+        }
+
+        // Toggle railway visibility
+        function toggleRailway(railway) {
+            visibleRailways[railway] = !visibleRailways[railway];
+            const toggle = document.querySelector(`.railway-toggle[data-railway="${railway}"]`);
+            toggle.classList.toggle('inactive', !visibleRailways[railway]);
+            toggle.querySelector('input').checked = visibleRailways[railway];
+            updateVisualization();
+        }
+
+        // Play animation
+        function togglePlay() {
+            if (isPlaying) {
+                clearInterval(playInterval);
+                document.getElementById('playBtn').textContent = 'Play';
+                isPlaying = false;
+            } else {
+                isPlaying = true;
+                document.getElementById('playBtn').textContent = 'Pause';
+                let year = parseInt(document.getElementById('yearSlider').value);
+
+                playInterval = setInterval(() => {
+                    year++;
+                    if (year > 1920) {
+                        clearInterval(playInterval);
+                        document.getElementById('playBtn').textContent = 'Play';
+                        isPlaying = false;
+                        return;
+                    }
+                    document.getElementById('yearSlider').value = year;
+                    updateVisualization();
+                }, 500);
+            }
+        }
+
+        // Reset to 1882
+        function reset() {
+            if (isPlaying) togglePlay();
+            document.getElementById('yearSlider').value = 1882;
+            updateVisualization();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            loadData();
+
+            // Year slider
+            document.getElementById('yearSlider').addEventListener('input', updateVisualization);
+
+            // Play/Reset buttons
+            document.getElementById('playBtn').addEventListener('click', togglePlay);
+            document.getElementById('resetBtn').addEventListener('click', reset);
+
+            // Railway toggles
+            document.querySelectorAll('.railway-toggle').forEach(toggle => {
+                toggle.addEventListener('click', (e) => {
+                    // Prevent checkbox default so we control it
+                    if (e.target.tagName !== 'INPUT') {
+                        e.preventDefault();
+                    }
+                    toggleRailway(toggle.dataset.railway);
+                });
+            });
+        });
+
+        // Make selectNode available globally for onclick handlers
+        window.selectNode = selectNode;
+    </script>
+</body>
+</html>

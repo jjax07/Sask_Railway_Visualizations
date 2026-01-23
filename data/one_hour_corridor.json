@@ -5,21 +5,30 @@
   },
   "settlements": [
     {
-      "name": "Osler",
-      "lat": 52.367218967277104,
-      "lon": -106.53848267157272,
-      "distance_km": 28.7,
-      "railway_arrives": 1890,
-      "first_railway": "QLSRSC",
-      "connected_to_saskatoon": 1890
+      "name": "Sutherland",
+      "lat": 52.13404295294396,
+      "lon": -106.6075177686084,
+      "distance_km": 4.3,
+      "railway_arrives": 1908,
+      "first_railway": "CPR",
+      "connected_to_saskatoon": 1908
     },
     {
-      "name": "Dundurn",
-      "lat": 51.80864191632001,
-      "lon": -106.50715802499818,
-      "distance_km": 36.4,
-      "railway_arrives": 1889,
-      "first_railway": "GTPR",
+      "name": "Warman",
+      "lat": 52.308796066544254,
+      "lon": -106.59153021296451,
+      "distance_km": 21.5,
+      "railway_arrives": 1902,
+      "first_railway": "CPR",
+      "connected_to_saskatoon": 1902
+    },
+    {
+      "name": "Vanscoy",
+      "lat": 52.00575006598925,
+      "lon": -106.96769533632929,
+      "distance_km": 24.3,
+      "railway_arrives": 1908,
+      "first_railway": "CNoR",
       "connected_to_saskatoon": 1908
     },
     {
@@ -32,13 +41,22 @@
       "connected_to_saskatoon": 1908
     },
     {
-      "name": "Delisle",
-      "lat": 51.92265905830071,
-      "lon": -107.1221805649192,
-      "distance_km": 38.2,
-      "railway_arrives": 1908,
+      "name": "Dalmeny",
+      "lat": 52.34090922208426,
+      "lon": -106.77322600097465,
+      "distance_km": 25.5,
+      "railway_arrives": 1905,
       "first_railway": "CNoR",
-      "connected_to_saskatoon": 1908
+      "connected_to_saskatoon": 1905
+    },
+    {
+      "name": "Osler",
+      "lat": 52.367218967277104,
+      "lon": -106.53848267157272,
+      "distance_km": 28.7,
+      "railway_arrives": 1890,
+      "first_railway": "QLSRSC",
+      "connected_to_saskatoon": 1890
     },
     {
       "name": "Langham",
@@ -59,15 +77,6 @@
       "connected_to_saskatoon": 1905
     },
     {
-      "name": "Warman",
-      "lat": 52.308796066544254,
-      "lon": -106.59153021296451,
-      "distance_km": 21.5,
-      "railway_arrives": 1902,
-      "first_railway": "CPR",
-      "connected_to_saskatoon": 1902
-    },
-    {
       "name": "Bradwell",
       "lat": 51.947489359944534,
       "lon": -106.22878656152407,
@@ -77,13 +86,22 @@
       "connected_to_saskatoon": 1908
     },
     {
-      "name": "Dalmeny",
-      "lat": 52.34090922208426,
-      "lon": -106.77322600097465,
-      "distance_km": 25.5,
-      "railway_arrives": 1905,
-      "first_railway": null,
-      "connected_to_saskatoon": null
+      "name": "Dundurn",
+      "lat": 51.80864191632001,
+      "lon": -106.50715802499818,
+      "distance_km": 36.4,
+      "railway_arrives": 1889,
+      "first_railway": "QLSRSC",
+      "connected_to_saskatoon": 1889
+    },
+    {
+      "name": "Delisle",
+      "lat": 51.92265905830071,
+      "lon": -107.1221805649192,
+      "distance_km": 38.2,
+      "railway_arrives": 1908,
+      "first_railway": "CNoR",
+      "connected_to_saskatoon": 1908
     },
     {
       "name": "Asquith",
@@ -93,30 +111,12 @@
       "railway_arrives": 1908,
       "first_railway": "CPR",
       "connected_to_saskatoon": 1908
-    },
-    {
-      "name": "Sutherland",
-      "lat": 52.13404295294396,
-      "lon": -106.6075177686084,
-      "distance_km": 4.3,
-      "railway_arrives": 1908,
-      "first_railway": "CPR",
-      "connected_to_saskatoon": 1908
-    },
-    {
-      "name": "Vanscoy",
-      "lat": 52.00575006598925,
-      "lon": -106.96769533632929,
-      "distance_km": 24.3,
-      "railway_arrives": 1908,
-      "first_railway": "CNoR",
-      "connected_to_saskatoon": 1908
     }
   ],
   "saskatoon_connections": {
-    "QLSRSC": 1890,
+    "QLSRSC": 1889,
+    "CPR": 1896,
     "CNoR": 1905,
-    "GTPR": 1908,
-    "CPR": 1896
+    "GTPR": 1908
   }
 }
