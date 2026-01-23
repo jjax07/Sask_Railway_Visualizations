@@ -20,9 +20,9 @@ An interactive map showing which settlements could be reached from Saskatoon wit
 **Key Findings:**
 | Year | Connected Settlements |
 |------|----------------------|
-| 1890 | 2 (Osler, Dundurn) |
-| 1905 | 5 (added Warman, Langham, Aberdeen) |
-| 1910 | 11 (major expansion with GTPR) |
+| 1890 | 1 (Osler via QLSRSC) |
+| 1905 | 4 (added Warman, Langham, Aberdeen via CNoR) |
+| 1910 | 11 (major expansion with GTPR and CPR) |
 
 ### 2. Settlement Explorer
 
@@ -264,4 +264,4 @@ This project is for academic research purposes.
 ---
 
 *Created January 2026*
-*Last updated: January 22, 2026*
+*Last updated: January 23, 2026*
