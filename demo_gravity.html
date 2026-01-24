@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo: Gravitational Pull Animation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 { color: #e94560; margin-bottom: 10px; }
+        .header p { color: #aaa; max-width: 800px; margin: 0 auto; }
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+        #canvas {
+            flex: 1;
+            background: #1a1a2e;
+        }
+        .sidebar {
+            width: 320px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .control-group {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .control-group h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .btn:hover { background: #ff6b6b; }
+        .btn.secondary {
+            background: transparent;
+            border: 2px solid #e94560;
+            color: #e94560;
+        }
+        .btn.secondary:hover {
+            background: rgba(233, 69, 96, 0.2);
+        }
+        .year-display {
+            font-size: 64px;
+            text-align: center;
+            color: #e94560;
+            margin: 10px 0;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .legend {
+            margin-top: 15px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .stats-box {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #0f3460;
+            font-size: 13px;
+        }
+        .stat-value { color: #4ecca3; font-weight: bold; }
+        .explanation {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #aaa;
+            margin-top: 15px;
+        }
+        .explanation strong { color: #4ecca3; }
+        .hub-select {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .hub-btn {
+            padding: 8px;
+            border: 2px solid #0f3460;
+            background: #1a1a2e;
+            color: #aaa;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        .hub-btn:hover {
+            border-color: #e94560;
+            color: #e94560;
+        }
+        .hub-btn.active {
+            border-color: #e94560;
+            background: #e94560;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Demo: Gravitational Pull Animation</h1>
+        <p>Watch railway hubs "pull" connected settlements closer. The railway network acts like gravity, compressing space-time around major centers.</p>
+    </div>
+    <div class="container">
+        <canvas id="canvas"></canvas>
+        <div class="sidebar">
+            <div class="control-group">
+                <h3>ANIMATION</h3>
+                <button class="btn" id="animateBtn">Start Gravity Animation</button>
+                <button class="btn secondary" id="resetBtn">Reset to Geographic</button>
+            </div>
+
+            <div class="control-group">
+                <h3>GRAVITY HUBS</h3>
+                <p style="font-size: 12px; color: #888; margin-bottom: 10px;">Major railway junctions that pull connected settlements:</p>
+                <div class="hub-select">
+                    <button class="hub-btn active" data-hub="Saskatoon">Saskatoon</button>
+                    <button class="hub-btn active" data-hub="Regina">Regina</button>
+                    <button class="hub-btn active" data-hub="Moose Jaw">Moose Jaw</button>
+                    <button class="hub-btn active" data-hub="Prince Albert">Prince Albert</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>YEAR</h3>
+                <div class="year-display" id="yearDisplay">1920</div>
+                <input type="range" id="yearSlider" min="1882" max="1920" value="1920">
+            </div>
+
+            <div class="control-group">
+                <h3>GRAVITY STRENGTH</h3>
+                <input type="range" id="gravitySlider" min="1" max="10" value="5">
+                <p style="font-size: 11px; color: #666; margin-top: 5px;">
+                    How strongly railways compress distances
+                </p>
+            </div>
+
+            <div class="stats-box">
+                <div class="stat-row">
+                    <span>Settlements with railway:</span>
+                    <span class="stat-value" id="connectedCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Isolated settlements:</span>
+                    <span class="stat-value" id="isolatedCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Avg pull distance:</span>
+                    <span class="stat-value" id="avgPull">0 km</span>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #e94560; width: 20px; height: 20px;"></div>
+                    <span>Gravity hub (railway junction)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #4ecca3;"></div>
+                    <span>Railway-connected (pulled in)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #666;"></div>
+                    <span>Isolated (drifts outward)</span>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <strong>The Gravity Metaphor:</strong><br><br>
+                Railway junctions act like "gravity wells." Connected settlements are pulled toward hubs proportional to how fast railways could reach them.<br><br>
+                Isolated settlements (no railway) drift to the edges, representing their relative remoteness in travel time.<br><br>
+                This visualizes how railways restructured the perceived geography of Saskatchewan.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = null;
+        let settlements = [];
+        let animating = false;
+        let animationId = null;
+        let currentYear = 1920;
+        let gravityStrength = 0.5;
+        let activeHubs = new Set(['Saskatoon', 'Regina', 'Moose Jaw', 'Prince Albert']);
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        async function loadData() {
+            const response = await fetch('data/settlement_connections.json');
+            data = await response.json();
+            initSettlements();
+            resizeCanvas();
+            draw();
+        }
+
+        function initSettlements() {
+            settlements = [];
+
+            // Calculate bounds
+            let minLat = Infinity, maxLat = -Infinity;
+            let minLon = Infinity, maxLon = -Infinity;
+
+            Object.values(data.settlements).forEach(s => {
+                minLat = Math.min(minLat, s.lat);
+                maxLat = Math.max(maxLat, s.lat);
+                minLon = Math.min(minLon, s.lon);
+                maxLon = Math.max(maxLon, s.lon);
+            });
+
+            const padding = 80;
+            const width = canvas.width - padding * 2;
+            const height = canvas.height - padding * 2;
+
+            Object.entries(data.settlements).forEach(([name, s]) => {
+                const geoX = padding + ((s.lon - minLon) / (maxLon - minLon)) * width;
+                const geoY = padding + ((maxLat - s.lat) / (maxLat - minLat)) * height;
+
+                const isHub = activeHubs.has(name);
+                const hasRailway = s.railway_arrives && s.railway_arrives <= currentYear;
+
+                settlements.push({
+                    name,
+                    geoX, geoY,
+                    x: geoX, y: geoY,  // Current animated position
+                    vx: 0, vy: 0,      // Velocity
+                    isHub,
+                    hasRailway,
+                    railwayArrives: s.railway_arrives,
+                    lat: s.lat, lon: s.lon
+                });
+            });
+
+            updateStats();
+        }
+
+        function updateStats() {
+            let connected = 0, isolated = 0;
+
+            settlements.forEach(s => {
+                if (s.hasRailway) connected++;
+                else isolated++;
+            });
+
+            document.getElementById('connectedCount').textContent = connected;
+            document.getElementById('isolatedCount').textContent = isolated;
+        }
+
+        function calculateGravity() {
+            const hubs = settlements.filter(s => s.isHub && activeHubs.has(s.name));
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            settlements.forEach(s => {
+                if (s.isHub) {
+                    // Hubs stay near their geographic positions but move slightly toward center
+                    const dx = s.geoX - s.x;
+                    const dy = s.geoY - s.y;
+                    s.vx += dx * 0.02;
+                    s.vy += dy * 0.02;
+                    return;
+                }
+
+                if (s.hasRailway) {
+                    // Connected settlements are pulled toward nearest hub
+                    let nearestHub = null;
+                    let nearestDist = Infinity;
+
+                    hubs.forEach(hub => {
+                        const dist = Math.hypot(hub.geoX - s.geoX, hub.geoY - s.geoY);
+                        if (dist < nearestDist) {
+                            nearestDist = dist;
+                            nearestHub = hub;
+                        }
+                    });
+
+                    if (nearestHub) {
+                        // Pull toward hub
+                        const dx = nearestHub.x - s.x;
+                        const dy = nearestHub.y - s.y;
+                        const dist = Math.hypot(dx, dy);
+
+                        if (dist > 20) {
+                            const force = gravityStrength * 0.03;
+                            s.vx += (dx / dist) * force * dist * 0.01;
+                            s.vy += (dy / dist) * force * dist * 0.01;
+                        }
+                    }
+                } else {
+                    // Isolated settlements drift outward from center
+                    const dx = s.x - centerX;
+                    const dy = s.y - centerY;
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist > 10) {
+                        const force = gravityStrength * 0.005;
+                        s.vx += (dx / dist) * force;
+                        s.vy += (dy / dist) * force;
+                    }
+                }
+
+                // Apply friction
+                s.vx *= 0.95;
+                s.vy *= 0.95;
+            });
+
+            // Update positions
+            settlements.forEach(s => {
+                s.x += s.vx;
+                s.y += s.vy;
+
+                // Keep in bounds
+                s.x = Math.max(20, Math.min(canvas.width - 20, s.x));
+                s.y = Math.max(20, Math.min(canvas.height - 20, s.y));
+            });
+
+            // Calculate average pull distance
+            let totalPull = 0;
+            let pullCount = 0;
+            settlements.forEach(s => {
+                if (!s.isHub) {
+                    const pull = Math.hypot(s.x - s.geoX, s.y - s.geoY);
+                    totalPull += pull;
+                    pullCount++;
+                }
+            });
+            const avgPull = pullCount > 0 ? (totalPull / pullCount) : 0;
+            document.getElementById('avgPull').textContent = Math.round(avgPull) + ' px';
+        }
+
+        function draw() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw connections to hubs (faint lines)
+            ctx.strokeStyle = 'rgba(78, 204, 163, 0.1)';
+            ctx.lineWidth = 1;
+            const hubs = settlements.filter(s => s.isHub && activeHubs.has(s.name));
+
+            settlements.forEach(s => {
+                if (!s.isHub && s.hasRailway) {
+                    let nearestHub = null;
+                    let nearestDist = Infinity;
+                    hubs.forEach(hub => {
+                        const dist = Math.hypot(hub.x - s.x, hub.y - s.y);
+                        if (dist < nearestDist) {
+                            nearestDist = dist;
+                            nearestHub = hub;
+                        }
+                    });
+                    if (nearestHub) {
+                        ctx.beginPath();
+                        ctx.moveTo(s.x, s.y);
+                        ctx.lineTo(nearestHub.x, nearestHub.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+
+            // Draw settlements (non-hubs first)
+            settlements.filter(s => !s.isHub).forEach(s => {
+                ctx.beginPath();
+                if (s.hasRailway) {
+                    ctx.arc(s.x, s.y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = '#4ecca3';
+                } else {
+                    ctx.arc(s.x, s.y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = '#666';
+                }
+                ctx.fill();
+            });
+
+            // Draw hubs (on top)
+            settlements.filter(s => s.isHub && activeHubs.has(s.name)).forEach(s => {
+                // Glow effect
+                const gradient = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 40);
+                gradient.addColorStop(0, 'rgba(233, 69, 96, 0.3)');
+                gradient.addColorStop(1, 'rgba(233, 69, 96, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, 40, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Hub dot
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = '#e94560';
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Label
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(s.name, s.x, s.y - 18);
+            });
+
+            if (animating) {
+                calculateGravity();
+                animationId = requestAnimationFrame(draw);
+            }
+        }
+
+        function startAnimation() {
+            if (animating) {
+                animating = false;
+                document.getElementById('animateBtn').textContent = 'Resume Animation';
+            } else {
+                animating = true;
+                document.getElementById('animateBtn').textContent = 'Pause Animation';
+                draw();
+            }
+        }
+
+        function reset() {
+            animating = false;
+            if (animationId) cancelAnimationFrame(animationId);
+            document.getElementById('animateBtn').textContent = 'Start Gravity Animation';
+
+            settlements.forEach(s => {
+                s.x = s.geoX;
+                s.y = s.geoY;
+                s.vx = 0;
+                s.vy = 0;
+            });
+
+            draw();
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            if (data) {
+                initSettlements();
+                draw();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('animateBtn').addEventListener('click', startAnimation);
+        document.getElementById('resetBtn').addEventListener('click', reset);
+
+        document.getElementById('yearSlider').addEventListener('input', (e) => {
+            currentYear = parseInt(e.target.value);
+            document.getElementById('yearDisplay').textContent = currentYear;
+
+            settlements.forEach(s => {
+                s.hasRailway = s.railwayArrives && s.railwayArrives <= currentYear;
+            });
+            updateStats();
+            if (!animating) draw();
+        });
+
+        document.getElementById('gravitySlider').addEventListener('input', (e) => {
+            gravityStrength = parseInt(e.target.value) / 10;
+        });
+
+        document.querySelectorAll('.hub-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('active');
+                const hub = btn.dataset.hub;
+                if (activeHubs.has(hub)) {
+                    activeHubs.delete(hub);
+                } else {
+                    activeHubs.add(hub);
+                }
+                settlements.forEach(s => {
+                    s.isHub = activeHubs.has(s.name);
+                });
+                if (!animating) draw();
+            });
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo: Time-Warped Cartogram</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 { color: #e94560; margin-bottom: 10px; }
+        .header p { color: #aaa; max-width: 800px; margin: 0 auto; }
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+        #canvas {
+            flex: 1;
+            background: #1a1a2e;
+        }
+        .sidebar {
+            width: 300px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .control-group {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .control-group h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .control-group label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #ccc;
+            font-size: 13px;
+        }
+        select, input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #0f3460;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .value-display {
+            text-align: center;
+            font-size: 24px;
+            color: #4ecca3;
+            margin: 10px 0;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .btn:hover { background: #ff6b6b; }
+        .legend {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #0f3460;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .explanation {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #aaa;
+        }
+        .explanation strong { color: #4ecca3; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Demo: Time-Warped Cartogram</h1>
+        <p>Settlements reposition based on travel time from a central hub. Railway-connected places appear closer; distant places stay far.</p>
+    </div>
+    <div class="container">
+        <canvas id="canvas"></canvas>
+        <div class="sidebar">
+            <div class="control-group">
+                <h3>CENTER POINT</h3>
+                <label>Select Hub Settlement:</label>
+                <select id="hubSelect"></select>
+            </div>
+
+            <div class="control-group">
+                <h3>VIEW MODE</h3>
+                <button class="btn" id="toggleBtn">Switch to Time-Distance View</button>
+                <div class="value-display" id="modeDisplay">Geographic</div>
+            </div>
+
+            <div class="control-group">
+                <h3>ANIMATION</h3>
+                <label>Morph Speed:</label>
+                <input type="range" id="speedSlider" min="1" max="10" value="5">
+                <button class="btn" id="animateBtn">Animate Transition</button>
+            </div>
+
+            <div class="control-group">
+                <h3>YEAR</h3>
+                <label>Show railways as of:</label>
+                <div class="value-display" id="yearDisplay">1920</div>
+                <input type="range" id="yearSlider" min="1882" max="1920" value="1920">
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #e94560;"></div>
+                    <span>Hub settlement</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #4ecca3;"></div>
+                    <span>Railway connected</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #666;"></div>
+                    <span>Not connected (walking distance)</span>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <strong>How it works:</strong><br>
+                In geographic view, settlements are at their real positions.<br><br>
+                In time-distance view, positions are calculated based on travel time from the hub:
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>Railway: 40 km/h</li>
+                    <li>Walking: 5 km/h</li>
+                </ul>
+                <br>
+                Railway-connected settlements "pull in" toward the hub, while unconnected ones remain at their walking-time distance.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = null;
+        let currentView = 'geo'; // 'geo' or 'time'
+        let animating = false;
+        let morphProgress = 0;
+        let hubName = 'Saskatoon';
+        let currentYear = 1920;
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Settlement positions
+        let settlements = [];
+
+        async function loadData() {
+            const response = await fetch('data/settlement_connections.json');
+            data = await response.json();
+
+            // Populate hub selector
+            const hubSelect = document.getElementById('hubSelect');
+            const majorCities = ['Saskatoon', 'Regina', 'Moose Jaw', 'Prince Albert', 'Swift Current', 'Yorkton'];
+
+            Object.keys(data.settlements).sort().forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                if (name === 'Saskatoon') option.selected = true;
+                hubSelect.appendChild(option);
+            });
+
+            processSettlements();
+            resizeCanvas();
+            draw();
+        }
+
+        function processSettlements() {
+            settlements = [];
+            const hub = data.settlements[hubName];
+            if (!hub) return;
+
+            // Get connections from hub
+            const hubConnections = {};
+            (data.connections[hubName] || []).forEach(conn => {
+                hubConnections[conn.to] = conn;
+            });
+
+            // Calculate bounds for geographic view
+            let minLat = Infinity, maxLat = -Infinity;
+            let minLon = Infinity, maxLon = -Infinity;
+
+            Object.entries(data.settlements).forEach(([name, s]) => {
+                minLat = Math.min(minLat, s.lat);
+                maxLat = Math.max(maxLat, s.lat);
+                minLon = Math.min(minLon, s.lon);
+                maxLon = Math.max(maxLon, s.lon);
+            });
+
+            const padding = 60;
+            const width = canvas.width - padding * 2;
+            const height = canvas.height - padding * 2;
+
+            Object.entries(data.settlements).forEach(([name, s]) => {
+                // Geographic position
+                const geoX = padding + ((s.lon - minLon) / (maxLon - minLon)) * width;
+                const geoY = padding + ((maxLat - s.lat) / (maxLat - minLat)) * height;
+
+                // Calculate time-distance position
+                const conn = hubConnections[name];
+                const isHub = name === hubName;
+
+                let travelTimeHours;
+                let isConnected = false;
+
+                if (isHub) {
+                    travelTimeHours = 0;
+                    isConnected = true;
+                } else if (conn) {
+                    const hasRailway = conn.connected_year && conn.connected_year <= currentYear;
+                    if (hasRailway && conn.railway_distance_km != null) {
+                        // Railway speed: 40 km/h
+                        travelTimeHours = conn.railway_distance_km / 40;
+                        isConnected = true;
+                    } else {
+                        // Walking speed: 5 km/h (use direct distance)
+                        travelTimeHours = conn.distance_km / 5;
+                    }
+                } else {
+                    // Calculate haversine distance for non-connected
+                    const dist = haversine(hub.lat, hub.lon, s.lat, s.lon);
+                    travelTimeHours = dist / 5; // Walking
+                }
+
+                // Convert time to radial distance from center
+                // Scale: 1 hour = 30 pixels
+                const timeRadius = travelTimeHours * 30;
+
+                // Keep same angle from hub
+                const hubGeoX = padding + ((hub.lon - minLon) / (maxLon - minLon)) * width;
+                const hubGeoY = padding + ((maxLat - hub.lat) / (maxLat - minLat)) * height;
+
+                const angle = Math.atan2(geoY - hubGeoY, geoX - hubGeoX);
+                const timeX = hubGeoX + Math.cos(angle) * timeRadius;
+                const timeY = hubGeoY + Math.sin(angle) * timeRadius;
+
+                settlements.push({
+                    name,
+                    geoX, geoY,
+                    timeX, timeY,
+                    isHub,
+                    isConnected,
+                    travelTimeHours,
+                    railwayArrives: s.railway_arrives
+                });
+            });
+        }
+
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        function draw() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw settlements
+            settlements.forEach(s => {
+                const x = s.geoX + (s.timeX - s.geoX) * morphProgress;
+                const y = s.geoY + (s.timeY - s.geoY) * morphProgress;
+
+                ctx.beginPath();
+                if (s.isHub) {
+                    ctx.arc(x, y, 10, 0, Math.PI * 2);
+                    ctx.fillStyle = '#e94560';
+                } else if (s.isConnected) {
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#4ecca3';
+                } else {
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = '#666';
+                }
+                ctx.fill();
+
+                // Label for hub
+                if (s.isHub) {
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(s.name, x, y - 15);
+                }
+            });
+
+            // Draw time rings in time view
+            if (morphProgress > 0.5) {
+                const hub = settlements.find(s => s.isHub);
+                if (hub) {
+                    const hx = hub.geoX + (hub.timeX - hub.geoX) * morphProgress;
+                    const hy = hub.geoY + (hub.timeY - hub.geoY) * morphProgress;
+
+                    ctx.strokeStyle = 'rgba(233, 69, 96, 0.3)';
+                    ctx.setLineDash([5, 5]);
+                    [1, 2, 4, 8].forEach(hours => {
+                        ctx.beginPath();
+                        ctx.arc(hx, hy, hours * 30, 0, Math.PI * 2);
+                        ctx.stroke();
+
+                        // Label
+                        ctx.fillStyle = 'rgba(233, 69, 96, 0.6)';
+                        ctx.font = '11px sans-serif';
+                        ctx.fillText(`${hours}h`, hx + hours * 30 + 5, hy);
+                    });
+                    ctx.setLineDash([]);
+                }
+            }
+
+            if (animating) {
+                requestAnimationFrame(draw);
+            }
+        }
+
+        function animate() {
+            if (animating) return;
+
+            animating = true;
+            const speed = parseInt(document.getElementById('speedSlider').value) / 100;
+            const targetProgress = currentView === 'geo' ? 1 : 0;
+
+            function step() {
+                if (targetProgress > morphProgress) {
+                    morphProgress = Math.min(targetProgress, morphProgress + speed);
+                } else {
+                    morphProgress = Math.max(targetProgress, morphProgress - speed);
+                }
+
+                draw();
+
+                if (Math.abs(morphProgress - targetProgress) > 0.01) {
+                    requestAnimationFrame(step);
+                } else {
+                    morphProgress = targetProgress;
+                    animating = false;
+                    currentView = targetProgress === 1 ? 'time' : 'geo';
+                    updateUI();
+                    draw();
+                }
+            }
+            step();
+        }
+
+        function toggleView() {
+            currentView = currentView === 'geo' ? 'time' : 'geo';
+            morphProgress = currentView === 'time' ? 1 : 0;
+            updateUI();
+            draw();
+        }
+
+        function updateUI() {
+            document.getElementById('modeDisplay').textContent =
+                currentView === 'geo' ? 'Geographic' : 'Time-Distance';
+            document.getElementById('toggleBtn').textContent =
+                currentView === 'geo' ? 'Switch to Time-Distance View' : 'Switch to Geographic View';
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            if (data) {
+                processSettlements();
+                draw();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('toggleBtn').addEventListener('click', toggleView);
+        document.getElementById('animateBtn').addEventListener('click', animate);
+
+        document.getElementById('hubSelect').addEventListener('change', (e) => {
+            hubName = e.target.value;
+            processSettlements();
+            draw();
+        });
+
+        document.getElementById('yearSlider').addEventListener('input', (e) => {
+            currentYear = parseInt(e.target.value);
+            document.getElementById('yearDisplay').textContent = currentYear;
+            processSettlements();
+            draw();
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>

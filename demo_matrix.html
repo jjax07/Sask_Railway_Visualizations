@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo: Journey Time Matrix</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 { color: #e94560; margin-bottom: 10px; }
+        .header p { color: #aaa; max-width: 800px; margin: 0 auto; }
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+        .matrix-container {
+            flex: 1;
+            padding: 30px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sidebar {
+            width: 300px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .control-group {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .control-group h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .mode-toggle {
+            display: flex;
+            gap: 5px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border: 2px solid #e94560;
+            background: transparent;
+            color: #e94560;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .mode-btn.active {
+            background: #e94560;
+            color: white;
+        }
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 15px;
+        }
+        .legend-row {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+        .legend-color {
+            width: 30px;
+            height: 15px;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        .stats-box {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #0f3460;
+            font-size: 13px;
+        }
+        .stat-value { color: #4ecca3; font-weight: bold; }
+        .matrix {
+            display: grid;
+            gap: 2px;
+            background: #0f3460;
+            padding: 2px;
+            border-radius: 5px;
+        }
+        .matrix-cell {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .matrix-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        .matrix-cell .time {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .matrix-cell .label {
+            font-size: 9px;
+            opacity: 0.8;
+        }
+        .matrix-header {
+            background: #16213e !important;
+            color: #e94560;
+            font-weight: bold;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-size: 11px;
+        }
+        .matrix-header.row-header {
+            writing-mode: horizontal-tb;
+            text-align: right;
+            padding-right: 10px;
+        }
+        .diagonal {
+            background: #333 !important;
+        }
+        .comparison-view {
+            display: flex;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        .matrix-wrapper {
+            text-align: center;
+        }
+        .matrix-wrapper h4 {
+            color: #e94560;
+            margin-bottom: 15px;
+        }
+        .explanation {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #aaa;
+            margin-top: 15px;
+        }
+        .tooltip {
+            position: fixed;
+            background: #16213e;
+            border: 2px solid #e94560;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            max-width: 250px;
+        }
+        .tooltip.visible { opacity: 1; }
+        .tooltip h4 { color: #e94560; margin-bottom: 10px; }
+        .tooltip .row { margin: 5px 0; }
+        .tooltip .value { color: #4ecca3; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Demo: Journey Time Matrix</h1>
+        <p>Compare travel times between major settlements. See how railways transformed multi-day journeys into hours.</p>
+    </div>
+    <div class="container">
+        <div class="matrix-container">
+            <div class="comparison-view" id="matrices"></div>
+        </div>
+        <div class="sidebar">
+            <div class="control-group">
+                <h3>VIEW MODE</h3>
+                <div class="mode-toggle">
+                    <button class="mode-btn active" data-mode="both">Side by Side</button>
+                    <button class="mode-btn" data-mode="walking">Walking Only</button>
+                    <button class="mode-btn" data-mode="railway">Railway Only</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>COLOR SCALE (Hours)</h3>
+                <div class="legend">
+                    <div class="legend-row">
+                        <div class="legend-color" style="background: #4ecca3;"></div>
+                        <span>&lt; 2 hours</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-color" style="background: #7bc47f;"></div>
+                        <span>2-4 hours</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-color" style="background: #ffd93d;"></div>
+                        <span>4-8 hours (half day)</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-color" style="background: #ff9f43;"></div>
+                        <span>8-24 hours (full day)</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-color" style="background: #e94560;"></div>
+                        <span>24-48 hours (2 days)</span>
+                    </div>
+                    <div class="legend-row">
+                        <div class="legend-color" style="background: #8b0000;"></div>
+                        <span>&gt; 48 hours (3+ days)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-box">
+                <div class="stat-row">
+                    <span>Avg walking time:</span>
+                    <span class="stat-value" id="avgWalk">-</span>
+                </div>
+                <div class="stat-row">
+                    <span>Avg railway time:</span>
+                    <span class="stat-value" id="avgRail">-</span>
+                </div>
+                <div class="stat-row">
+                    <span>Time savings:</span>
+                    <span class="stat-value" id="savings">-</span>
+                </div>
+                <div class="stat-row">
+                    <span>Compression factor:</span>
+                    <span class="stat-value" id="compression">-</span>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <strong>Reading the matrix:</strong><br><br>
+                Each cell shows travel time between two settlements.<br><br>
+                <strong>Walking:</strong> 5 km/h, 10 hours/day = 50 km/day max<br>
+                <strong>Railway:</strong> 40 km/h average<br><br>
+                The dramatic color shift from red/orange (days) to green (hours) shows how railways compressed space-time.
+            </div>
+        </div>
+    </div>
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        let data = null;
+        let currentMode = 'both';
+
+        const majorCities = [
+            'Regina', 'Saskatoon', 'Moose Jaw', 'Prince Albert',
+            'Swift Current', 'Yorkton', 'North Battleford', 'Weyburn'
+        ];
+
+        const speeds = {
+            walking: 5,   // km/h
+            railway: 40   // km/h
+        };
+
+        async function loadData() {
+            const response = await fetch('data/settlement_connections.json');
+            data = await response.json();
+            buildMatrices();
+        }
+
+        function getDistance(from, to) {
+            const conns = data.connections[from] || [];
+            const conn = conns.find(c => c.to === to);
+            if (conn) {
+                return {
+                    direct: conn.distance_km,
+                    railway: conn.railway_distance_km
+                };
+            }
+            // Calculate haversine if not in connections
+            const s1 = data.settlements[from];
+            const s2 = data.settlements[to];
+            if (s1 && s2) {
+                return {
+                    direct: haversine(s1.lat, s1.lon, s2.lat, s2.lon),
+                    railway: null
+                };
+            }
+            return { direct: 0, railway: null };
+        }
+
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        function getColor(hours) {
+            if (hours < 2) return '#4ecca3';
+            if (hours < 4) return '#7bc47f';
+            if (hours < 8) return '#ffd93d';
+            if (hours < 24) return '#ff9f43';
+            if (hours < 48) return '#e94560';
+            return '#8b0000';
+        }
+
+        function formatTime(hours) {
+            if (hours < 1) return Math.round(hours * 60) + 'm';
+            if (hours < 24) return hours.toFixed(1) + 'h';
+            const days = hours / 24;
+            return days.toFixed(1) + 'd';
+        }
+
+        function buildMatrices() {
+            const container = document.getElementById('matrices');
+            container.innerHTML = '';
+
+            // Filter to cities that exist in our data
+            const cities = majorCities.filter(c => data.settlements[c]);
+            const n = cities.length;
+
+            let totalWalkHours = 0;
+            let totalRailHours = 0;
+            let pairCount = 0;
+
+            // Build matrices based on mode
+            if (currentMode === 'both' || currentMode === 'walking') {
+                const walkWrapper = document.createElement('div');
+                walkWrapper.className = 'matrix-wrapper';
+                walkWrapper.innerHTML = '<h4>Pre-Railway (Walking: 5 km/h)</h4>';
+                const walkMatrix = buildMatrix(cities, 'walking');
+                walkWrapper.appendChild(walkMatrix.element);
+                container.appendChild(walkWrapper);
+                totalWalkHours = walkMatrix.totalHours;
+                pairCount = walkMatrix.pairCount;
+            }
+
+            if (currentMode === 'both' || currentMode === 'railway') {
+                const railWrapper = document.createElement('div');
+                railWrapper.className = 'matrix-wrapper';
+                railWrapper.innerHTML = '<h4>With Railway (40 km/h)</h4>';
+                const railMatrix = buildMatrix(cities, 'railway');
+                railWrapper.appendChild(railMatrix.element);
+                container.appendChild(railWrapper);
+                totalRailHours = railMatrix.totalHours;
+                if (!pairCount) pairCount = railMatrix.pairCount;
+            }
+
+            // Update stats
+            const avgWalk = totalWalkHours / pairCount;
+            const avgRail = totalRailHours / pairCount || avgWalk / 8;
+
+            document.getElementById('avgWalk').textContent = formatTime(avgWalk);
+            document.getElementById('avgRail').textContent = formatTime(totalRailHours ? avgRail : avgWalk / 8);
+            document.getElementById('savings').textContent = formatTime(avgWalk - avgRail);
+            document.getElementById('compression').textContent = (avgWalk / avgRail).toFixed(1) + 'x';
+        }
+
+        function buildMatrix(cities, mode) {
+            const n = cities.length;
+            const matrix = document.createElement('div');
+            matrix.className = 'matrix';
+            matrix.style.gridTemplateColumns = `80px repeat(${n}, 60px)`;
+
+            let totalHours = 0;
+            let pairCount = 0;
+
+            // Empty corner
+            const corner = document.createElement('div');
+            corner.className = 'matrix-cell matrix-header';
+            matrix.appendChild(corner);
+
+            // Column headers
+            cities.forEach(city => {
+                const header = document.createElement('div');
+                header.className = 'matrix-cell matrix-header';
+                header.textContent = city.substring(0, 10);
+                matrix.appendChild(header);
+            });
+
+            // Rows
+            cities.forEach((fromCity, i) => {
+                // Row header
+                const rowHeader = document.createElement('div');
+                rowHeader.className = 'matrix-cell matrix-header row-header';
+                rowHeader.textContent = fromCity;
+                matrix.appendChild(rowHeader);
+
+                // Cells
+                cities.forEach((toCity, j) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'matrix-cell';
+
+                    if (i === j) {
+                        cell.classList.add('diagonal');
+                        cell.innerHTML = '<span class="time">-</span>';
+                    } else {
+                        const dist = getDistance(fromCity, toCity);
+                        let hours;
+
+                        if (mode === 'railway' && dist.railway != null && dist.railway > 0) {
+                            hours = dist.railway / speeds.railway;
+                        } else if (mode === 'railway') {
+                            // Fallback: use direct distance with railway speed
+                            hours = dist.direct / speeds.railway;
+                        } else {
+                            hours = dist.direct / speeds.walking;
+                        }
+
+                        cell.style.background = getColor(hours);
+                        cell.style.color = hours < 8 ? '#333' : '#fff';
+                        cell.innerHTML = `<span class="time">${formatTime(hours)}</span>`;
+
+                        // Store data for tooltip
+                        cell.dataset.from = fromCity;
+                        cell.dataset.to = toCity;
+                        cell.dataset.directKm = dist.direct.toFixed(1);
+                        cell.dataset.railKm = dist.railway ? dist.railway.toFixed(1) : '-';
+                        cell.dataset.walkHours = (dist.direct / speeds.walking).toFixed(1);
+                        cell.dataset.railHours = hours.toFixed(1);
+
+                        if (j > i) {
+                            totalHours += hours;
+                            pairCount++;
+                        }
+
+                        cell.addEventListener('mouseenter', showTooltip);
+                        cell.addEventListener('mouseleave', hideTooltip);
+                    }
+
+                    matrix.appendChild(cell);
+                });
+            });
+
+            return { element: matrix, totalHours, pairCount };
+        }
+
+        function showTooltip(e) {
+            const cell = e.target.closest('.matrix-cell');
+            if (!cell.dataset.from) return;
+
+            const tooltip = document.getElementById('tooltip');
+            tooltip.innerHTML = `
+                <h4>${cell.dataset.from} → ${cell.dataset.to}</h4>
+                <div class="row">Direct distance: <span class="value">${cell.dataset.directKm} km</span></div>
+                <div class="row">Railway distance: <span class="value">${cell.dataset.railKm} km</span></div>
+                <div class="row">Walking time: <span class="value">${cell.dataset.walkHours} hours</span></div>
+                <div class="row">Railway time: <span class="value">${cell.dataset.railHours} hours</span></div>
+            `;
+
+            tooltip.style.left = (e.pageX + 15) + 'px';
+            tooltip.style.top = (e.pageY + 15) + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').classList.remove('visible');
+        }
+
+        // Event listeners
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.mode;
+                buildMatrices();
+            });
+        });
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
