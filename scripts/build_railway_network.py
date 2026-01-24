@@ -33,6 +33,7 @@ SHAPEFILE_PATH = os.path.join(
     "HR_rails_NEW.shp"
 )
 OUTPUT_FILE = os.path.join(PROJECT_DIR, "data", "railway_network.json")
+GEOMETRY_FILE = os.path.join(PROJECT_DIR, "data", "railway_tracks.json")
 
 # Saskatchewan bounding box (lat/lon)
 # Note: Eastern boundary is -101.36 but we use -101.0 to catch border tracks
@@ -417,6 +418,48 @@ def export_network(graph, stats, inverse_transformer):
     print(f"Wrote {len(nodes)} nodes and {len(edges)} edges")
 
 
+def export_track_geometry(graph, inverse_transformer):
+    """Export track geometry as GeoJSON-like format for visualization."""
+    print(f"\nExporting track geometry to {GEOMETRY_FILE}")
+
+    tracks = []
+    for u, v, data in graph.edges(data=True):
+        # Convert projected coords to lat/lon
+        points = data.get('points', [])
+        if not points:
+            continue
+
+        coords = []
+        for pt in points:
+            lon, lat = inverse_transformer.transform(pt[0], pt[1])
+            coords.append([round(lon, 5), round(lat, 5)])
+
+        tracks.append({
+            'source': u,
+            'target': v,
+            'coordinates': coords,
+            'built_year': data['built_year'],
+            'abandoned_year': data['abandoned_year'],
+            'builder_name': data['builder_name'],
+            'length_km': round(data['length_m'] / 1000, 2)
+        })
+
+    output = {
+        'metadata': {
+            'description': 'Saskatchewan railway track geometries',
+            'format': 'Array of polylines with [lon, lat] coordinates',
+            'source': 'HR_rails_NEW.shp'
+        },
+        'track_count': len(tracks),
+        'tracks': tracks
+    }
+
+    with open(GEOMETRY_FILE, 'w') as f:
+        json.dump(output, f)
+
+    print(f"Wrote {len(tracks)} track segments with geometry")
+
+
 def main():
     print("=" * 60)
     print("Building Railway Network Graph - Step 1")
@@ -444,6 +487,9 @@ def main():
 
     # Export to JSON
     export_network(graph, stats, inverse_transformer)
+
+    # Export track geometry for visualization
+    export_track_geometry(graph, inverse_transformer)
 
     print("\n" + "=" * 60)
     print("Step 1 Complete!")
