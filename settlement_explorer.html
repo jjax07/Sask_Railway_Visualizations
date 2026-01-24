@@ -430,7 +430,6 @@
                 } catch (e) {
                     console.warn('Could not load track geometry:', e);
                 }
-
                 // Load network graph for pathfinding
                 try {
                     const networkResponse = await fetch('data/railway_network.json');
@@ -672,16 +671,71 @@
             return trimmedCoords;
         }
 
+        // Extend path geometry to include partial edge when settlement is snapped mid-edge
+        function extendPathToEdge(coords, mapping, settlementLat, settlementLon, atEnd) {
+            // Only extend if settlement is snapped to an edge (not a node)
+            if (!mapping.snap_nodes || mapping.snap_nodes.length !== 2) return coords;
+
+            const [node1, node2] = mapping.snap_nodes;
+            const edgeKey1 = `${node1}|${node2}`;
+            const edgeKey2 = `${node2}|${node1}`;
+
+            const track = trackData.lookup[edgeKey1] || trackData.lookup[edgeKey2];
+            if (!track || !track.coordinates) return coords;
+
+            // Convert track coords to [lat, lon] format
+            let trackCoords = track.coordinates.map(c => [c[1], c[0]]);
+
+            // Find the point on this track closest to the settlement
+            let minDist = Infinity;
+            let closestIdx = 0;
+            for (let i = 0; i < trackCoords.length; i++) {
+                const dist = haversineDistance(trackCoords[i][0], trackCoords[i][1], settlementLat, settlementLon);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestIdx = i;
+                }
+            }
+
+            // Check if extending would actually help (closest point should be closer than current endpoint)
+            const currentEndpoint = atEnd ? coords[coords.length - 1] : coords[0];
+            const currentDist = haversineDistance(currentEndpoint[0], currentEndpoint[1], settlementLat, settlementLon);
+
+            if (minDist >= currentDist) {
+                // Extension wouldn't help
+                return coords;
+            }
+
+            // Determine which end of the track connects to our path
+            const pathEndpoint = atEnd ? coords[coords.length - 1] : coords[0];
+            const distToTrackStart = Math.abs(pathEndpoint[0] - trackCoords[0][0]) + Math.abs(pathEndpoint[1] - trackCoords[0][1]);
+            const distToTrackEnd = Math.abs(pathEndpoint[0] - trackCoords[trackCoords.length-1][0]) + Math.abs(pathEndpoint[1] - trackCoords[trackCoords.length-1][1]);
+
+            let extensionCoords;
+            if (distToTrackStart < distToTrackEnd) {
+                // Track starts near our path endpoint, take from start to closest point
+                extensionCoords = trackCoords.slice(0, closestIdx + 1);
+            } else {
+                // Track ends near our path endpoint, take from closest point to end (reversed)
+                extensionCoords = trackCoords.slice(closestIdx).reverse();
+            }
+
+            // Append or prepend the extension
+            if (atEnd) {
+                // Skip first point of extension (it overlaps with path end)
+                return [...coords, ...extensionCoords.slice(1)];
+            } else {
+                // Skip last point of extension (it overlaps with path start)
+                return [...extensionCoords.slice(0, -1), ...coords];
+            }
+        }
+
         // Draw connection using actual railway path
         function drawRailwayConnection(fromSettlement, toSettlement, color, weight, opacity) {
-            if (!mappingData || !mappingData.lookup) {
-                // Fallback to straight line
-                return null;
-            }
+            if (!mappingData || !mappingData.lookup) return null;
 
             const fromMapping = mappingData.lookup[fromSettlement];
             const toMapping = mappingData.lookup[toSettlement];
-
             if (!fromMapping || !toMapping) return null;
 
             const fromNode = fromMapping.snap_node;
@@ -697,6 +751,11 @@
             const fromData = data.settlements[fromSettlement];
             const toData = data.settlements[toSettlement];
             if (!fromData || !toData) return null;
+
+            // Extend path if settlements are snapped to edges (not just nodes)
+            // This handles cases where the settlement is far from its snap_node but close to the edge
+            coords = extendPathToEdge(coords, fromMapping, fromData.lat, fromData.lon, false);
+            coords = extendPathToEdge(coords, toMapping, toData.lat, toData.lon, true);
 
             // Trim path to start and end at settlement locations
             coords = trimPathToSettlements(coords, fromData.lat, fromData.lon, toData.lat, toData.lon);

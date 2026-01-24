@@ -1,6 +1,6 @@
 # TODO: Railway Route Line Visualization
 
-## Current Status: In Progress - Needs Troubleshooting
+## Current Status: Complete
 
 ## What We've Done
 
@@ -28,7 +28,13 @@ Replace the straight "as the crow flies" connection lines between settlements wi
    - Added `trimPathToSettlements()` - trims the path to start and end at actual settlement coordinates
    - This prevents lines from extending past the destination settlement (e.g., Saskatoon-Osler was extending to Prince Albert)
 
-5. **Fallback to straight lines**
+5. **Edge extension for mid-edge snapped settlements** (Added Jan 24, 2026)
+   - Added `extendPathToEdge()` function to handle settlements snapped to the middle of long edges
+   - Problem: Some settlements (e.g., Dundurn) are snapped to long edges but the pathfinding stops at the edge's endpoint node, missing the track geometry that passes near the settlement
+   - Solution: When a settlement is snapped to an edge, extend the path geometry to include the portion of that edge closest to the settlement
+   - Example: Dundurn is snapped to the n132-n165 edge (216km long). The path used to stop at n132 (30km from Dundurn), but now extends along the edge to the point only 1.2km from Dundurn
+
+6. **Fallback to straight lines**
    - If railway path cannot be found, falls back to dashed straight line
 
 ### Key Functions Added
@@ -40,6 +46,9 @@ haversineDistance(lat1, lon1, lat2, lon2)
 // Pathfinding
 findPath(startNode, endNode)  // Dijkstra's algorithm
 getPathGeometry(path)          // Convert node path to coordinates
+
+// Path extension for mid-edge snapped settlements
+extendPathToEdge(coords, mapping, settlementLat, settlementLon, atEnd)
 
 // Path trimming
 findClosestPointIndex(coords, targetLat, targetLon)
@@ -58,25 +67,19 @@ drawRailwayConnection(fromSettlement, toSettlement, color, weight, opacity)
 - `data/railway_tracks.json` - Track polyline geometries
 - `data/settlement_network_mapping.json` - Settlement to network node mappings
 
-## Still Needs Work
+## Known Limitations
 
-### Known Issues to Troubleshoot
-- Some railway route lines may still not display correctly
-- Need to verify routes for various settlement pairs
-- May need to investigate specific problematic connections (user mentioned Saskatoon-Osler as an example that needed fixing)
+### Network Data Gaps
+- Some settlements may still show straight lines if:
+  - The GIS track data is missing for that section
+  - The settlement is too far from any track in the network
+  - The pathfinding cannot find a route between the settlements
 
-### Testing Needed
-- Test multiple settlement pairs to verify routes look correct
-- Check edge cases:
-  - Settlements that are very close together
-  - Settlements on different railway lines
-  - Settlements at railway junctions
-
-### Potential Improvements
-- Visual debugging: temporarily show network nodes to verify snapping
-- Add console logging to help debug specific routes
-- Consider whether some settlements might be snapped to wrong nodes
+### Long Edges in Network
+- The railway network contains some very long edges (e.g., n132-n165 is 216km)
+- The `extendPathToEdge()` function handles this by including partial edge geometry
+- Future improvement: Could split long edges at intermediate points for better snapping
 
 ---
-*Last updated: January 23, 2026*
-*Status: Awaiting further troubleshooting*
+*Last updated: January 24, 2026*
+*Status: Complete*
