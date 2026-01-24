@@ -633,7 +633,7 @@
             return allCoords.length > 0 ? allCoords : null;
         }
 
-        // Draw connection using actual railway path, clipped to 40km radius
+        // Draw connection using actual railway path
         function drawRailwayConnection(fromSettlement, toSettlement, color, weight, opacity) {
             if (!mappingData || !mappingData.lookup) {
                 // Fallback to straight line
@@ -651,15 +651,8 @@
             const path = findPath(fromNode, toNode);
             if (!path) return null;
 
-            let coords = getPathGeometry(path);
+            const coords = getPathGeometry(path);
             if (!coords || coords.length < 2) return null;
-
-            // Clip to 40km radius from selected settlement
-            const selectedSettlement = data.settlements[currentSettlement];
-            if (selectedSettlement) {
-                coords = clipPolylineToCircle(coords, selectedSettlement.lat, selectedSettlement.lon, 40000);
-                if (!coords || coords.length < 2) return null;
-            }
 
             return L.polyline(coords, {
                 color: color,

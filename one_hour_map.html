@@ -372,7 +372,7 @@
             return allCoords.length > 0 ? allCoords : null;
         }
 
-        // Draw railway connection from Saskatoon to a settlement, clipped to 40km
+        // Draw railway connection from Saskatoon to a settlement
         function drawRailwayConnection(settlementName, color, weight, opacity) {
             if (!mappingData || !mappingData.lookup) return null;
             const saskatoonMapping = mappingData.lookup['Saskatoon'];
@@ -380,10 +380,7 @@
             if (!saskatoonMapping || !toMapping) return null;
             const path = findPath(saskatoonMapping.snap_node, toMapping.snap_node);
             if (!path) return null;
-            let coords = getPathGeometry(path);
-            if (!coords || coords.length < 2) return null;
-            // Clip to 40km radius from Saskatoon
-            coords = clipPolylineToCircle(coords, data.saskatoon.lat, data.saskatoon.lon, 40000);
+            const coords = getPathGeometry(path);
             if (!coords || coords.length < 2) return null;
             return L.polyline(coords, { color, weight, opacity });
         }
