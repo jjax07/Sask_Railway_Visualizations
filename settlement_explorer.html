@@ -730,6 +730,143 @@
             }
         }
 
+        // Check if two arrays of node IDs represent the same edge
+        function isSameEdge(nodes1, nodes2) {
+            if (!nodes1 || !nodes2 || nodes1.length !== 2 || nodes2.length !== 2) return false;
+            return (nodes1[0] === nodes2[0] && nodes1[1] === nodes2[1]) ||
+                   (nodes1[0] === nodes2[1] && nodes1[1] === nodes2[0]);
+        }
+
+        // Get geometry for two settlements on the same edge
+        function getSameEdgeGeometry(fromMapping, toMapping, fromLat, fromLon, toLat, toLon) {
+            // Both must be snapped to edges
+            if (!fromMapping.snap_nodes || !toMapping.snap_nodes) return null;
+            if (fromMapping.snap_nodes.length !== 2 || toMapping.snap_nodes.length !== 2) return null;
+
+            // Check if they're on the same edge
+            if (!isSameEdge(fromMapping.snap_nodes, toMapping.snap_nodes)) return null;
+
+            const [node1, node2] = fromMapping.snap_nodes;
+            const edgeKey = `${node1}|${node2}`;
+            const track = trackData.lookup[edgeKey] || trackData.lookup[`${node2}|${node1}`];
+
+            if (!track || !track.coordinates) return null;
+
+            // Convert to [lat, lon] format
+            const trackCoords = track.coordinates.map(c => [c[1], c[0]]);
+
+            // Find closest points to each settlement
+            let fromIdx = 0, toIdx = 0;
+            let fromMinDist = Infinity, toMinDist = Infinity;
+
+            for (let i = 0; i < trackCoords.length; i++) {
+                const fromDist = haversineDistance(trackCoords[i][0], trackCoords[i][1], fromLat, fromLon);
+                const toDist = haversineDistance(trackCoords[i][0], trackCoords[i][1], toLat, toLon);
+
+                if (fromDist < fromMinDist) {
+                    fromMinDist = fromDist;
+                    fromIdx = i;
+                }
+                if (toDist < toMinDist) {
+                    toMinDist = toDist;
+                    toIdx = i;
+                }
+            }
+
+            // Extract the portion between the two indices
+            let coords;
+            if (fromIdx <= toIdx) {
+                coords = trackCoords.slice(fromIdx, toIdx + 1);
+            } else {
+                coords = trackCoords.slice(toIdx, fromIdx + 1).reverse();
+            }
+
+            return coords.length >= 2 ? coords : null;
+        }
+
+        // Get geometry for settlements on different edges meeting at a shared node
+        function getSharedNodeGeometry(fromMapping, toMapping, fromLat, fromLon, toLat, toLon) {
+            // Both must be snapped to edges
+            if (!fromMapping.snap_nodes || !toMapping.snap_nodes) return null;
+            if (fromMapping.snap_nodes.length !== 2 || toMapping.snap_nodes.length !== 2) return null;
+
+            // Must share the same snap_node but be on different edges
+            if (fromMapping.snap_node !== toMapping.snap_node) return null;
+            if (isSameEdge(fromMapping.snap_nodes, toMapping.snap_nodes)) return null;
+
+            // Get track geometry for the "from" edge
+            const [fromNode1, fromNode2] = fromMapping.snap_nodes;
+            const fromEdgeKey = `${fromNode1}|${fromNode2}`;
+            const fromTrack = trackData.lookup[fromEdgeKey] || trackData.lookup[`${fromNode2}|${fromNode1}`];
+
+            // Get track geometry for the "to" edge
+            const [toNode1, toNode2] = toMapping.snap_nodes;
+            const toEdgeKey = `${toNode1}|${toNode2}`;
+            const toTrack = trackData.lookup[toEdgeKey] || trackData.lookup[`${toNode2}|${toNode1}`];
+
+            if (!fromTrack || !toTrack || !fromTrack.coordinates || !toTrack.coordinates) return null;
+
+            // Convert to [lat, lon]
+            const fromCoords = fromTrack.coordinates.map(c => [c[1], c[0]]);
+            const toCoords = toTrack.coordinates.map(c => [c[1], c[0]]);
+
+            // Find closest point to "from" settlement on its edge
+            let fromIdx = 0, fromMinDist = Infinity;
+            for (let i = 0; i < fromCoords.length; i++) {
+                const dist = haversineDistance(fromCoords[i][0], fromCoords[i][1], fromLat, fromLon);
+                if (dist < fromMinDist) {
+                    fromMinDist = dist;
+                    fromIdx = i;
+                }
+            }
+
+            // Find closest point to "to" settlement on its edge
+            let toIdx = 0, toMinDist = Infinity;
+            for (let i = 0; i < toCoords.length; i++) {
+                const dist = haversineDistance(toCoords[i][0], toCoords[i][1], toLat, toLon);
+                if (dist < toMinDist) {
+                    toMinDist = dist;
+                    toIdx = i;
+                }
+            }
+
+            // Determine which end of each track is the shared node
+            // by checking distances to both ends
+            const sharedNode = fromMapping.snap_node;
+
+            // For fromTrack: is the shared node at start or end?
+            const fromTrackStartIsShared = fromMapping.snap_nodes[0] === sharedNode;
+
+            // For toTrack: is the shared node at start or end?
+            const toTrackStartIsShared = toMapping.snap_nodes[0] === sharedNode;
+
+            // Build path from "from" settlement to shared node
+            let fromPortion;
+            if (fromTrackStartIsShared) {
+                // Shared node is at start, so we need from settlement point back to start
+                fromPortion = fromCoords.slice(0, fromIdx + 1).reverse();
+            } else {
+                // Shared node is at end, so we need from settlement point to end
+                fromPortion = fromCoords.slice(fromIdx);
+            }
+
+            // Build path from shared node to "to" settlement
+            let toPortion;
+            if (toTrackStartIsShared) {
+                // Shared node is at start, so we go from start to settlement point
+                toPortion = toCoords.slice(0, toIdx + 1);
+            } else {
+                // Shared node is at end, so we go from end (reversed) to settlement point
+                toPortion = toCoords.slice(toIdx).reverse();
+            }
+
+            // Combine: fromPortion ends at shared node, toPortion starts at shared node
+            // Skip duplicate shared node point
+            const combined = [...fromPortion, ...toPortion.slice(1)];
+
+            return combined.length >= 2 ? combined : null;
+        }
+
         // Draw connection using actual railway path
         function drawRailwayConnection(fromSettlement, toSettlement, color, weight, opacity) {
             if (!mappingData || !mappingData.lookup) return null;
@@ -738,24 +875,42 @@
             const toMapping = mappingData.lookup[toSettlement];
             if (!fromMapping || !toMapping) return null;
 
-            const fromNode = fromMapping.snap_node;
-            const toNode = toMapping.snap_node;
-
-            const path = findPath(fromNode, toNode);
-            if (!path) return null;
-
-            let coords = getPathGeometry(path);
-            if (!coords || coords.length < 2) return null;
-
             // Get actual settlement coordinates
             const fromData = data.settlements[fromSettlement];
             const toData = data.settlements[toSettlement];
             if (!fromData || !toData) return null;
 
-            // Extend path if settlements are snapped to edges (not just nodes)
-            // This handles cases where the settlement is far from its snap_node but close to the edge
-            coords = extendPathToEdge(coords, fromMapping, fromData.lat, fromData.lon, false);
-            coords = extendPathToEdge(coords, toMapping, toData.lat, toData.lon, true);
+            const fromNode = fromMapping.snap_node;
+            const toNode = toMapping.snap_node;
+
+            let coords = null;
+
+            // Case 1: Both settlements on the same edge
+            if (fromNode === toNode) {
+                // Try same-edge geometry first
+                coords = getSameEdgeGeometry(fromMapping, toMapping, fromData.lat, fromData.lon, toData.lat, toData.lon);
+
+                // If not same edge, try shared-node geometry (different edges meeting at same node)
+                if (!coords) {
+                    coords = getSharedNodeGeometry(fromMapping, toMapping, fromData.lat, fromData.lon, toData.lat, toData.lon);
+                }
+            }
+
+            // Case 2: Different nodes - use pathfinding
+            if (!coords) {
+                const path = findPath(fromNode, toNode);
+                if (!path) return null;
+
+                coords = getPathGeometry(path);
+
+                if (coords && coords.length >= 2) {
+                    // Extend path if settlements are snapped to edges
+                    coords = extendPathToEdge(coords, fromMapping, fromData.lat, fromData.lon, false);
+                    coords = extendPathToEdge(coords, toMapping, toData.lat, toData.lon, true);
+                }
+            }
+
+            if (!coords || coords.length < 2) return null;
 
             // Trim path to start and end at settlement locations
             coords = trimPathToSettlements(coords, fromData.lat, fromData.lon, toData.lat, toData.lon);

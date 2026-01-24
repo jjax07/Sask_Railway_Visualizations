@@ -175,6 +175,110 @@ def find_closest_point_distance(coords, target_lat, target_lon):
             min_dist = dist
     return min_dist
 
+def is_same_edge(nodes1, nodes2):
+    """Check if two node arrays represent the same edge."""
+    if not nodes1 or not nodes2 or len(nodes1) != 2 or len(nodes2) != 2:
+        return False
+    return (nodes1[0] == nodes2[0] and nodes1[1] == nodes2[1]) or \
+           (nodes1[0] == nodes2[1] and nodes1[1] == nodes2[0])
+
+def get_same_edge_geometry(from_mapping, to_mapping, from_lat, from_lon, to_lat, to_lon, track_lookup):
+    """Get geometry for two settlements on the same edge."""
+    from_nodes = from_mapping.get('snap_nodes')
+    to_nodes = to_mapping.get('snap_nodes')
+
+    if not from_nodes or not to_nodes or len(from_nodes) != 2 or len(to_nodes) != 2:
+        return None
+    if not is_same_edge(from_nodes, to_nodes):
+        return None
+
+    node1, node2 = from_nodes
+    edge_key = f"{node1}|{node2}"
+    track = track_lookup.get(edge_key) or track_lookup.get(f"{node2}|{node1}")
+
+    if not track or not track.get('coordinates'):
+        return None
+
+    track_coords = [[c[1], c[0]] for c in track['coordinates']]
+
+    from_idx, to_idx = 0, 0
+    from_min_dist, to_min_dist = float('inf'), float('inf')
+
+    for i, tc in enumerate(track_coords):
+        from_dist = haversine(tc[0], tc[1], from_lat, from_lon)
+        to_dist = haversine(tc[0], tc[1], to_lat, to_lon)
+        if from_dist < from_min_dist:
+            from_min_dist = from_dist
+            from_idx = i
+        if to_dist < to_min_dist:
+            to_min_dist = to_dist
+            to_idx = i
+
+    if from_idx <= to_idx:
+        coords = track_coords[from_idx:to_idx + 1]
+    else:
+        coords = track_coords[to_idx:from_idx + 1][::-1]
+
+    return coords if len(coords) >= 2 else None
+
+def get_shared_node_geometry(from_mapping, to_mapping, from_lat, from_lon, to_lat, to_lon, track_lookup):
+    """Get geometry for settlements on different edges meeting at a shared node."""
+    from_nodes = from_mapping.get('snap_nodes')
+    to_nodes = to_mapping.get('snap_nodes')
+
+    if not from_nodes or not to_nodes or len(from_nodes) != 2 or len(to_nodes) != 2:
+        return None
+    if from_mapping['snap_node'] != to_mapping['snap_node']:
+        return None
+    if is_same_edge(from_nodes, to_nodes):
+        return None
+
+    from_node1, from_node2 = from_nodes
+    from_track = track_lookup.get(f"{from_node1}|{from_node2}") or track_lookup.get(f"{from_node2}|{from_node1}")
+
+    to_node1, to_node2 = to_nodes
+    to_track = track_lookup.get(f"{to_node1}|{to_node2}") or track_lookup.get(f"{to_node2}|{to_node1}")
+
+    if not from_track or not to_track:
+        return None
+    if not from_track.get('coordinates') or not to_track.get('coordinates'):
+        return None
+
+    from_coords = [[c[1], c[0]] for c in from_track['coordinates']]
+    to_coords = [[c[1], c[0]] for c in to_track['coordinates']]
+
+    # Find closest points
+    from_idx, from_min_dist = 0, float('inf')
+    for i, c in enumerate(from_coords):
+        dist = haversine(c[0], c[1], from_lat, from_lon)
+        if dist < from_min_dist:
+            from_min_dist = dist
+            from_idx = i
+
+    to_idx, to_min_dist = 0, float('inf')
+    for i, c in enumerate(to_coords):
+        dist = haversine(c[0], c[1], to_lat, to_lon)
+        if dist < to_min_dist:
+            to_min_dist = dist
+            to_idx = i
+
+    shared_node = from_mapping['snap_node']
+    from_track_start_is_shared = from_nodes[0] == shared_node
+    to_track_start_is_shared = to_nodes[0] == shared_node
+
+    if from_track_start_is_shared:
+        from_portion = from_coords[:from_idx + 1][::-1]
+    else:
+        from_portion = from_coords[from_idx:]
+
+    if to_track_start_is_shared:
+        to_portion = to_coords[:to_idx + 1]
+    else:
+        to_portion = to_coords[to_idx:][::-1]
+
+    combined = from_portion + to_portion[1:]
+    return combined if len(combined) >= 2 else None
+
 def verify_connection(from_name, to_name, from_data, to_data, mapping_lookup, adj, track_lookup):
     """Verify a single connection. Returns (success, issue_description, details)."""
 
@@ -189,19 +293,32 @@ def verify_connection(from_name, to_name, from_data, to_data, mapping_lookup, ad
     from_node = from_mapping['snap_node']
     to_node = to_mapping['snap_node']
 
-    # Find path
-    path = find_path(from_node, to_node, adj)
-    if not path:
-        return False, "NO_PATH", f"No path from {from_node} to {to_node}"
+    coords = None
 
-    # Get geometry
-    coords = get_path_geometry(path, track_lookup)
+    # Case 1: Same snap_node - try same-edge or shared-node geometry
+    if from_node == to_node:
+        coords = get_same_edge_geometry(from_mapping, to_mapping, from_data['lat'], from_data['lon'],
+                                        to_data['lat'], to_data['lon'], track_lookup)
+        if not coords:
+            coords = get_shared_node_geometry(from_mapping, to_mapping, from_data['lat'], from_data['lon'],
+                                              to_data['lat'], to_data['lon'], track_lookup)
+
+    # Case 2: Different nodes - use pathfinding
+    if not coords:
+        path = find_path(from_node, to_node, adj)
+        if not path:
+            return False, "NO_PATH", f"No path from {from_node} to {to_node}"
+
+        coords = get_path_geometry(path, track_lookup)
+        if not coords or len(coords) < 2:
+            return False, "NO_GEOMETRY", f"No track geometry for path {path}"
+
+        # Extend path for edge-snapped settlements
+        coords = extend_path_to_edge(coords, from_mapping, from_data['lat'], from_data['lon'], track_lookup, False)
+        coords = extend_path_to_edge(coords, to_mapping, to_data['lat'], to_data['lon'], track_lookup, True)
+
     if not coords or len(coords) < 2:
-        return False, "NO_GEOMETRY", f"No track geometry for path {path}"
-
-    # Extend path for edge-snapped settlements
-    coords = extend_path_to_edge(coords, from_mapping, from_data['lat'], from_data['lon'], track_lookup, False)
-    coords = extend_path_to_edge(coords, to_mapping, to_data['lat'], to_data['lon'], track_lookup, True)
+        return False, "NO_GEOMETRY", "Could not build geometry"
 
     # Check how close the path gets to each settlement
     from_dist = find_closest_point_distance(coords, from_data['lat'], from_data['lon'])
