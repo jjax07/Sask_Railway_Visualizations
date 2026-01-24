@@ -485,7 +485,15 @@
             } else {
                 coords = trackCoords.slice(toIdx, fromIdx + 1).reverse();
             }
-            return coords.length >= 2 ? coords : null;
+
+            // If both settlements project to the same point (sparse track geometry),
+            // create a simple 2-point path through the closest track point
+            if (coords.length < 2) {
+                const trackPoint = trackCoords[fromIdx];
+                return [[fromLat, fromLon], trackPoint, [toLat, toLon]];
+            }
+
+            return coords;
         }
 
         // Get geometry for settlements on different edges meeting at a shared node
@@ -542,6 +550,55 @@
             return combined.length >= 2 ? combined : null;
         }
 
+        // Get geometry when one or both settlements are snapped to a node (not an edge)
+        function getNodeOnlyGeometry(fromMapping, toMapping, fromLat, fromLon, toLat, toLon) {
+            if (fromMapping.snap_node !== toMapping.snap_node) return null;
+
+            const fromIsNodeOnly = !fromMapping.snap_nodes || fromMapping.snap_nodes.length === 1;
+            const toIsNodeOnly = !toMapping.snap_nodes || toMapping.snap_nodes.length === 1;
+            if (!fromIsNodeOnly && !toIsNodeOnly) return null;
+
+            const sharedNode = fromMapping.snap_node;
+            const sharedNodeData = networkData.nodes.find(n => n.id === sharedNode);
+            if (!sharedNodeData) return null;
+
+            if (fromIsNodeOnly && toIsNodeOnly) {
+                return [[fromLat, fromLon], [sharedNodeData.lat, sharedNodeData.lon], [toLat, toLon]];
+            }
+
+            const edgeMapping = fromIsNodeOnly ? toMapping : fromMapping;
+            const edgeLat = fromIsNodeOnly ? toLat : fromLat;
+            const edgeLon = fromIsNodeOnly ? toLon : fromLon;
+            const nodeLat = fromIsNodeOnly ? fromLat : toLat;
+            const nodeLon = fromIsNodeOnly ? fromLon : toLon;
+
+            const [node1, node2] = edgeMapping.snap_nodes;
+            const track = trackData.lookup[`${node1}|${node2}`] || trackData.lookup[`${node2}|${node1}`];
+
+            if (!track || !track.coordinates) {
+                return [[fromLat, fromLon], [sharedNodeData.lat, sharedNodeData.lon], [toLat, toLon]];
+            }
+
+            const trackCoords = track.coordinates.map(c => [c[1], c[0]]);
+            const startDist = Math.abs(trackCoords[0][0] - sharedNodeData.lat) + Math.abs(trackCoords[0][1] - sharedNodeData.lon);
+            const endDist = Math.abs(trackCoords[trackCoords.length-1][0] - sharedNodeData.lat) + Math.abs(trackCoords[trackCoords.length-1][1] - sharedNodeData.lon);
+            const nodeAtStart = startDist < endDist;
+
+            let closestIdx = 0, minDist = Infinity;
+            for (let i = 0; i < trackCoords.length; i++) {
+                const dist = haversineDistance(trackCoords[i][0], trackCoords[i][1], edgeLat, edgeLon);
+                if (dist < minDist) { minDist = dist; closestIdx = i; }
+            }
+
+            let portion = nodeAtStart ? trackCoords.slice(0, closestIdx + 1) : trackCoords.slice(closestIdx).reverse();
+
+            if (fromIsNodeOnly) {
+                return [[nodeLat, nodeLon], ...portion.slice(1)];
+            } else {
+                return [...portion.slice(0, -1).reverse(), [nodeLat, nodeLon]];
+            }
+        }
+
         // Draw railway connection from Saskatoon to a settlement
         function drawRailwayConnection(settlementName, color, weight, opacity) {
             if (!mappingData || !mappingData.lookup) return null;
@@ -557,11 +614,14 @@
 
             let coords = null;
 
-            // Case 1: Both settlements on the same node
+            // Case 1: Both settlements on the same snap_node
             if (fromNode === toNode) {
                 coords = getSameEdgeGeometry(saskatoonMapping, toMapping, data.saskatoon.lat, data.saskatoon.lon, settlement.lat, settlement.lon);
                 if (!coords) {
                     coords = getSharedNodeGeometry(saskatoonMapping, toMapping, data.saskatoon.lat, data.saskatoon.lon, settlement.lat, settlement.lon);
+                }
+                if (!coords) {
+                    coords = getNodeOnlyGeometry(saskatoonMapping, toMapping, data.saskatoon.lat, data.saskatoon.lon, settlement.lat, settlement.lon);
                 }
             }
 

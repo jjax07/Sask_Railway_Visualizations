@@ -219,7 +219,13 @@ def get_same_edge_geometry(from_mapping, to_mapping, from_lat, from_lon, to_lat,
     else:
         coords = track_coords[to_idx:from_idx + 1][::-1]
 
-    return coords if len(coords) >= 2 else None
+    # If both settlements project to the same point (sparse track geometry),
+    # create a simple 2-point path through the closest track point
+    if len(coords) < 2:
+        track_point = track_coords[from_idx]
+        return [[from_lat, from_lon], track_point, [to_lat, to_lon]]
+
+    return coords
 
 def get_shared_node_geometry(from_mapping, to_mapping, from_lat, from_lon, to_lat, to_lon, track_lookup, nodes_lookup):
     """Get geometry for settlements on different edges meeting at a shared node."""
@@ -291,6 +297,60 @@ def get_shared_node_geometry(from_mapping, to_mapping, from_lat, from_lon, to_la
     combined = from_portion + to_portion[1:]
     return combined if len(combined) >= 2 else None
 
+def get_node_only_geometry(from_mapping, to_mapping, from_lat, from_lon, to_lat, to_lon, track_lookup, nodes_lookup):
+    """Get geometry when one or both settlements are snapped to a node (not an edge)."""
+    if from_mapping['snap_node'] != to_mapping['snap_node']:
+        return None
+
+    from_nodes = from_mapping.get('snap_nodes', [])
+    to_nodes = to_mapping.get('snap_nodes', [])
+    from_is_node_only = len(from_nodes) == 1
+    to_is_node_only = len(to_nodes) == 1
+
+    if not from_is_node_only and not to_is_node_only:
+        return None
+
+    shared_node = from_mapping['snap_node']
+    shared_node_data = nodes_lookup.get(shared_node)
+    if not shared_node_data:
+        return None
+
+    # Case: Both are node-only - return line through the node
+    if from_is_node_only and to_is_node_only:
+        return [[from_lat, from_lon], [shared_node_data['lat'], shared_node_data['lon']], [to_lat, to_lon]]
+
+    # Case: One is node-only, the other is on an edge containing the node
+    edge_mapping = to_mapping if from_is_node_only else from_mapping
+    edge_lat = to_lat if from_is_node_only else from_lat
+    edge_lon = to_lon if from_is_node_only else from_lon
+    node_lat = from_lat if from_is_node_only else to_lat
+    node_lon = from_lon if from_is_node_only else to_lon
+
+    node1, node2 = edge_mapping['snap_nodes']
+    track = track_lookup.get(f"{node1}|{node2}") or track_lookup.get(f"{node2}|{node1}")
+
+    if not track or not track.get('coordinates'):
+        return [[from_lat, from_lon], [shared_node_data['lat'], shared_node_data['lon']], [to_lat, to_lon]]
+
+    track_coords = [[c[1], c[0]] for c in track['coordinates']]
+    start_dist = abs(track_coords[0][0] - shared_node_data['lat']) + abs(track_coords[0][1] - shared_node_data['lon'])
+    end_dist = abs(track_coords[-1][0] - shared_node_data['lat']) + abs(track_coords[-1][1] - shared_node_data['lon'])
+    node_at_start = start_dist < end_dist
+
+    closest_idx, min_dist = 0, float('inf')
+    for i, tc in enumerate(track_coords):
+        dist = haversine(tc[0], tc[1], edge_lat, edge_lon)
+        if dist < min_dist:
+            min_dist = dist
+            closest_idx = i
+
+    portion = track_coords[:closest_idx + 1] if node_at_start else track_coords[closest_idx:][::-1]
+
+    if from_is_node_only:
+        return [[node_lat, node_lon]] + portion[1:]
+    else:
+        return portion[:-1][::-1] + [[node_lat, node_lon]]
+
 def verify_connection(from_name, to_name, from_data, to_data, mapping_lookup, adj, track_lookup, nodes_lookup):
     """Verify a single connection. Returns (success, issue_description, details)."""
 
@@ -314,6 +374,9 @@ def verify_connection(from_name, to_name, from_data, to_data, mapping_lookup, ad
         if not coords:
             coords = get_shared_node_geometry(from_mapping, to_mapping, from_data['lat'], from_data['lon'],
                                               to_data['lat'], to_data['lon'], track_lookup, nodes_lookup)
+        if not coords:
+            coords = get_node_only_geometry(from_mapping, to_mapping, from_data['lat'], from_data['lon'],
+                                            to_data['lat'], to_data['lon'], track_lookup, nodes_lookup)
 
     # Case 2: Different nodes - use pathfinding
     if not coords:

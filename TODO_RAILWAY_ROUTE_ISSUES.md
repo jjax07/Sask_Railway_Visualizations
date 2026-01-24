@@ -7,9 +7,9 @@ After implementing railway route visualization, we ran a verification script (`s
 **Current Results (after fixes):**
 | Status | Count | Percentage |
 |--------|-------|------------|
-| OK | 1,453 | 80.2% |
+| OK | 1,458 | 80.5% |
 | Warnings (5-15km from path) | 289 | 16.0% |
-| Errors (will show straight lines) | 69 | 3.8% |
+| Errors (will show straight lines) | 64 | 3.5% |
 
 **Progress:**
 | Date | OK | Warnings | Errors | Notes |
@@ -17,6 +17,7 @@ After implementing railway route visualization, we ran a verification script (`s
 | Initial | 1,006 | 235 | 570 | Before edge interpolation |
 | Jan 24 | 1,445 | 289 | 77 | Added edge interpolation |
 | Jan 24 | 1,453 | 289 | 69 | Fixed track direction bug |
+| Jan 24 | 1,458 | 289 | 64 | Fixed sparse track + node-only cases |
 
 ## Issue Categories
 
@@ -190,35 +191,120 @@ Edenwold -> Markinch: Path 8.2km from Edenwold
 
 **Result:** Additional 8 connections fixed (NO_GEOMETRY: 7→5, FAR_FROM_PATH: 70→64)
 
+### Bug 3: Sparse Track Geometry (Jan 24, 2026)
+
+**Problem:** When two settlements on the same edge both projected to the same track point (because the track geometry was sparse - only 4-5 points over 30-60km), the `getSameEdgeGeometry()` function returned null because the extracted segment had fewer than 2 points.
+
+**Example:**
+- Imperial and Simpson are both on edge n409-n422 (63.9km, only 4 points)
+- Both settlements projected to index 0 of the track coordinates
+- Result: segment of length 1, returned null
+
+**Solution:** When both settlements project to the same point, create a 3-point path: `[fromSettlement, trackPoint, toSettlement]`. This draws through the closest track point rather than returning null.
+
+**Files modified:**
+- `settlement_explorer.html`
+- `one_hour_map.html`
+- `scripts/verify_railway_routes.py`
+
+**Result:** 2 connections fixed (Imperial↔Simpson, Drake↔Lockwood)
+
+### Bug 4: Node-Only Settlements (Jan 24, 2026)
+
+**Problem:** Some settlements have `snap_nodes` with only 1 element (e.g., `['n328']`), meaning they were snapped directly to a network node intersection rather than to an edge. The existing geometry functions required `snap_nodes.length === 2`.
+
+**Affected settlements:**
+- Indian Head: `snap_nodes=['n328']`
+- Holdfast: `snap_nodes=['n422']`
+- Aylesbury: `snap_nodes=['n422']`
+
+**Solution:** Added `getNodeOnlyGeometry()` function to handle:
+1. Both settlements node-only: draw line through the shared node coordinates
+2. One node-only, one on edge: use portion of edge from node to settlement
+
+**Files modified:**
+- `settlement_explorer.html`
+- `one_hour_map.html`
+- `scripts/verify_railway_routes.py`
+
+**Result:** 3 connections fixed (Qu'Appelle↔Indian Head, Indian Head↔McLean, Holdfast↔Aylesbury)
+
 ---
 
 ## Remaining Issues
 
-### Current Error Count: 69 connections (3.8%)
+### Current Error Count: 64 connections (3.5%)
 
-**5 NO_GEOMETRY:**
-- Qu'Appelle ↔ Indian Head (node n328)
-- Indian Head ↔ McLean (node n328)
-- Holdfast ↔ Aylesbury (node n422)
-- Imperial ↔ Simpson (node n409)
-- Drake ↔ Lockwood (node n114)
+**0 NO_GEOMETRY:** All resolved! ✓
 
 **64 FAR_FROM_PATH:** Settlements far from GIS track data (Liberty, Major, Imperial, etc.)
 
 ### Implementation Priority
 
-1. **Investigate remaining NO_GEOMETRY (5 connections)**
-   - These are on different edges meeting at a node, but one edge has no track geometry
-   - May need to check if track data is missing
+1. **Integrate NRWN Dataset (National Railway Network)**
+   - Downloaded NRWN Saskatchewan GML data to `KnowledgeGraph/nrwn_rfn_sk_gml_en/`
+   - Contains 7,084 track segments with detailed geometry
+   - Includes shortline railways missing from GEORIA: Last Mountain Railway, Great Western Railway
+   - **Will fix most FAR_FROM_PATH issues** - see analysis below
 
-2. **Investigate FAR_FROM_PATH (64 connections)**
-   - Requires investigation into GIS data quality
-   - May require obtaining additional data
-   - Some cases may be acceptable as-is
+2. **Remaining FAR_FROM_PATH after NRWN integration**
+   - Liberty (27km) and Imperial (39km) are on an ABANDONED branch line not in any dataset
+   - Accept straight dashed line fallback for these
 
-3. **WARNINGS (289 connections)**
-   - Current visualization is reasonable
-   - May improve naturally when fixing other issues
+---
+
+## NRWN Dataset Analysis (Jan 24, 2026)
+
+### Key Finding
+The NRWN (National Railway Network) dataset from Natural Resources Canada contains track geometry for the shortline railways missing from our GEORIA historical data.
+
+### Settlements FIXED by NRWN Data
+
+**Craik Subdivision (Last Mountain Railway):**
+| Settlement | Distance to NRWN Track |
+|------------|----------------------|
+| Craik | 0.14 km ✓ |
+| Davidson | 0.26 km ✓ |
+| Girvin | 0.82 km ✓ |
+| Aylesbury | 0.04 km ✓ |
+| Chamberlain | 0.09 km ✓ |
+| Bethune | 0.07 km ✓ |
+| Findlater | 0.30 km ✓ |
+
+**Shaunavon/Altawan Subdivisions (Great Western Railway):**
+| Settlement | Distance to NRWN Track |
+|------------|----------------------|
+| Shaunavon | 0.45 km ✓ |
+| Eastend | 0.40 km ✓ |
+| Dollard | 0.38 km ✓ |
+| Admiral | 0.28 km ✓ |
+| Cadillac | 0.23 km ✓ |
+| Ponteix | 0.25 km ✓ |
+
+### Still Not Covered
+| Settlement | Distance | Reason |
+|------------|----------|--------|
+| Liberty | 27.3 km | Abandoned branch line (not in NRWN or GEORIA) |
+| Imperial | 38.8 km | Abandoned branch line (not in NRWN or GEORIA) |
+
+### NRWN Dataset Details
+- **Location:** `KnowledgeGraph/nrwn_rfn_sk_gml_en/NRWN_SK_2_0_eng.gml`
+- **Format:** GML (Geography Markup Language)
+- **Size:** 75 MB, 81,629 coordinate points
+- **Operators included:** CN, CP, Last Mountain Railway, Great Western Railway, Carlton Trail Railway, Great Sandhills Railway, Fife Lake Railway, and others
+
+### Next Steps to Integrate NRWN
+1. Convert GML to GeoJSON or merge with existing shapefile
+2. Extract relevant subdivisions (Craik, Shaunavon, Altawan, Vanguard, Notukeu)
+3. Merge with existing `railway_tracks.json`
+4. Re-run settlement snapping (`snap_settlements_to_network.py`)
+5. Re-verify with `verify_railway_routes.py`
+
+---
+
+## WARNINGS (289 connections)
+- Current visualization is reasonable (5-15km from track)
+- May improve after NRWN integration
 
 ## Verification Script
 
@@ -237,4 +323,4 @@ It outputs:
 
 *Created: January 24, 2026*
 *Last updated: January 24, 2026*
-*Status: In progress - 69 remaining issues*
+*Status: In progress - 64 remaining FAR_FROM_PATH issues (all NO_GEOMETRY resolved)*
