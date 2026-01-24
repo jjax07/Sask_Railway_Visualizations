@@ -1,7 +1,7 @@
 {
   "metadata": {
     "description": "Saskatchewan railway network graph",
-    "source": "HR_rails_NEW.shp (Historical Railways of Canada)",
+    "source": "HR_rails_NEW.shp (Historical Railways of Canada) + NRWN (LMR, GWR)",
     "projection": "NAD27 Lambert Conformal Conic",
     "units": "meters",
     "snap_tolerance_m": 500.0
@@ -9,8 +9,8 @@
   "stats": {
     "sk_segments": 474,
     "total_length_km": 27217.5,
-    "node_count": 424,
-    "edge_count": 509,
+    "node_count": 521,
+    "edge_count": 609,
     "by_builder": {
       "1": {
         "count": 207,
@@ -63,6 +63,14 @@
       "76K": {
         "count": 1,
         "length_km": 35.3
+      },
+      "LMR": {
+        "count": 8,
+        "length_km": 143.3
+      },
+      "GWR": {
+        "count": 42,
+        "length_km": 704.5
       }
     },
     "by_decade": {
@@ -3080,6 +3088,685 @@
       "y": 352428.61850379687,
       "lat": 51.490055,
       "lon": -106.92452
+    },
+    {
+      "id": "n500",
+      "lat": 49.6891475,
+      "lon": -107.1379476,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n501",
+      "lat": 49.6692714,
+      "lon": -107.0155601,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n502",
+      "lat": 50.0214336,
+      "lon": -107.699104,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n503",
+      "lat": 49.9099713,
+      "lon": -107.3013895,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n504",
+      "lat": 49.6449613,
+      "lon": -108.4004947,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n505",
+      "lat": 49.7232095,
+      "lon": -108.2804168,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n506",
+      "lat": 49.2014446,
+      "lon": -108.9025497,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n507",
+      "lat": 49.2077556,
+      "lon": -108.5674381,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n508",
+      "lat": 49.6684609,
+      "lon": -106.8251196,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n509",
+      "lat": 49.692503,
+      "lon": -106.7229474,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n510",
+      "lat": 49.3753202,
+      "lon": -109.2680045,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n511",
+      "lat": 49.5110973,
+      "lon": -108.8121995,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n512",
+      "lat": 49.643468,
+      "lon": -104.6512388,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n513",
+      "lat": 49.5506197,
+      "lon": -105.0402589,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n514",
+      "lat": 49.6511756,
+      "lon": -106.2574297,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n515",
+      "lat": 49.7088848,
+      "lon": -106.5758345,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n516",
+      "lat": 49.2059513,
+      "lon": -108.3870993,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n517",
+      "lat": 49.1824773,
+      "lon": -108.1037372,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n518",
+      "lat": 49.7239984,
+      "lon": -107.7254342,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n519",
+      "lat": 49.7477714,
+      "lon": -107.4866133,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n520",
+      "lat": 49.847489,
+      "lon": -107.0131496,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n521",
+      "lat": 49.6694896,
+      "lon": -107.0171617,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n522",
+      "lat": 49.2995625,
+      "lon": -109.5106584,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n523",
+      "lat": 49.2011829,
+      "lon": -108.911858,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n524",
+      "lat": 49.5219428,
+      "lon": -105.2181308,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n525",
+      "lat": 49.5500379,
+      "lon": -105.0470372,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n526",
+      "lat": 49.6405319,
+      "lon": -108.4203403,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n527",
+      "lat": 49.5108567,
+      "lon": -108.8091338,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n528",
+      "lat": 49.65082,
+      "lon": -106.2549429,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n529",
+      "lat": 49.6419231,
+      "lon": -106.184711,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n530",
+      "lat": 49.4582635,
+      "lon": -105.3811971,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n531",
+      "lat": 49.6001518,
+      "lon": -105.8341649,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n532",
+      "lat": 49.2076735,
+      "lon": -108.5579818,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n533",
+      "lat": 49.2082326,
+      "lon": -108.3995838,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n534",
+      "lat": 49.8532497,
+      "lon": -107.0166211,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n535",
+      "lat": 49.9058902,
+      "lon": -107.2902992,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n536",
+      "lat": 49.3715817,
+      "lon": -109.2787791,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n537",
+      "lat": 49.3004472,
+      "lon": -109.5083796,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n538",
+      "lat": 49.7122515,
+      "lon": -108.0093472,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n539",
+      "lat": 49.7272976,
+      "lon": -108.2741675,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n540",
+      "lat": 49.6166444,
+      "lon": -104.7572677,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n541",
+      "lat": 49.6183694,
+      "lon": -104.749366,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n542",
+      "lat": 49.9609609,
+      "lon": -107.6388314,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n543",
+      "lat": 49.9609323,
+      "lon": -107.6264555,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n544",
+      "lat": 49.7072767,
+      "lon": -106.5883108,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n545",
+      "lat": 49.695667,
+      "lon": -106.7094443,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n546",
+      "lat": 49.2077791,
+      "lon": -108.5701338,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n547",
+      "lat": 49.2078369,
+      "lon": -108.5768116,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n548",
+      "lat": 49.641128,
+      "lon": -108.4176983,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n549",
+      "lat": 49.6453208,
+      "lon": -108.3991445,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n550",
+      "lat": 49.2964048,
+      "lon": -109.5193578,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n551",
+      "lat": 49.2965404,
+      "lon": -109.5189425,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n552",
+      "lat": 49.5116164,
+      "lon": -108.8210973,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n553",
+      "lat": 49.5116272,
+      "lon": -108.8204405,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n554",
+      "lat": 49.6672345,
+      "lon": -106.8421372,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n555",
+      "lat": 49.6672155,
+      "lon": -106.8364715,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n556",
+      "lat": 50.0266664,
+      "lon": -107.6989744,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n557",
+      "lat": 49.5734219,
+      "lon": -104.9128862,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n558",
+      "lat": 49.7150423,
+      "lon": -107.2984803,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n559",
+      "lat": 49.690336,
+      "lon": -107.1454001,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n560",
+      "lat": 49.6425898,
+      "lon": -104.649384,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n561",
+      "lat": 49.6401856,
+      "lon": -104.6407923,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n562",
+      "lat": 49.7170048,
+      "lon": -107.3107807,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n563",
+      "lat": 49.7439359,
+      "lon": -107.4753261,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n564",
+      "lat": 49.5180049,
+      "lon": -105.2253547,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n565",
+      "lat": 49.1804518,
+      "lon": -108.0949489,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n566",
+      "lat": 49.1783735,
+      "lon": -108.0861586,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n567",
+      "lat": 49.8773617,
+      "lon": -107.1399113,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n568",
+      "lat": 49.8786392,
+      "lon": -107.1329423,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n569",
+      "lat": 49.6025854,
+      "lon": -105.8412811,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n570",
+      "lat": 49.6143291,
+      "lon": -105.9293755,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n571",
+      "lat": 49.6424623,
+      "lon": -106.0383917,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n572",
+      "lat": 49.1896889,
+      "lon": -105.9615548,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n573",
+      "lat": 49.5116694,
+      "lon": -105.626135,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n574",
+      "lat": 49.5091325,
+      "lon": -105.6178739,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n575",
+      "lat": 49.6429664,
+      "lon": -108.4079791,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n576",
+      "lat": 49.6428532,
+      "lon": -108.4084477,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n577",
+      "lat": 49.5748391,
+      "lon": -104.9052819,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n578",
+      "lat": 49.5749405,
+      "lon": -104.9043502,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n579",
+      "lat": 49.6162991,
+      "lon": -108.5860135,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n580",
+      "lat": 49.6168709,
+      "lon": -108.5922621,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n581",
+      "lat": 49.7239489,
+      "lon": -107.7382092,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n582",
+      "lat": 49.709448,
+      "lon": -107.9988324,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n583",
+      "lat": 50.6451405,
+      "lon": -105.0598779,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n584",
+      "lat": 51.0493591,
+      "lon": -105.8200119,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n585",
+      "lat": 51.1576875,
+      "lon": -105.9193338,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n586",
+      "lat": 51.2145531,
+      "lon": -105.9704937,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n587",
+      "lat": 50.7093943,
+      "lon": -105.2049459,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n588",
+      "lat": 50.7085732,
+      "lon": -105.2033466,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n589",
+      "lat": 50.647988,
+      "lon": -104.8594514,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n590",
+      "lat": 50.643858,
+      "lon": -105.0560762,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n591",
+      "lat": 50.848567,
+      "lon": -105.5636236,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n592",
+      "lat": 50.8510857,
+      "lon": -105.5688788,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n593",
+      "lat": 51.0502252,
+      "lon": -105.8210379,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n594",
+      "lat": 51.1517847,
+      "lon": -105.9139937,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n595",
+      "lat": 50.9378256,
+      "lon": -105.6848824,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "n596",
+      "lat": 50.9402933,
+      "lon": -105.6937748,
+      "x": 0,
+      "y": 0
     }
   ],
   "edges": [
@@ -8172,6 +8859,1006 @@
       "abandoned_year": 1978,
       "builder_code": "2",
       "builder_name": "CNR"
+    },
+    {
+      "source": "n500",
+      "target": "n501",
+      "length_m": 11737.7,
+      "length_km": 11.74,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n502",
+      "target": "n503",
+      "length_m": 37346.2,
+      "length_km": 37.35,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n504",
+      "target": "n505",
+      "length_m": 21181.9,
+      "length_km": 21.18,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n506",
+      "target": "n507",
+      "length_m": 27659.4,
+      "length_km": 27.66,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n508",
+      "target": "n509",
+      "length_m": 11760.6,
+      "length_km": 11.76,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n510",
+      "target": "n511",
+      "length_m": 46732.1,
+      "length_km": 46.73,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n512",
+      "target": "n513",
+      "length_m": 36323.5,
+      "length_km": 36.32,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n514",
+      "target": "n515",
+      "length_m": 28800.4,
+      "length_km": 28.8,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n516",
+      "target": "n517",
+      "length_m": 24248.4,
+      "length_km": 24.25,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n518",
+      "target": "n519",
+      "length_m": 23720.1,
+      "length_km": 23.72,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n520",
+      "target": "n521",
+      "length_m": 42696.5,
+      "length_km": 42.7,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n522",
+      "target": "n523",
+      "length_m": 67222.5,
+      "length_km": 67.22,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n524",
+      "target": "n525",
+      "length_m": 15437.2,
+      "length_km": 15.44,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n526",
+      "target": "n527",
+      "length_m": 35333.3,
+      "length_km": 35.33,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n528",
+      "target": "n529",
+      "length_m": 5152.5,
+      "length_km": 5.15,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n530",
+      "target": "n531",
+      "length_m": 47373.5,
+      "length_km": 47.37,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n532",
+      "target": "n533",
+      "length_m": 11551.2,
+      "length_km": 11.55,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n534",
+      "target": "n535",
+      "length_m": 21715.7,
+      "length_km": 21.72,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n536",
+      "target": "n537",
+      "length_m": 18598.7,
+      "length_km": 18.6,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n538",
+      "target": "n539",
+      "length_m": 22890.6,
+      "length_km": 22.89,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n540",
+      "target": "n541",
+      "length_m": 676.6,
+      "length_km": 0.68,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n542",
+      "target": "n543",
+      "length_m": 886.6,
+      "length_km": 0.89,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n544",
+      "target": "n545",
+      "length_m": 8919.7,
+      "length_km": 8.92,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n546",
+      "target": "n547",
+      "length_m": 485.2,
+      "length_km": 0.49,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n548",
+      "target": "n549",
+      "length_m": 1415.7,
+      "length_km": 1.42,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n550",
+      "target": "n551",
+      "length_m": 33.7,
+      "length_km": 0.03,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n552",
+      "target": "n553",
+      "length_m": 47.4,
+      "length_km": 0.05,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n554",
+      "target": "n555",
+      "length_m": 1518.2,
+      "length_km": 1.52,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n242",
+      "target": "n556",
+      "length_m": 7319.9,
+      "length_km": 7.32,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n558",
+      "target": "n559",
+      "length_m": 13169.9,
+      "length_km": 13.17,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n560",
+      "target": "n561",
+      "length_m": 674.3,
+      "length_km": 0.67,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n562",
+      "target": "n563",
+      "length_m": 12206.9,
+      "length_km": 12.21,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n564",
+      "target": "n377",
+      "length_m": 12871.6,
+      "length_km": 12.87,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n565",
+      "target": "n566",
+      "length_m": 679.5,
+      "length_km": 0.68,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n567",
+      "target": "n568",
+      "length_m": 519.2,
+      "length_km": 0.52,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n569",
+      "target": "n570",
+      "length_m": 6806.2,
+      "length_km": 6.81,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n571",
+      "target": "n572",
+      "length_m": 56410.2,
+      "length_km": 56.41,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n573",
+      "target": "n574",
+      "length_m": 662.1,
+      "length_km": 0.66,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n575",
+      "target": "n576",
+      "length_m": 36.0,
+      "length_km": 0.04,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n577",
+      "target": "n578",
+      "length_m": 68.1,
+      "length_km": 0.07,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n579",
+      "target": "n580",
+      "length_m": 454.6,
+      "length_km": 0.45,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n581",
+      "target": "n582",
+      "length_m": 21107.7,
+      "length_km": 21.11,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "GWR",
+      "builder_name": "GWR"
+    },
+    {
+      "source": "n583",
+      "target": "n584",
+      "length_m": 74951.0,
+      "length_km": 74.95,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "LMR",
+      "builder_name": "LMR"
+    },
+    {
+      "source": "n585",
+      "target": "n586",
+      "length_m": 8770.7,
+      "length_km": 8.77,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "LMR",
+      "builder_name": "LMR"
+    },
+    {
+      "source": "n587",
+      "target": "n588",
+      "length_m": 1410.8,
+      "length_km": 1.41,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "LMR",
+      "builder_name": "LMR"
+    },
+    {
+      "source": "n164",
+      "target": "n589",
+      "length_m": 29864.4,
+      "length_km": 29.86,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "LMR",
+      "builder_name": "LMR"
+    },
+    {
+      "source": "n590",
+      "target": "n165",
+      "length_m": 14147.7,
+      "length_km": 14.15,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "LMR",
+      "builder_name": "LMR"
+    },
+    {
+      "source": "n591",
+      "target": "n592",
+      "length_m": 463.2,
+      "length_km": 0.46,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "LMR",
+      "builder_name": "LMR"
+    },
+    {
+      "source": "n593",
+      "target": "n594",
+      "length_m": 13028.0,
+      "length_km": 13.03,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "LMR",
+      "builder_name": "LMR"
+    },
+    {
+      "source": "n595",
+      "target": "n596",
+      "length_m": 681.3,
+      "length_km": 0.68,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "LMR",
+      "builder_name": "LMR"
+    },
+    {
+      "source": "n300",
+      "target": "n301",
+      "length_m": 15387.0,
+      "length_km": 15.39,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n311",
+      "target": "n29",
+      "length_m": 12977.3,
+      "length_km": 12.98,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n358",
+      "target": "n186",
+      "length_m": 13226.6,
+      "length_km": 13.23,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n288",
+      "target": "n304",
+      "length_m": 18176.0,
+      "length_km": 18.18,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n253",
+      "target": "n501",
+      "length_m": 12493.7,
+      "length_km": 12.49,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n556",
+      "target": "n502",
+      "length_m": 581.9,
+      "length_km": 0.58,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n246",
+      "target": "n505",
+      "length_m": 27420.7,
+      "length_km": 27.42,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n386",
+      "target": "n507",
+      "length_m": 13797.7,
+      "length_km": 13.8,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n253",
+      "target": "n508",
+      "length_m": 1477.8,
+      "length_km": 1.48,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n252",
+      "target": "n510",
+      "length_m": 24931.9,
+      "length_km": 24.93,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n269",
+      "target": "n512",
+      "length_m": 11381.1,
+      "length_km": 11.38,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n384",
+      "target": "n515",
+      "length_m": 6678.1,
+      "length_km": 6.68,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n386",
+      "target": "n516",
+      "length_m": 874.4,
+      "length_km": 0.87,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n361",
+      "target": "n519",
+      "length_m": 20723.9,
+      "length_km": 20.72,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n501",
+      "target": "n521",
+      "length_m": 117.8,
+      "length_km": 0.12,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n506",
+      "target": "n523",
+      "length_m": 676.9,
+      "length_km": 0.68,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n513",
+      "target": "n525",
+      "length_m": 493.3,
+      "length_km": 0.49,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n511",
+      "target": "n527",
+      "length_m": 223.0,
+      "length_km": 0.22,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n514",
+      "target": "n528",
+      "length_m": 183.3,
+      "length_km": 0.18,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n377",
+      "target": "n530",
+      "length_m": 838.7,
+      "length_km": 0.84,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n507",
+      "target": "n532",
+      "length_m": 687.0,
+      "length_km": 0.69,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n520",
+      "target": "n534",
+      "length_m": 687.2,
+      "length_km": 0.69,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n522",
+      "target": "n537",
+      "length_m": 192.3,
+      "length_km": 0.19,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n505",
+      "target": "n539",
+      "length_m": 639.1,
+      "length_km": 0.64,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n269",
+      "target": "n540",
+      "length_m": 3199.5,
+      "length_km": 3.2,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n502",
+      "target": "n542",
+      "length_m": 7986.3,
+      "length_km": 7.99,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n515",
+      "target": "n544",
+      "length_m": 914.8,
+      "length_km": 0.91,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n507",
+      "target": "n546",
+      "length_m": 195.8,
+      "length_km": 0.2,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n504",
+      "target": "n549",
+      "length_m": 105.1,
+      "length_km": 0.11,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n522",
+      "target": "n551",
+      "length_m": 688.3,
+      "length_km": 0.69,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n511",
+      "target": "n553",
+      "length_m": 597.9,
+      "length_km": 0.6,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n253",
+      "target": "n554",
+      "length_m": 661.4,
+      "length_km": 0.66,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n500",
+      "target": "n559",
+      "length_m": 552.1,
+      "length_km": 0.55,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n512",
+      "target": "n560",
+      "length_m": 165.4,
+      "length_km": 0.17,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n558",
+      "target": "n562",
+      "length_m": 910.9,
+      "length_km": 0.91,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n517",
+      "target": "n565",
+      "length_m": 677.3,
+      "length_km": 0.68,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n534",
+      "target": "n568",
+      "length_m": 8802.2,
+      "length_km": 8.8,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n531",
+      "target": "n569",
+      "length_m": 579.8,
+      "length_km": 0.58,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n280",
+      "target": "n572",
+      "length_m": 705.2,
+      "length_km": 0.71,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n369",
+      "target": "n574",
+      "length_m": 13035.8,
+      "length_km": 13.04,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n504",
+      "target": "n575",
+      "length_m": 582.8,
+      "length_km": 0.58,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n269",
+      "target": "n578",
+      "length_m": 8426.9,
+      "length_km": 8.43,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n526",
+      "target": "n579",
+      "length_m": 12233.2,
+      "length_km": 12.23,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n538",
+      "target": "n582",
+      "length_m": 817.8,
+      "length_km": 0.82,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n590",
+      "target": "n583",
+      "length_m": 303.6,
+      "length_km": 0.3,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n584",
+      "target": "n585",
+      "length_m": 13899.2,
+      "length_km": 13.9,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n583",
+      "target": "n588",
+      "length_m": 12326.7,
+      "length_km": 12.33,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n422",
+      "target": "n591",
+      "length_m": 16013.8,
+      "length_km": 16.01,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n584",
+      "target": "n593",
+      "length_m": 120.1,
+      "length_km": 0.12,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n592",
+      "target": "n595",
+      "length_m": 12618.3,
+      "length_km": 12.62,
+      "built_year": 0,
+      "abandoned_year": 0,
+      "builder_code": "VIRTUAL",
+      "builder_name": "Virtual Connection"
     }
   ]
 }
