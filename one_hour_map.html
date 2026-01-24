@@ -372,6 +372,38 @@
             return allCoords.length > 0 ? allCoords : null;
         }
 
+        // Find the index of the point on a path closest to a given location
+        function findClosestPointIndex(coords, targetLat, targetLon) {
+            let minDist = Infinity;
+            let minIndex = 0;
+            for (let i = 0; i < coords.length; i++) {
+                const dist = haversineDistance(coords[i][0], coords[i][1], targetLat, targetLon);
+                if (dist < minDist) {
+                    minDist = dist;
+                    minIndex = i;
+                }
+            }
+            return minIndex;
+        }
+
+        // Trim path to start and end at settlement locations
+        function trimPathToSettlements(coords, fromLat, fromLon, toLat, toLon) {
+            if (!coords || coords.length < 2) return coords;
+            const startIndex = findClosestPointIndex(coords, fromLat, fromLon);
+            const endIndex = findClosestPointIndex(coords, toLat, toLon);
+            let trimmedCoords;
+            if (startIndex <= endIndex) {
+                trimmedCoords = coords.slice(startIndex, endIndex + 1);
+            } else {
+                trimmedCoords = coords.slice(endIndex, startIndex + 1).reverse();
+            }
+            if (trimmedCoords.length >= 2) {
+                trimmedCoords[0] = [fromLat, fromLon];
+                trimmedCoords[trimmedCoords.length - 1] = [toLat, toLon];
+            }
+            return trimmedCoords;
+        }
+
         // Draw railway connection from Saskatoon to a settlement
         function drawRailwayConnection(settlementName, color, weight, opacity) {
             if (!mappingData || !mappingData.lookup) return null;
@@ -380,8 +412,17 @@
             if (!saskatoonMapping || !toMapping) return null;
             const path = findPath(saskatoonMapping.snap_node, toMapping.snap_node);
             if (!path) return null;
-            const coords = getPathGeometry(path);
+            let coords = getPathGeometry(path);
             if (!coords || coords.length < 2) return null;
+
+            // Get settlement data to trim path
+            const settlement = data.settlements.find(s => s.name === settlementName);
+            if (!settlement) return null;
+
+            // Trim path to start at Saskatoon and end at destination settlement
+            coords = trimPathToSettlements(coords, data.saskatoon.lat, data.saskatoon.lon, settlement.lat, settlement.lon);
+            if (!coords || coords.length < 2) return null;
+
             return L.polyline(coords, { color, weight, opacity });
         }
 
