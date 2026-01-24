@@ -218,6 +218,10 @@
                     <div class="legend-circle" style="background: transparent; border: 2px dashed #e94560;"></div>
                     <span>40 km Radius (1 hour)</span>
                 </div>
+                <div class="legend-item">
+                    <div style="width: 20px; height: 3px; background: #4ecca3; margin-right: 10px;"></div>
+                    <span>Railway Route</span>
+                </div>
             </div>
 
             <div class="settlement-list">
@@ -230,8 +234,12 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         let data = null;
+        let trackData = null;         // Railway track geometry
+        let networkData = null;       // Railway network (nodes/edges)
+        let mappingData = null;       // Settlement to node mappings
         let map = null;
         let markers = {};
+        let connectionLines = [];     // Railway route lines
         let radiusCircle = null;
         let isPlaying = false;
         let playInterval = null;
@@ -247,10 +255,183 @@
             }).addTo(map);
         }
 
+        // Calculate distance between two lat/lon points in meters (Haversine)
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // Earth's radius in meters
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Find intersection point of line segment with circle boundary
+        function findCircleIntersection(pt1, pt2, centerLat, centerLon, radiusM) {
+            const dist1 = haversineDistance(centerLat, centerLon, pt1[0], pt1[1]);
+            let lo = 0, hi = 1;
+            for (let iter = 0; iter < 20; iter++) {
+                const mid = (lo + hi) / 2;
+                const lat = pt1[0] + (pt2[0] - pt1[0]) * mid;
+                const lon = pt1[1] + (pt2[1] - pt1[1]) * mid;
+                const dist = haversineDistance(centerLat, centerLon, lat, lon);
+                if (dist < radiusM) {
+                    if (dist1 < radiusM) lo = mid;
+                    else hi = mid;
+                } else {
+                    if (dist1 < radiusM) hi = mid;
+                    else lo = mid;
+                }
+            }
+            const t = (lo + hi) / 2;
+            return [pt1[0] + (pt2[0] - pt1[0]) * t, pt1[1] + (pt2[1] - pt1[1]) * t];
+        }
+
+        // Clip a polyline to stay within a circle
+        function clipPolylineToCircle(coords, centerLat, centerLon, radiusM) {
+            if (!coords || coords.length < 2) return coords;
+            const clipped = [];
+            for (let i = 0; i < coords.length; i++) {
+                const pt = coords[i];
+                const dist = haversineDistance(centerLat, centerLon, pt[0], pt[1]);
+                const isInside = dist <= radiusM;
+                if (i === 0) {
+                    if (isInside) clipped.push(pt);
+                } else {
+                    const prevPt = coords[i - 1];
+                    const prevDist = haversineDistance(centerLat, centerLon, prevPt[0], prevPt[1]);
+                    const prevInside = prevDist <= radiusM;
+                    if (isInside && prevInside) {
+                        clipped.push(pt);
+                    } else if (isInside && !prevInside) {
+                        clipped.push(findCircleIntersection(prevPt, pt, centerLat, centerLon, radiusM));
+                        clipped.push(pt);
+                    } else if (!isInside && prevInside) {
+                        clipped.push(findCircleIntersection(prevPt, pt, centerLat, centerLon, radiusM));
+                    }
+                }
+            }
+            return clipped.length >= 2 ? clipped : null;
+        }
+
+        // Find shortest path between two nodes using Dijkstra
+        function findPath(startNode, endNode) {
+            if (!networkData || !networkData.adj) return null;
+            if (startNode === endNode) return [startNode];
+            const dist = {}, prev = {}, visited = new Set(), queue = [];
+            dist[startNode] = 0;
+            queue.push({node: startNode, dist: 0});
+            while (queue.length > 0) {
+                queue.sort((a, b) => a.dist - b.dist);
+                const {node: current} = queue.shift();
+                if (visited.has(current)) continue;
+                visited.add(current);
+                if (current === endNode) break;
+                const neighbors = networkData.adj[current] || [];
+                for (const {node: neighbor, weight} of neighbors) {
+                    if (visited.has(neighbor)) continue;
+                    const newDist = dist[current] + weight;
+                    if (dist[neighbor] === undefined || newDist < dist[neighbor]) {
+                        dist[neighbor] = newDist;
+                        prev[neighbor] = current;
+                        queue.push({node: neighbor, dist: newDist});
+                    }
+                }
+            }
+            if (prev[endNode] === undefined && startNode !== endNode) return null;
+            const path = [];
+            let current = endNode;
+            while (current !== undefined) {
+                path.unshift(current);
+                current = prev[current];
+            }
+            return path;
+        }
+
+        // Get track geometry for a path
+        function getPathGeometry(path) {
+            if (!path || path.length < 2 || !trackData || !trackData.lookup) return null;
+            const allCoords = [];
+            for (let i = 0; i < path.length - 1; i++) {
+                const key = `${path[i]}|${path[i+1]}`;
+                const track = trackData.lookup[key];
+                if (track && track.coordinates) {
+                    let coords = track.coordinates.map(c => [c[1], c[0]]);
+                    if (allCoords.length > 0) {
+                        const lastPoint = allCoords[allCoords.length - 1];
+                        const firstPoint = coords[0];
+                        const lastPointReversed = coords[coords.length - 1];
+                        const distToFirst = Math.abs(lastPoint[0] - firstPoint[0]) + Math.abs(lastPoint[1] - firstPoint[1]);
+                        const distToLast = Math.abs(lastPoint[0] - lastPointReversed[0]) + Math.abs(lastPoint[1] - lastPointReversed[1]);
+                        if (distToLast < distToFirst) coords = coords.reverse();
+                    }
+                    allCoords.push(...coords);
+                }
+            }
+            return allCoords.length > 0 ? allCoords : null;
+        }
+
+        // Draw railway connection from Saskatoon to a settlement, clipped to 40km
+        function drawRailwayConnection(settlementName, color, weight, opacity) {
+            if (!mappingData || !mappingData.lookup) return null;
+            const saskatoonMapping = mappingData.lookup['Saskatoon'];
+            const toMapping = mappingData.lookup[settlementName];
+            if (!saskatoonMapping || !toMapping) return null;
+            const path = findPath(saskatoonMapping.snap_node, toMapping.snap_node);
+            if (!path) return null;
+            let coords = getPathGeometry(path);
+            if (!coords || coords.length < 2) return null;
+            // Clip to 40km radius from Saskatoon
+            coords = clipPolylineToCircle(coords, data.saskatoon.lat, data.saskatoon.lon, 40000);
+            if (!coords || coords.length < 2) return null;
+            return L.polyline(coords, { color, weight, opacity });
+        }
+
         // Load data and initialize
         async function loadData() {
             const response = await fetch('data/one_hour_corridor.json');
             data = await response.json();
+
+            // Load railway track geometry
+            try {
+                const trackResponse = await fetch('data/railway_tracks.json');
+                if (trackResponse.ok) {
+                    trackData = await trackResponse.json();
+                    trackData.lookup = {};
+                    trackData.tracks.forEach(t => {
+                        trackData.lookup[`${t.source}|${t.target}`] = t;
+                        trackData.lookup[`${t.target}|${t.source}`] = t;
+                    });
+                }
+            } catch (e) { console.warn('Could not load track geometry:', e); }
+
+            // Load network graph for pathfinding
+            try {
+                const networkResponse = await fetch('data/railway_network.json');
+                if (networkResponse.ok) {
+                    networkData = await networkResponse.json();
+                    networkData.adj = {};
+                    networkData.edges.forEach(e => {
+                        if (!networkData.adj[e.source]) networkData.adj[e.source] = [];
+                        if (!networkData.adj[e.target]) networkData.adj[e.target] = [];
+                        networkData.adj[e.source].push({node: e.target, weight: e.length_m});
+                        networkData.adj[e.target].push({node: e.source, weight: e.length_m});
+                    });
+                }
+            } catch (e) { console.warn('Could not load network:', e); }
+
+            // Load settlement to node mappings
+            try {
+                const mappingResponse = await fetch('data/settlement_network_mapping.json');
+                if (mappingResponse.ok) {
+                    mappingData = await mappingResponse.json();
+                    mappingData.lookup = {};
+                    mappingData.mappings.forEach(m => {
+                        mappingData.lookup[m.settlement] = m;
+                    });
+                }
+            } catch (e) { console.warn('Could not load mappings:', e); }
 
             // Add Saskatoon marker
             const saskatoonIcon = L.divIcon({
@@ -310,6 +491,10 @@
             document.getElementById('yearDisplay').textContent = year;
             document.getElementById('yearSlider').value = year;
 
+            // Clear existing connection lines
+            connectionLines.forEach(line => map.removeLayer(line));
+            connectionLines = [];
+
             let connectedCount = 0;
             let listHTML = '';
 
@@ -327,6 +512,18 @@
                         opacity: 1,
                         fillOpacity: 0.9
                     });
+
+                    // Draw railway connection line (clipped to 40km)
+                    let line = drawRailwayConnection(s.name, '#4ecca3', 3, 0.7);
+                    if (!line) {
+                        // Fallback to straight line if railway path not found
+                        line = L.polyline(
+                            [[data.saskatoon.lat, data.saskatoon.lon], [s.lat, s.lon]],
+                            { color: '#4ecca3', weight: 2, opacity: 0.5, dashArray: '5, 5' }
+                        );
+                    }
+                    line.addTo(map);
+                    connectionLines.push(line);
                 } else {
                     m.marker.setStyle({
                         fillColor: '#666',

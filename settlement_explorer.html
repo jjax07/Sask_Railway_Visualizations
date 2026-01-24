@@ -481,6 +481,78 @@
             }
         }
 
+        // Calculate distance between two lat/lon points in meters (Haversine)
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // Earth's radius in meters
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Find intersection point of line segment with circle boundary using binary search
+        function findCircleIntersection(pt1, pt2, centerLat, centerLon, radiusM) {
+            const dist1 = haversineDistance(centerLat, centerLon, pt1[0], pt1[1]);
+            const dist2 = haversineDistance(centerLat, centerLon, pt2[0], pt2[1]);
+
+            let lo = 0, hi = 1;
+            for (let iter = 0; iter < 20; iter++) {
+                const mid = (lo + hi) / 2;
+                const lat = pt1[0] + (pt2[0] - pt1[0]) * mid;
+                const lon = pt1[1] + (pt2[1] - pt1[1]) * mid;
+                const dist = haversineDistance(centerLat, centerLon, lat, lon);
+
+                if (dist < radiusM) {
+                    if (dist1 < radiusM) lo = mid;
+                    else hi = mid;
+                } else {
+                    if (dist1 < radiusM) hi = mid;
+                    else lo = mid;
+                }
+            }
+
+            const t = (lo + hi) / 2;
+            return [pt1[0] + (pt2[0] - pt1[0]) * t, pt1[1] + (pt2[1] - pt1[1]) * t];
+        }
+
+        // Clip a polyline to stay within a circle
+        function clipPolylineToCircle(coords, centerLat, centerLon, radiusM) {
+            if (!coords || coords.length < 2) return coords;
+
+            const clipped = [];
+
+            for (let i = 0; i < coords.length; i++) {
+                const pt = coords[i];
+                const dist = haversineDistance(centerLat, centerLon, pt[0], pt[1]);
+                const isInside = dist <= radiusM;
+
+                if (i === 0) {
+                    if (isInside) clipped.push(pt);
+                } else {
+                    const prevPt = coords[i - 1];
+                    const prevDist = haversineDistance(centerLat, centerLon, prevPt[0], prevPt[1]);
+                    const prevInside = prevDist <= radiusM;
+
+                    if (isInside && prevInside) {
+                        clipped.push(pt);
+                    } else if (isInside && !prevInside) {
+                        const intersect = findCircleIntersection(prevPt, pt, centerLat, centerLon, radiusM);
+                        clipped.push(intersect);
+                        clipped.push(pt);
+                    } else if (!isInside && prevInside) {
+                        const intersect = findCircleIntersection(prevPt, pt, centerLat, centerLon, radiusM);
+                        clipped.push(intersect);
+                    }
+                    // Both outside: skip (handle pass-through if needed)
+                }
+            }
+
+            return clipped.length >= 2 ? clipped : null;
+        }
+
         // Find shortest path between two nodes using Dijkstra
         function findPath(startNode, endNode) {
             if (!networkData || !networkData.adj) return null;
@@ -561,7 +633,7 @@
             return allCoords.length > 0 ? allCoords : null;
         }
 
-        // Draw connection using actual railway path
+        // Draw connection using actual railway path, clipped to 40km radius
         function drawRailwayConnection(fromSettlement, toSettlement, color, weight, opacity) {
             if (!mappingData || !mappingData.lookup) {
                 // Fallback to straight line
@@ -579,8 +651,15 @@
             const path = findPath(fromNode, toNode);
             if (!path) return null;
 
-            const coords = getPathGeometry(path);
+            let coords = getPathGeometry(path);
             if (!coords || coords.length < 2) return null;
+
+            // Clip to 40km radius from selected settlement
+            const selectedSettlement = data.settlements[currentSettlement];
+            if (selectedSettlement) {
+                coords = clipPolylineToCircle(coords, selectedSettlement.lat, selectedSettlement.lon, 40000);
+                if (!coords || coords.length < 2) return null;
+            }
 
             return L.polyline(coords, {
                 color: color,
