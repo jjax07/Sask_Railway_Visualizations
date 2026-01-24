@@ -126,14 +126,19 @@ Sask_Railway_Visualizations/
 ├── railway_timeline.html      # Railway network timeline
 ├── network_graph.html         # Network graph visualization
 ├── data/
-│   ├── settlements.json           # 429 settlements with coordinates & railway info
-│   ├── settlement_connections.json # Pre-calculated connections for explorer
-│   ├── one_hour_corridor.json     # Saskatoon-specific corridor data
-│   └── railway_timeline.json      # Settlements by railway with years
+│   ├── settlements.json              # 429 settlements with coordinates & railway info
+│   ├── settlement_connections.json   # Pre-calculated connections with railway distances
+│   ├── one_hour_corridor.json        # Saskatoon-specific corridor data
+│   ├── railway_timeline.json         # Settlements by railway with years
+│   ├── railway_network.json          # Track network graph (424 nodes, 509 edges)
+│   └── settlement_network_mapping.json # Settlement to network node mappings
 ├── scripts/
-│   ├── generate_connections.py    # Script to generate connection data
-│   ├── update_multi_railways.py   # Cross-reference multi-railway data
-│   └── create_data_issues_doc.py  # Generate Word doc for data consultation
+│   ├── generate_connections.py       # Script to generate connection data
+│   ├── update_multi_railways.py      # Cross-reference multi-railway data
+│   ├── create_data_issues_doc.py     # Generate Word doc for data consultation
+│   ├── build_railway_network.py      # Build network graph from GIS shapefile
+│   ├── snap_settlements_to_network.py # Map settlements to network nodes
+│   └── calculate_railway_distances.py # Calculate railway distances via Dijkstra
 ├── Historical_Railway_Data_By_Settlement.xlsx  # GIS comparison data
 ├── Saskatchewan_Railway_Data_Issues.docx       # Data issues for consultation
 ├── KNOWN_ISSUES.md            # Outstanding issues and testing checklist
@@ -145,9 +150,11 @@ Sask_Railway_Visualizations/
 | File | Records | Description |
 |------|---------|-------------|
 | `settlements.json` | 429 | All settlements with lat/lon, railway arrival year, first railway |
-| `settlement_connections.json` | 429 + 1,494 pairs | Settlement data plus pre-calculated connections within 40km |
+| `settlement_connections.json` | 429 + 1,811 pairs | Settlement data plus connections with direct & railway distances |
 | `one_hour_corridor.json` | 12 | Settlements within 40 km of Saskatoon |
 | `railway_timeline.json` | 392 | Settlements organized by railway company |
+| `railway_network.json` | 424 nodes, 509 edges | Track network graph from GIS data |
+| `settlement_network_mapping.json` | 429 | Settlement to network node mappings |
 
 ### Settlement Connections Data Structure
 
@@ -169,6 +176,7 @@ The `settlement_connections.json` file contains:
       {
         "to": "Osler",
         "distance_km": 28.7,
+        "railway_distance_km": 132.8,
         "shared_railway": "QLSRSC",
         "connected_year": 1889,
         "all_shared_railways": null
@@ -177,6 +185,8 @@ The `settlement_connections.json` file contains:
   }
 }
 ```
+
+The `railway_distance_km` field shows actual track distance (may be longer than direct distance due to route geometry).
 
 ## Scripts
 
@@ -215,16 +225,64 @@ python3 scripts/update_multi_railways.py
 
 **Statistics (current data):**
 - Total settlements: 429
-- Connection pairs within 40km: 1,494
-- Railway-connected pairs: 857
+- Connection pairs within 40km: 1,811
+- Railway-connected pairs: 1,691
 - Settlements with nearby connections: 391
 - Settlements with multiple railways: 8
+
+### Railway Distance Scripts
+
+Three scripts process GIS track data to calculate actual railway distances:
+
+**1. build_railway_network.py**
+Builds a network graph from the Historical Railways of Canada shapefile.
+
+```bash
+python3 scripts/build_railway_network.py
+```
+
+- Loads Saskatchewan track segments from HR_rails_NEW.shp
+- Detects junction points where multiple tracks meet
+- Splits tracks at junctions for accurate routing
+- Output: `data/railway_network.json` (424 nodes, 509 edges)
+
+**2. snap_settlements_to_network.py**
+Maps each settlement to the nearest point on the railway network.
+
+```bash
+python3 scripts/snap_settlements_to_network.py
+```
+
+- Finds nearest network node or edge for each settlement
+- 88.6% of settlements are within 5km of the network
+- Output: `data/settlement_network_mapping.json`
+
+**3. calculate_railway_distances.py**
+Calculates shortest path railway distances between connected settlements.
+
+```bash
+python3 scripts/calculate_railway_distances.py
+```
+
+- Uses Dijkstra's algorithm for shortest path routing
+- Handles same-edge cases using edge interpolation
+- Updates `data/settlement_connections.json` with `railway_distance_km`
 
 ## Methodology
 
 ### Distance Calculation
-- Haversine formula for great-circle distance between settlement coordinates
-- 40 km threshold = approximately 1 hour travel at 40 km/h average speed (typical for branch lines with stops)
+
+**Direct Distance (Haversine):**
+- Great-circle distance between settlement coordinates
+- 40 km threshold = approximately 1 hour travel at 40 km/h average speed
+
+**Railway Distance:**
+- Actual track distance calculated from GIS shapefile geometries
+- Built from Historical Railways of Canada dataset (HR_rails_NEW.shp)
+- Uses Dijkstra's shortest path algorithm on network graph
+- Average railway/direct distance ratio: 2.58x (some routes are indirect)
+
+Both distances are displayed in Settlement Explorer and Saskatoon Corridor visualizations.
 
 ### Connection Logic
 A settlement pair is considered "railway connected" when:
