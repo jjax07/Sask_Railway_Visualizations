@@ -221,7 +221,7 @@ def get_same_edge_geometry(from_mapping, to_mapping, from_lat, from_lon, to_lat,
 
     return coords if len(coords) >= 2 else None
 
-def get_shared_node_geometry(from_mapping, to_mapping, from_lat, from_lon, to_lat, to_lon, track_lookup):
+def get_shared_node_geometry(from_mapping, to_mapping, from_lat, from_lon, to_lat, to_lon, track_lookup, nodes_lookup):
     """Get geometry for settlements on different edges meeting at a shared node."""
     from_nodes = from_mapping.get('snap_nodes')
     to_nodes = to_mapping.get('snap_nodes')
@@ -262,9 +262,21 @@ def get_shared_node_geometry(from_mapping, to_mapping, from_lat, from_lon, to_la
             to_min_dist = dist
             to_idx = i
 
+    # Determine which end of each track is the shared node by checking actual coordinates
     shared_node = from_mapping['snap_node']
-    from_track_start_is_shared = from_nodes[0] == shared_node
-    to_track_start_is_shared = to_nodes[0] == shared_node
+    shared_node_data = nodes_lookup.get(shared_node)
+    if not shared_node_data:
+        return None
+
+    # Check which end of from_coords is closer to the shared node
+    from_start_dist = abs(from_coords[0][0] - shared_node_data['lat']) + abs(from_coords[0][1] - shared_node_data['lon'])
+    from_end_dist = abs(from_coords[-1][0] - shared_node_data['lat']) + abs(from_coords[-1][1] - shared_node_data['lon'])
+    from_track_start_is_shared = from_start_dist < from_end_dist
+
+    # Check which end of to_coords is closer to the shared node
+    to_start_dist = abs(to_coords[0][0] - shared_node_data['lat']) + abs(to_coords[0][1] - shared_node_data['lon'])
+    to_end_dist = abs(to_coords[-1][0] - shared_node_data['lat']) + abs(to_coords[-1][1] - shared_node_data['lon'])
+    to_track_start_is_shared = to_start_dist < to_end_dist
 
     if from_track_start_is_shared:
         from_portion = from_coords[:from_idx + 1][::-1]
@@ -279,7 +291,7 @@ def get_shared_node_geometry(from_mapping, to_mapping, from_lat, from_lon, to_la
     combined = from_portion + to_portion[1:]
     return combined if len(combined) >= 2 else None
 
-def verify_connection(from_name, to_name, from_data, to_data, mapping_lookup, adj, track_lookup):
+def verify_connection(from_name, to_name, from_data, to_data, mapping_lookup, adj, track_lookup, nodes_lookup):
     """Verify a single connection. Returns (success, issue_description, details)."""
 
     from_mapping = mapping_lookup.get(from_name)
@@ -301,7 +313,7 @@ def verify_connection(from_name, to_name, from_data, to_data, mapping_lookup, ad
                                         to_data['lat'], to_data['lon'], track_lookup)
         if not coords:
             coords = get_shared_node_geometry(from_mapping, to_mapping, from_data['lat'], from_data['lon'],
-                                              to_data['lat'], to_data['lon'], track_lookup)
+                                              to_data['lat'], to_data['lon'], track_lookup, nodes_lookup)
 
     # Case 2: Different nodes - use pathfinding
     if not coords:
@@ -355,6 +367,7 @@ def main():
     adj = build_adjacency(network)
     track_lookup = build_track_lookup(tracks)
     mapping_lookup = build_mapping_lookup(mappings)
+    nodes_lookup = {n['id']: n for n in network['nodes']}
 
     settlements = connections['settlements']
     all_connections = connections['connections']
@@ -392,7 +405,7 @@ def main():
 
             success, issue_type, details = verify_connection(
                 from_name, to_name, from_data, to_data,
-                mapping_lookup, adj, track_lookup
+                mapping_lookup, adj, track_lookup, nodes_lookup
             )
 
             results[issue_type].append({

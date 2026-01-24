@@ -517,9 +517,18 @@
                 if (dist < toMinDist) { toMinDist = dist; toIdx = i; }
             }
 
+            // Determine which end of each track is the shared node by checking actual coordinates
             const sharedNode = fromMapping.snap_node;
-            const fromTrackStartIsShared = fromMapping.snap_nodes[0] === sharedNode;
-            const toTrackStartIsShared = toMapping.snap_nodes[0] === sharedNode;
+            const sharedNodeData = networkData.nodes.find(n => n.id === sharedNode);
+            if (!sharedNodeData) return null;
+
+            const fromStartDist = Math.abs(fromCoords[0][0] - sharedNodeData.lat) + Math.abs(fromCoords[0][1] - sharedNodeData.lon);
+            const fromEndDist = Math.abs(fromCoords[fromCoords.length-1][0] - sharedNodeData.lat) + Math.abs(fromCoords[fromCoords.length-1][1] - sharedNodeData.lon);
+            const fromTrackStartIsShared = fromStartDist < fromEndDist;
+
+            const toStartDist = Math.abs(toCoords[0][0] - sharedNodeData.lat) + Math.abs(toCoords[0][1] - sharedNodeData.lon);
+            const toEndDist = Math.abs(toCoords[toCoords.length-1][0] - sharedNodeData.lat) + Math.abs(toCoords[toCoords.length-1][1] - sharedNodeData.lon);
+            const toTrackStartIsShared = toStartDist < toEndDist;
 
             let fromPortion = fromTrackStartIsShared
                 ? fromCoords.slice(0, fromIdx + 1).reverse()

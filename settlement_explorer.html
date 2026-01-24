@@ -831,32 +831,38 @@
             }
 
             // Determine which end of each track is the shared node
-            // by checking distances to both ends
+            // by checking actual coordinate distances (not assuming snap_nodes order matches track direction)
             const sharedNode = fromMapping.snap_node;
+            const sharedNodeData = networkData.nodes.find(n => n.id === sharedNode);
+            if (!sharedNodeData) return null;
 
-            // For fromTrack: is the shared node at start or end?
-            const fromTrackStartIsShared = fromMapping.snap_nodes[0] === sharedNode;
+            // For fromTrack: check which end is closer to the shared node
+            const fromStartDist = Math.abs(fromCoords[0][0] - sharedNodeData.lat) + Math.abs(fromCoords[0][1] - sharedNodeData.lon);
+            const fromEndDist = Math.abs(fromCoords[fromCoords.length-1][0] - sharedNodeData.lat) + Math.abs(fromCoords[fromCoords.length-1][1] - sharedNodeData.lon);
+            const fromTrackStartIsShared = fromStartDist < fromEndDist;
 
-            // For toTrack: is the shared node at start or end?
-            const toTrackStartIsShared = toMapping.snap_nodes[0] === sharedNode;
+            // For toTrack: check which end is closer to the shared node
+            const toStartDist = Math.abs(toCoords[0][0] - sharedNodeData.lat) + Math.abs(toCoords[0][1] - sharedNodeData.lon);
+            const toEndDist = Math.abs(toCoords[toCoords.length-1][0] - sharedNodeData.lat) + Math.abs(toCoords[toCoords.length-1][1] - sharedNodeData.lon);
+            const toTrackStartIsShared = toStartDist < toEndDist;
 
             // Build path from "from" settlement to shared node
             let fromPortion;
             if (fromTrackStartIsShared) {
-                // Shared node is at start, so we need from settlement point back to start
+                // Shared node is at start of coords, so we need from settlement point back to start
                 fromPortion = fromCoords.slice(0, fromIdx + 1).reverse();
             } else {
-                // Shared node is at end, so we need from settlement point to end
+                // Shared node is at end of coords, so we need from settlement point to end
                 fromPortion = fromCoords.slice(fromIdx);
             }
 
             // Build path from shared node to "to" settlement
             let toPortion;
             if (toTrackStartIsShared) {
-                // Shared node is at start, so we go from start to settlement point
+                // Shared node is at start of coords, so we go from start to settlement point
                 toPortion = toCoords.slice(0, toIdx + 1);
             } else {
-                // Shared node is at end, so we go from end (reversed) to settlement point
+                // Shared node is at end of coords, so we go from end (reversed) to settlement point
                 toPortion = toCoords.slice(toIdx).reverse();
             }
 

@@ -4,12 +4,19 @@
 
 After implementing railway route visualization, we ran a verification script (`scripts/verify_railway_routes.py`) that checks all 1,811 unique settlement connections. The script simulates the JavaScript path-finding logic and measures how close the resulting path geometry gets to each settlement.
 
-**Results Summary:**
+**Current Results (after fixes):**
 | Status | Count | Percentage |
 |--------|-------|------------|
-| OK | 1,006 | 55.5% |
-| Warnings (5-15km from path) | 235 | 13.0% |
-| Errors (will show straight lines) | 570 | 31.5% |
+| OK | 1,453 | 80.2% |
+| Warnings (5-15km from path) | 289 | 16.0% |
+| Errors (will show straight lines) | 69 | 3.8% |
+
+**Progress:**
+| Date | OK | Warnings | Errors | Notes |
+|------|-----|----------|--------|-------|
+| Initial | 1,006 | 235 | 570 | Before edge interpolation |
+| Jan 24 | 1,445 | 289 | 77 | Added edge interpolation |
+| Jan 24 | 1,453 | 289 | 69 | Fixed track direction bug |
 
 ## Issue Categories
 
@@ -153,19 +160,63 @@ Edenwold -> Markinch: Path 8.2km from Edenwold
 | `data/settlement_network_mapping.json` | Settlement to node mappings | Maybe (if re-snapping) |
 | `data/settlement_connections.json` | Connection pairs with distances | No |
 
-## Implementation Priority
+## Bugs Fixed
 
-1. **High Priority: NO_GEOMETRY (511 connections)**
-   - Affects the most connections
-   - Has a clear technical solution (edge interpolation)
-   - Doesn't require data regeneration
+### Bug 1: Edge Interpolation for Same-Node Settlements (Jan 24, 2026)
 
-2. **Medium Priority: FAR_FROM_PATH (59 connections)**
+**Problem:** When two settlements snapped to the same network node, the pathfinding returned a single-node path with no edges, resulting in no track geometry (511 connections affected).
+
+**Solution:** Added `getSameEdgeGeometry()` and `getSharedNodeGeometry()` functions to handle:
+- Two settlements on the same edge: extract the portion of track between them
+- Two settlements on different edges meeting at a shared node: combine portions from each edge
+
+**Result:** NO_GEOMETRY errors reduced from 511 to 7
+
+### Bug 2: Track Coordinate Direction Mismatch (Jan 24, 2026)
+
+**Problem:** The `getSharedNodeGeometry()` function assumed that `snap_nodes[0]` corresponded to the start of the track coordinates, but track geometry can be stored in either direction. This caused routes to take incorrect paths (e.g., Ruddell→Dalmeny was routing via Denholm instead of directly along the CNoR line).
+
+**Example:**
+- Track stored as `n75 -> n102` in the data
+- But actual coordinates went from n102 to n75 (opposite direction)
+- Code incorrectly assumed n75 was at coordinate index 0
+
+**Solution:** Changed the logic to determine which end of the track is the shared node by comparing actual coordinate distances to the node's lat/lon, rather than assuming based on `snap_nodes` array order.
+
+**Files modified:**
+- `settlement_explorer.html`
+- `one_hour_map.html`
+- `scripts/verify_railway_routes.py`
+
+**Result:** Additional 8 connections fixed (NO_GEOMETRY: 7→5, FAR_FROM_PATH: 70→64)
+
+---
+
+## Remaining Issues
+
+### Current Error Count: 69 connections (3.8%)
+
+**5 NO_GEOMETRY:**
+- Qu'Appelle ↔ Indian Head (node n328)
+- Indian Head ↔ McLean (node n328)
+- Holdfast ↔ Aylesbury (node n422)
+- Imperial ↔ Simpson (node n409)
+- Drake ↔ Lockwood (node n114)
+
+**64 FAR_FROM_PATH:** Settlements far from GIS track data (Liberty, Major, Imperial, etc.)
+
+### Implementation Priority
+
+1. **Investigate remaining NO_GEOMETRY (5 connections)**
+   - These are on different edges meeting at a node, but one edge has no track geometry
+   - May need to check if track data is missing
+
+2. **Investigate FAR_FROM_PATH (64 connections)**
    - Requires investigation into GIS data quality
    - May require obtaining additional data
    - Some cases may be acceptable as-is
 
-3. **Low Priority: WARNINGS (235 connections)**
+3. **WARNINGS (289 connections)**
    - Current visualization is reasonable
    - May improve naturally when fixing other issues
 
@@ -185,4 +236,5 @@ It outputs:
 ---
 
 *Created: January 24, 2026*
-*Status: Documented - awaiting implementation decisions*
+*Last updated: January 24, 2026*
+*Status: In progress - 69 remaining issues*
