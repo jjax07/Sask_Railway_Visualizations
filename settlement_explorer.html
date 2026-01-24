@@ -264,7 +264,7 @@
 <body>
     <div class="header">
         <h1>Settlement Explorer: One-Hour Railway Connections</h1>
-        <p>Select any Saskatchewan settlement to see which other settlements could be reached within one hour by train (40 km at 40 km/h). Use the time slider to see how connectivity evolved from 1882 to 1920.</p>
+        <p>Select any Saskatchewan settlement to see nearby settlements within 40 km (straight-line distance). Shows both direct distance and actual railway distance where available. Use the time slider to see how connectivity evolved from 1882 to 1920.</p>
     </div>
     <div class="nav">
         <a href="index.html">Home</a>
@@ -637,9 +637,14 @@
                     : '';
                 const multiInfo = isMultiRailway ? `<br><b>Junction:</b> ${allRailways}` : '';
 
+                const railwayDist = conn.railway_distance_km;
+                const distanceDisplay = railwayDist != null && railwayDist > 0
+                    ? `Direct: ${conn.distance_km} km | By rail: ${railwayDist} km`
+                    : `Distance: ${conn.distance_km} km`;
+
                 marker.bindPopup(`
                     <b>${conn.to}</b>${isMultiRailway ? ' <span style="color:#ffaa00;">★</span>' : ''}<br>
-                    Distance: ${conn.distance_km} km<br>
+                    ${distanceDisplay}<br>
                     ${railwayInfo}${multiInfo}<br>
                     <em>Click to explore</em>
                 `);
@@ -762,13 +767,22 @@
             connectedSettlements.sort((a, b) => a.distance_km - b.distance_km);
             pendingSettlements.sort((a, b) => a.distance_km - b.distance_km);
 
+            // Helper function to format distance display
+            function formatDistance(conn) {
+                const railDist = conn.railway_distance_km;
+                if (railDist != null && railDist > 0) {
+                    return `${conn.distance_km} km direct / ${railDist} km by rail`;
+                }
+                return `${conn.distance_km} km`;
+            }
+
             // Build list HTML - new connections first (highlighted)
             newSettlements.forEach(conn => {
                 listHTML += `
                     <div class="settlement-item new-connection" onclick="selectSettlement('${conn.to}')">
                         <div class="name">${conn.to}<span class="new-badge">NEW</span></div>
                         <div class="details">
-                            ${conn.distance_km} km | ${conn.shared_railway} (${conn.connected_year})
+                            ${formatDistance(conn)} | ${conn.shared_railway} (${conn.connected_year})
                         </div>
                     </div>
                 `;
@@ -780,7 +794,7 @@
                     <div class="settlement-item" onclick="selectSettlement('${conn.to}')">
                         <div class="name">${conn.to}</div>
                         <div class="details">
-                            ${conn.distance_km} km | ${conn.shared_railway} (${conn.connected_year})
+                            ${formatDistance(conn)} | ${conn.shared_railway} (${conn.connected_year})
                         </div>
                     </div>
                 `;

@@ -285,9 +285,14 @@
                     fillOpacity: 0.5
                 }).addTo(map);
 
+                const railDist = s.railway_distance_km;
+                const distanceDisplay = railDist != null && railDist > 0
+                    ? `Direct: ${s.distance_km} km | By rail: ${railDist} km`
+                    : `Distance: ${s.distance_km} km`;
+
                 marker.bindPopup(`
                     <b>${s.name}</b><br>
-                    Distance: ${s.distance_km} km<br>
+                    ${distanceDisplay}<br>
                     Railway: ${s.first_railway || 'Unknown'}<br>
                     Railway Arrives: ${s.railway_arrives || 'Unknown'}<br>
                     Connected to Saskatoon: ${s.connected_to_saskatoon || 'Unknown'}
@@ -335,11 +340,15 @@
             connectedSettlements.sort((a, b) => a.distance_km - b.distance_km);
 
             connectedSettlements.forEach(s => {
+                const railDist = s.railway_distance_km;
+                const distStr = railDist != null && railDist > 0
+                    ? `${s.distance_km} km direct / ${railDist} km by rail`
+                    : `${s.distance_km} km`;
                 listHTML += `
                     <div class="settlement-item">
                         <div class="name">${s.name}</div>
                         <div class="details">
-                            ${s.distance_km} km | ${s.first_railway} (${s.railway_arrives})
+                            ${distStr} | ${s.first_railway} (${s.railway_arrives})
                         </div>
                     </div>
                 `;

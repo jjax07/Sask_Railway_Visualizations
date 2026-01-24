@@ -11,7 +11,8 @@
       "distance_km": 4.3,
       "railway_arrives": 1908,
       "first_railway": "CPR",
-      "connected_to_saskatoon": 1908
+      "connected_to_saskatoon": 1908,
+      "railway_distance_km": 0.0
     },
     {
       "name": "Warman",
@@ -20,7 +21,8 @@
       "distance_km": 21.5,
       "railway_arrives": 1902,
       "first_railway": "CPR",
-      "connected_to_saskatoon": 1902
+      "connected_to_saskatoon": 1902,
+      "railway_distance_km": 19.9
     },
     {
       "name": "Vanscoy",
@@ -29,7 +31,8 @@
       "distance_km": 24.3,
       "railway_arrives": 1908,
       "first_railway": "CNoR",
-      "connected_to_saskatoon": 1908
+      "connected_to_saskatoon": 1908,
+      "railway_distance_km": 7.9
     },
     {
       "name": "Clavet",
@@ -38,7 +41,8 @@
       "distance_km": 24.8,
       "railway_arrives": 1907,
       "first_railway": "GTPR",
-      "connected_to_saskatoon": 1908
+      "connected_to_saskatoon": 1908,
+      "railway_distance_km": 12.2
     },
     {
       "name": "Dalmeny",
@@ -47,7 +51,8 @@
       "distance_km": 25.5,
       "railway_arrives": 1905,
       "first_railway": "CNoR",
-      "connected_to_saskatoon": 1905
+      "connected_to_saskatoon": 1905,
+      "railway_distance_km": 127.5
     },
     {
       "name": "Osler",
@@ -56,7 +61,8 @@
       "distance_km": 28.7,
       "railway_arrives": 1890,
       "first_railway": "QLSRSC",
-      "connected_to_saskatoon": 1890
+      "connected_to_saskatoon": 1890,
+      "railway_distance_km": 132.8
     },
     {
       "name": "Langham",
@@ -65,7 +71,8 @@
       "distance_km": 33.0,
       "railway_arrives": 1905,
       "first_railway": "CNoR",
-      "connected_to_saskatoon": 1905
+      "connected_to_saskatoon": 1905,
+      "railway_distance_km": 127.5
     },
     {
       "name": "Aberdeen",
@@ -74,7 +81,8 @@
       "distance_km": 35.3,
       "railway_arrives": 1905,
       "first_railway": "CNoR",
-      "connected_to_saskatoon": 1905
+      "connected_to_saskatoon": 1905,
+      "railway_distance_km": 19.9
     },
     {
       "name": "Bradwell",
@@ -83,7 +91,8 @@
       "distance_km": 35.6,
       "railway_arrives": 1907,
       "first_railway": "GTPR",
-      "connected_to_saskatoon": 1908
+      "connected_to_saskatoon": 1908,
+      "railway_distance_km": 12.2
     },
     {
       "name": "Dundurn",
@@ -92,7 +101,8 @@
       "distance_km": 36.4,
       "railway_arrives": 1889,
       "first_railway": "QLSRSC",
-      "connected_to_saskatoon": 1889
+      "connected_to_saskatoon": 1889,
+      "railway_distance_km": 12.2
     },
     {
       "name": "Delisle",
@@ -101,7 +111,8 @@
       "distance_km": 38.2,
       "railway_arrives": 1908,
       "first_railway": "CNoR",
-      "connected_to_saskatoon": 1908
+      "connected_to_saskatoon": 1908,
+      "railway_distance_km": 7.9
     },
     {
       "name": "Asquith",
@@ -110,7 +121,8 @@
       "distance_km": 38.4,
       "railway_arrives": 1908,
       "first_railway": "CPR",
-      "connected_to_saskatoon": 1908
+      "connected_to_saskatoon": 1908,
+      "railway_distance_km": 45.0
     }
   ],
   "saskatoon_connections": {
