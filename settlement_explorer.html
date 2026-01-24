@@ -319,7 +319,7 @@
             </div>
 
             <div class="legend">
-                <h3>Settlements</h3>
+                <h3>Legend</h3>
                 <div class="legend-item">
                     <div class="legend-circle" style="background: #e94560;"></div>
                     <span>Selected Settlement</span>
@@ -337,6 +337,10 @@
                     <span>Within 40km (pending)</span>
                 </div>
                 <div class="legend-item">
+                    <div class="legend-circle" style="background: #444; width: 8px; height: 8px;"></div>
+                    <span>Other Settlements</span>
+                </div>
+                <div class="legend-item">
                     <div style="width:12px; height:12px; background:#ffaa00; transform:rotate(45deg); border:2px solid #fff; margin-right:10px;"></div>
                     <span>Multi-Railway Junction</span>
                 </div>
@@ -344,26 +348,9 @@
                     <div class="legend-circle" style="background: transparent; border: 2px dashed #e94560;"></div>
                     <span>40 km Radius</span>
                 </div>
-                <h3 style="margin-top: 15px;">Railway Tracks</h3>
-                <div class="legend-item">
-                    <div style="width: 20px; height: 3px; background: #e94560; margin-right: 10px;"></div>
-                    <span>CPR</span>
-                </div>
-                <div class="legend-item">
-                    <div style="width: 20px; height: 3px; background: #ffd93d; margin-right: 10px;"></div>
-                    <span>CNoR</span>
-                </div>
-                <div class="legend-item">
-                    <div style="width: 20px; height: 3px; background: #6c5ce7; margin-right: 10px;"></div>
-                    <span>GTP</span>
-                </div>
                 <div class="legend-item">
                     <div style="width: 20px; height: 3px; background: #4ecca3; margin-right: 10px;"></div>
-                    <span>CNR</span>
-                </div>
-                <div class="legend-item">
-                    <div style="width: 20px; height: 3px; background: #888; margin-right: 10px;"></div>
-                    <span>Other</span>
+                    <span>Railway Route</span>
                 </div>
             </div>
 
@@ -378,27 +365,18 @@
     <script>
         let data = null;
         let trackData = null;         // Railway track geometry
+        let networkData = null;       // Railway network (nodes/edges)
+        let mappingData = null;       // Settlement to node mappings
         let map = null;
         let allMarkers = {};          // All settlement markers
         let nearbyMarkers = {};       // Markers within 40km of selected
         let connectionLines = [];     // Lines between connected settlements
-        let trackLines = [];          // Railway track polylines
         let selectedMarker = null;
         let radiusCircle = null;
         let isPlaying = false;
         let playInterval = null;
         let currentSettlement = null;
         let previousYear = null;
-
-        // Railway colors by builder
-        const railwayColors = {
-            'CPR': '#e94560',
-            'CNR': '#4ecca3',
-            'CNoR': '#ffd93d',
-            'GTP': '#6c5ce7',
-            'GTP Branch': '#6c5ce7',
-            'GTP Sask': '#6c5ce7'
-        };
 
         // Helper function to check if settlement has multiple railways
         function hasMultipleRailways(settlementName) {
@@ -442,9 +420,50 @@
                     if (trackResponse.ok) {
                         trackData = await trackResponse.json();
                         console.log('Track geometry loaded:', trackData.track_count, 'segments');
+                        // Build lookup by edge key
+                        trackData.lookup = {};
+                        trackData.tracks.forEach(t => {
+                            trackData.lookup[`${t.source}|${t.target}`] = t;
+                            trackData.lookup[`${t.target}|${t.source}`] = t; // Both directions
+                        });
                     }
                 } catch (e) {
                     console.warn('Could not load track geometry:', e);
+                }
+
+                // Load network graph for pathfinding
+                try {
+                    const networkResponse = await fetch('data/railway_network.json');
+                    if (networkResponse.ok) {
+                        networkData = await networkResponse.json();
+                        console.log('Network loaded:', networkData.stats.node_count, 'nodes');
+                        // Build adjacency list for pathfinding
+                        networkData.adj = {};
+                        networkData.edges.forEach(e => {
+                            if (!networkData.adj[e.source]) networkData.adj[e.source] = [];
+                            if (!networkData.adj[e.target]) networkData.adj[e.target] = [];
+                            networkData.adj[e.source].push({node: e.target, weight: e.length_m});
+                            networkData.adj[e.target].push({node: e.source, weight: e.length_m});
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Could not load network:', e);
+                }
+
+                // Load settlement to node mappings
+                try {
+                    const mappingResponse = await fetch('data/settlement_network_mapping.json');
+                    if (mappingResponse.ok) {
+                        mappingData = await mappingResponse.json();
+                        console.log('Mappings loaded:', mappingData.mappings.length, 'settlements');
+                        // Build lookup by settlement name
+                        mappingData.lookup = {};
+                        mappingData.mappings.forEach(m => {
+                            mappingData.lookup[m.settlement] = m;
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Could not load mappings:', e);
                 }
 
                 initSettlementSelector();
@@ -462,35 +481,111 @@
             }
         }
 
-        // Draw railway tracks for a given year
-        function drawRailwayTracks(year) {
-            // Clear existing track lines
-            trackLines.forEach(line => map.removeLayer(line));
-            trackLines = [];
+        // Find shortest path between two nodes using Dijkstra
+        function findPath(startNode, endNode) {
+            if (!networkData || !networkData.adj) return null;
+            if (startNode === endNode) return [startNode];
 
-            if (!trackData || !trackData.tracks) return;
+            const dist = {};
+            const prev = {};
+            const visited = new Set();
+            const queue = [];
 
-            // Draw tracks that existed by this year
-            trackData.tracks.forEach(track => {
-                // Only show tracks built by this year and not yet abandoned
-                const wasBuilt = !track.built_year || track.built_year <= year;
-                const wasAbandoned = track.abandoned_year && track.abandoned_year <= year;
+            dist[startNode] = 0;
+            queue.push({node: startNode, dist: 0});
 
-                if (wasBuilt && !wasAbandoned) {
-                    // Convert coordinates to Leaflet format [lat, lon]
-                    const latlngs = track.coordinates.map(c => [c[1], c[0]]);
+            while (queue.length > 0) {
+                // Sort by distance (simple priority queue)
+                queue.sort((a, b) => a.dist - b.dist);
+                const {node: current} = queue.shift();
 
-                    const color = railwayColors[track.builder_name] || '#888';
+                if (visited.has(current)) continue;
+                visited.add(current);
 
-                    const line = L.polyline(latlngs, {
-                        color: color,
-                        weight: 2,
-                        opacity: 0.6
-                    }).addTo(map);
+                if (current === endNode) break;
 
-                    line.bindPopup(`${track.builder_name}<br>${track.length_km} km<br>Built: ${track.built_year || '?'}`);
-                    trackLines.push(line);
+                const neighbors = networkData.adj[current] || [];
+                for (const {node: neighbor, weight} of neighbors) {
+                    if (visited.has(neighbor)) continue;
+                    const newDist = dist[current] + weight;
+                    if (dist[neighbor] === undefined || newDist < dist[neighbor]) {
+                        dist[neighbor] = newDist;
+                        prev[neighbor] = current;
+                        queue.push({node: neighbor, dist: newDist});
+                    }
                 }
+            }
+
+            if (prev[endNode] === undefined && startNode !== endNode) return null;
+
+            // Reconstruct path
+            const path = [];
+            let current = endNode;
+            while (current !== undefined) {
+                path.unshift(current);
+                current = prev[current];
+            }
+            return path;
+        }
+
+        // Get track geometry for a path (list of nodes)
+        function getPathGeometry(path) {
+            if (!path || path.length < 2 || !trackData || !trackData.lookup) return null;
+
+            const allCoords = [];
+            for (let i = 0; i < path.length - 1; i++) {
+                const key = `${path[i]}|${path[i+1]}`;
+                const track = trackData.lookup[key];
+                if (track && track.coordinates) {
+                    // Check if we need to reverse the coordinates
+                    let coords = track.coordinates.map(c => [c[1], c[0]]); // [lat, lon]
+
+                    // If this isn't the first segment, check if we need to reverse
+                    if (allCoords.length > 0) {
+                        const lastPoint = allCoords[allCoords.length - 1];
+                        const firstPoint = coords[0];
+                        const lastPointReversed = coords[coords.length - 1];
+
+                        // Check which end connects better
+                        const distToFirst = Math.abs(lastPoint[0] - firstPoint[0]) + Math.abs(lastPoint[1] - firstPoint[1]);
+                        const distToLast = Math.abs(lastPoint[0] - lastPointReversed[0]) + Math.abs(lastPoint[1] - lastPointReversed[1]);
+
+                        if (distToLast < distToFirst) {
+                            coords = coords.reverse();
+                        }
+                    }
+
+                    allCoords.push(...coords);
+                }
+            }
+            return allCoords.length > 0 ? allCoords : null;
+        }
+
+        // Draw connection using actual railway path
+        function drawRailwayConnection(fromSettlement, toSettlement, color, weight, opacity) {
+            if (!mappingData || !mappingData.lookup) {
+                // Fallback to straight line
+                return null;
+            }
+
+            const fromMapping = mappingData.lookup[fromSettlement];
+            const toMapping = mappingData.lookup[toSettlement];
+
+            if (!fromMapping || !toMapping) return null;
+
+            const fromNode = fromMapping.snap_node;
+            const toNode = toMapping.snap_node;
+
+            const path = findPath(fromNode, toNode);
+            if (!path) return null;
+
+            const coords = getPathGeometry(path);
+            if (!coords || coords.length < 2) return null;
+
+            return L.polyline(coords, {
+                color: color,
+                weight: weight,
+                opacity: opacity
             });
         }
 
@@ -774,9 +869,6 @@
             connectionLines.forEach(line => map.removeLayer(line));
             connectionLines = [];
 
-            // Draw railway tracks for this year
-            drawRailwayTracks(year);
-
             // Check if selected settlement has railway by this year
             const selectedHasRailway = selectedSettlement.railway_arrives && selectedSettlement.railway_arrives <= year;
 
@@ -813,18 +905,30 @@
                         });
                     }
 
-                    // Draw subtle connection indicator (actual tracks shown by drawRailwayTracks)
+                    // Draw connection using actual railway path
                     const connSettlement = data.settlements[conn.to];
-                    const line = L.polyline(
-                        [[selectedSettlement.lat, selectedSettlement.lon],
-                         [connSettlement.lat, connSettlement.lon]],
-                        {
-                            color: isNewThisYear ? '#ffcc00' : '#fff',
-                            weight: isNewThisYear ? 2 : 1,
-                            opacity: isNewThisYear ? 0.6 : 0.2,
-                            dashArray: '3, 6'
-                        }
-                    ).addTo(map);
+                    const color = isNewThisYear ? '#ffcc00' : '#4ecca3';
+                    const weight = isNewThisYear ? 4 : 3;
+                    const opacity = isNewThisYear ? 0.9 : 0.7;
+
+                    // Try to draw actual railway path
+                    let line = drawRailwayConnection(currentSettlement, conn.to, color, weight, opacity);
+
+                    // Fallback to straight line if path not found
+                    if (!line) {
+                        line = L.polyline(
+                            [[selectedSettlement.lat, selectedSettlement.lon],
+                             [connSettlement.lat, connSettlement.lon]],
+                            {
+                                color: color,
+                                weight: weight - 1,
+                                opacity: opacity * 0.7,
+                                dashArray: '5, 5'
+                            }
+                        );
+                    }
+
+                    line.addTo(map);
                     connectionLines.push(line);
                 } else {
                     pendingCount++;
