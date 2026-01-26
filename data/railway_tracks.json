@@ -54379,6 +54379,24 @@
       "abandoned_year": 0,
       "builder_name": "Virtual Connection",
       "length_km": 12.62
+    },
+    {
+      "source": "n557",
+      "target": "n577",
+      "coordinates": [
+        [
+          -104.9128862,
+          49.5734219
+        ],
+        [
+          -104.9052819,
+          49.5748391
+        ]
+      ],
+      "built_year": 1911,
+      "abandoned_year": 0,
+      "builder_name": "CPR",
+      "length_km": 0.57
     }
   ]
 }

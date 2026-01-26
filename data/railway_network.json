@@ -10,7 +10,7 @@
     "sk_segments": 474,
     "total_length_km": 27217.5,
     "node_count": 521,
-    "edge_count": 609,
+    "edge_count": 610,
     "by_builder": {
       "1": {
         "count": 207,
@@ -9859,6 +9859,16 @@
       "abandoned_year": 0,
       "builder_code": "VIRTUAL",
       "builder_name": "Virtual Connection"
+    },
+    {
+      "source": "n557",
+      "target": "n577",
+      "length_m": 570.5,
+      "length_km": 0.57,
+      "built_year": 1911,
+      "abandoned_year": 0,
+      "builder_code": "2",
+      "builder_name": "CPR"
     }
   ]
 }

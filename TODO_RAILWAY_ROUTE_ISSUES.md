@@ -7,9 +7,9 @@ After implementing railway route visualization, we ran a verification script (`s
 **Current Results (after fixes):**
 | Status | Count | Percentage |
 |--------|-------|------------|
-| OK | 1,458 | 80.5% |
-| Warnings (5-15km from path) | 289 | 16.0% |
-| Errors (will show straight lines) | 64 | 3.5% |
+| OK | 1,474 | 81.4% |
+| Warnings (5-15km from path) | 286 | 15.8% |
+| Errors (will show straight lines) | 51 | 2.8% |
 
 **Progress:**
 | Date | OK | Warnings | Errors | Notes |
@@ -18,6 +18,8 @@ After implementing railway route visualization, we ran a verification script (`s
 | Jan 24 | 1,445 | 289 | 77 | Added edge interpolation |
 | Jan 24 | 1,453 | 289 | 69 | Fixed track direction bug |
 | Jan 24 | 1,458 | 289 | 64 | Fixed sparse track + node-only cases |
+| Jan 24 | 1,466 | 285 | 60 | Added NRWN shortline data (LMR, GWR) |
+| Jan 26 | 1,474 | 286 | 51 | Fixed Ogema (n557) isolated node connectivity |
 
 ## Issue Categories
 
@@ -156,9 +158,9 @@ Edenwold -> Markinch: Path 8.2km from Edenwold
 
 | File | Description | Regeneration needed? |
 |------|-------------|---------------------|
-| `data/railway_network.json` | Network graph (424 nodes, 509 edges) | Maybe (if splitting edges) |
-| `data/railway_tracks.json` | Track polyline geometries (509 tracks) | No |
-| `data/settlement_network_mapping.json` | Settlement to node mappings | Maybe (if re-snapping) |
+| `data/railway_network.json` | Network graph (521 nodes, 610 edges) | No |
+| `data/railway_tracks.json` | Track polyline geometries (610 tracks) | No |
+| `data/settlement_network_mapping.json` | Settlement to node mappings | No |
 | `data/settlement_connections.json` | Connection pairs with distances | No |
 
 ## Bugs Fixed
@@ -229,27 +231,62 @@ Edenwold -> Markinch: Path 8.2km from Edenwold
 
 **Result:** 3 connections fixed (Qu'Appelle↔Indian Head, Indian Head↔McLean, Holdfast↔Aylesbury)
 
+### Bug 5: Ogema Isolated Node (Jan 26, 2026)
+
+**Problem:** After merging NRWN shortline data, node n557 (Ogema) was completely disconnected from the rest of the network (0 edges). This caused 9 NO_PATH errors for all connections involving Ogema.
+
+**Affected connections:**
+- Forward↔Ogema, Khedive↔Ogema, Truax↔Ogema, Pangman↔Ogema, Amulet↔Ogema
+- Ogema↔Horizon, Ogema↔Bengough, Ogema↔Ceylon, Ogema↔Viceroy
+
+**Root cause:** The NRWN GML data created a new node at Ogema's location (n557) but didn't connect it to the existing GEORIA network. Nodes n577 and n578 (from GEORIA) were only 570m away and connected to the network.
+
+**Solution:** Added edge connecting n557 to n577 (570m) in `railway_network.json` and corresponding track in `railway_tracks.json`.
+
+**Files modified:**
+- `data/railway_network.json`
+- `data/railway_tracks.json`
+
+**Script created:**
+- `scripts/fix_ogema_connectivity.py`
+
+**Result:** 9 NO_PATH errors resolved (all became OK or warnings)
+
 ---
 
 ## Remaining Issues
 
-### Current Error Count: 64 connections (3.5%)
+### Current Error Count: 51 connections (2.8%)
 
 **0 NO_GEOMETRY:** All resolved! ✓
 
-**64 FAR_FROM_PATH:** Settlements far from GIS track data (Liberty, Major, Imperial, etc.)
+**0 NO_PATH:** All resolved! ✓ (Ogema connectivity fixed Jan 26)
 
-### Implementation Priority
+**51 FAR_FROM_PATH:** Settlements far from GIS track data (Liberty, Major, Imperial, Bredenbury, Kelfield, Penzance)
 
-1. **Integrate NRWN Dataset (National Railway Network)**
-   - Downloaded NRWN Saskatchewan GML data to `KnowledgeGraph/nrwn_rfn_sk_gml_en/`
-   - Contains 7,084 track segments with detailed geometry
-   - Includes shortline railways missing from GEORIA: Last Mountain Railway, Great Western Railway
-   - **Will fix most FAR_FROM_PATH issues** - see analysis below
+### Completed Steps
 
-2. **Remaining FAR_FROM_PATH after NRWN integration**
-   - Liberty (27km) and Imperial (39km) are on an ABANDONED branch line not in any dataset
-   - Accept straight dashed line fallback for these
+1. **✓ Integrate NRWN Dataset (National Railway Network)** - Jan 24
+   - Merged Last Mountain Railway and Great Western Railway track data
+   - Fixed Craik subdivision settlements (Craik, Davidson, Girvin, Aylesbury, Chamberlain, Bethune, Findlater)
+   - Fixed Shaunavon/Altawan subdivision settlements (Shaunavon, Eastend, Dollard, Admiral, Cadillac, Ponteix)
+
+2. **✓ Fix Ogema Isolated Node** - Jan 26
+   - Node n557 was disconnected after NRWN merge
+   - Added edge connecting n557 to n577 (570m, same location)
+   - Fixed 9 NO_PATH errors involving Ogema
+
+### Remaining FAR_FROM_PATH (51 connections)
+
+These settlements are on abandoned branch lines not present in any available GIS dataset:
+- Liberty (27km from track)
+- Imperial (20km from track)
+- Major (28km from track)
+- Bredenbury (22km from track)
+- Kelfield (24km from track)
+- Penzance (25km from track)
+
+**Resolution:** Accept straight dashed line fallback for these connections
 
 ---
 
@@ -302,9 +339,9 @@ The NRWN (National Railway Network) dataset from Natural Resources Canada contai
 
 ---
 
-## WARNINGS (289 connections)
+## WARNINGS (286 connections)
 - Current visualization is reasonable (5-15km from track)
-- May improve after NRWN integration
+- Improved after NRWN integration
 
 ## Verification Script
 
@@ -322,5 +359,5 @@ It outputs:
 ---
 
 *Created: January 24, 2026*
-*Last updated: January 24, 2026*
-*Status: In progress - 64 remaining FAR_FROM_PATH issues (all NO_GEOMETRY resolved)*
+*Last updated: January 26, 2026*
+*Status: Essentially complete - 51 remaining FAR_FROM_PATH on abandoned branch lines (accept straight line fallback)*
