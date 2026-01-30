@@ -196,7 +196,7 @@
                         <div class="color-box" style="background: #4ecca3;"></div>
                         <div>
                             <div>Railway</div>
-                            <div class="details">40 km/h</div>
+                            <div class="details">40 km/h (actual route)</div>
                         </div>
                     </label>
                 </div>
@@ -238,9 +238,9 @@
             </div>
 
             <div class="explanation">
-                <strong>The circles show how far you could travel in the same time.</strong><br><br>
-                Before railways, most travel was by foot (5 km/h) or horse-drawn wagon (10 km/h). A one-hour journey meant 5-10 km.<br><br>
-                Railways traveling at 40 km/h expanded your one-hour reach to 40 km - an <strong>8x increase</strong> over walking.
+                <strong>Circles</strong> show theoretical range for each travel speed.<br><br>
+                <strong>Railway reach</strong> (dashed circle) uses <em>actual track routes</em> to determine which settlements are reachable. Green markers appear only where railways actually connect within the time limit.<br><br>
+                Notice how railway-reachable settlements cluster along rail lines rather than filling the circle evenly - this reflects the real network geography.
             </div>
         </div>
     </div>
@@ -271,20 +271,29 @@
         }
 
         async function loadData() {
-            const response = await fetch('data/settlement_connections.json');
-            data = await response.json();
+            try {
+                const response = await fetch('data/settlement_connections.json');
+                if (!response.ok) {
+                    console.error('Failed to load data:', response.status);
+                    return;
+                }
+                data = await response.json();
+                console.log('Loaded settlements:', Object.keys(data.settlements).length);
 
-            // Populate hub selector
-            const hubSelect = document.getElementById('hubSelect');
-            Object.keys(data.settlements).sort().forEach(name => {
-                const option = document.createElement('option');
-                option.value = name;
-                option.textContent = name;
-                if (name === 'Saskatoon') option.selected = true;
-                hubSelect.appendChild(option);
-            });
+                // Populate hub selector
+                const hubSelect = document.getElementById('hubSelect');
+                Object.keys(data.settlements).sort().forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    if (name === 'Saskatoon') option.selected = true;
+                    hubSelect.appendChild(option);
+                });
 
-            updateVisualization();
+                updateVisualization();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
         }
 
         function updateVisualization() {
@@ -297,7 +306,7 @@
             markers = [];
             if (hubMarker) map.removeLayer(hubMarker);
 
-            // Calculate distances
+            // Calculate max distances for each mode
             const walkDist = speeds.walking * travelHours;
             const wagonDist = speeds.wagon * travelHours;
             const railDist = speeds.railway * travelHours;
@@ -309,18 +318,26 @@
             document.getElementById('wagonBar').style.width = (wagonDist / maxDist * 150) + 'px';
             document.getElementById('wagonBar').textContent = wagonDist + ' km';
             document.getElementById('railBar').style.width = (railDist / maxDist * 150) + 'px';
-            document.getElementById('railBar').textContent = railDist + ' km';
+            document.getElementById('railBar').textContent = railDist + ' km (by route)';
             document.getElementById('timeLabel').textContent =
                 travelHours < 1 ? (travelHours * 60) + ' MINUTES' : travelHours + ' HOUR' + (travelHours > 1 ? 'S' : '');
 
+            // Get hub's connections for railway distance lookup
+            const hubConnections = {};
+            (data.connections[hubName] || []).forEach(conn => {
+                hubConnections[conn.to] = conn;
+            });
+
             // Draw circles (largest first so smaller ones are on top)
+            // Railway circle shows theoretical range; actual reachability based on route distance
             if (document.getElementById('showRailway').checked) {
                 circles.railway = L.circle([hub.lat, hub.lon], {
                     radius: railDist * 1000,
                     color: '#4ecca3',
                     fillColor: '#4ecca3',
                     fillOpacity: 0.1,
-                    weight: 3
+                    weight: 3,
+                    dashArray: '10, 10'
                 }).addTo(map);
             }
 
@@ -356,34 +373,61 @@
 
             // Count settlements in each range
             let walkCount = 0, wagonCount = 0, railCount = 0;
+            const showRailway = document.getElementById('showRailway').checked;
 
             Object.entries(data.settlements).forEach(([name, s]) => {
                 if (name === hubName) return;
 
-                const dist = haversine(hub.lat, hub.lon, s.lat, s.lon);
+                // Straight-line distance for walking/wagon
+                const directDist = haversine(hub.lat, hub.lon, s.lat, s.lon);
 
-                if (dist <= walkDist) walkCount++;
-                if (dist <= wagonDist) wagonCount++;
-                if (dist <= railDist) railCount++;
+                // Railway distance from connections data (actual route distance)
+                const conn = hubConnections[name];
+                const railwayDist = conn && conn.railway_distance_km != null ? conn.railway_distance_km : null;
+                const hasRailwayConnection = railwayDist != null && conn.connected_year;
 
-                // Add marker for settlements in railway range
-                if (dist <= railDist) {
-                    let color = '#666';
-                    if (dist <= walkDist) color = '#888';
-                    else if (dist <= wagonDist) color = '#ffd93d';
-                    else color = '#4ecca3';
+                // Check reachability by each mode
+                const inWalkRange = directDist <= walkDist;
+                const inWagonRange = directDist <= wagonDist;
+                const inRailRange = hasRailwayConnection && railwayDist <= railDist;
 
-                    const marker = L.circleMarker([s.lat, s.lon], {
-                        radius: 5,
-                        fillColor: color,
-                        color: '#fff',
-                        weight: 1,
-                        fillOpacity: 0.8
-                    }).addTo(map);
+                if (inWalkRange) walkCount++;
+                if (inWagonRange) wagonCount++;
+                if (inRailRange) railCount++;
 
-                    marker.bindPopup(`<b>${name}</b><br>Distance: ${dist.toFixed(1)} km`);
-                    markers.push(marker);
+                // Determine if settlement should be shown and what color
+                const shouldShow = inWalkRange || inWagonRange || inRailRange;
+                if (!shouldShow) return;
+
+                let color, radius;
+                let popupText = `<b>${name}</b><br>Direct: ${directDist.toFixed(1)} km`;
+
+                if (inRailRange && showRailway) {
+                    // Reachable by railway - green, larger marker
+                    color = '#4ecca3';
+                    radius = 7;
+                    popupText += `<br>By rail: ${railwayDist.toFixed(1)} km`;
+                } else if (inWagonRange) {
+                    color = '#ffd93d';
+                    radius = 5;
+                } else if (inWalkRange) {
+                    color = '#888';
+                    radius = 5;
+                } else {
+                    // Only reachable by rail but railway layer is hidden
+                    return;
                 }
+
+                const marker = L.circleMarker([s.lat, s.lon], {
+                    radius: radius,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 1,
+                    fillOpacity: 0.8
+                }).addTo(map);
+
+                marker.bindPopup(popupText);
+                markers.push(marker);
             });
 
             // Update stats
