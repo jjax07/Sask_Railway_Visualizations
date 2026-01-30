@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo: Travel Times from Origin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 { color: #e94560; margin-bottom: 10px; }
+        .header p { color: #aaa; max-width: 800px; margin: 0 auto; }
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .sidebar {
+            width: 280px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .control-group {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .control-group h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #1a1a2e;
+            color: #eee;
+            border: 2px solid #0f3460;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        select:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        .stats-box {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #0f3460;
+            font-size: 13px;
+        }
+        .stat-value { color: #4ecca3; font-weight: bold; }
+        .legend {
+            margin-top: 15px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        .legend-bar {
+            height: 12px;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        .sort-controls {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .sort-btn {
+            flex: 1;
+            padding: 8px;
+            background: #1a1a2e;
+            color: #aaa;
+            border: 2px solid #0f3460;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .sort-btn.active {
+            border-color: #e94560;
+            color: #e94560;
+        }
+        .destination-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .destination-row {
+            border-radius: 8px;
+            padding: 14px 18px;
+            display: grid;
+            grid-template-columns: 150px 1fr 80px;
+            align-items: center;
+            gap: 15px;
+            border-left: 4px solid transparent;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .destination-row:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .dest-name {
+            font-weight: bold;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dest-name .distance {
+            font-weight: normal;
+            color: #888;
+            font-size: 11px;
+        }
+        .time-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .time-bar-row {
+            display: flex;
+            align-items: center;
+            height: 28px;
+        }
+        .time-bar {
+            height: 100%;
+            border-radius: 4px;
+            min-width: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform 0.6s ease-out;
+        }
+        .time-bar.walking {
+            background: linear-gradient(180deg, #ff6b6b 0%, #e94560 100%);
+        }
+        .time-bar.railway {
+            background: linear-gradient(180deg, #6ee7b7 0%, #4ecca3 100%);
+            transition-delay: 0.1s;
+        }
+        .destination-row.visible .time-bar {
+            transform: scaleX(1);
+        }
+        .time-label {
+            font-size: 10px;
+            color: #888;
+            width: 45px;
+            text-align: right;
+            margin-right: 8px;
+        }
+        .savings {
+            text-align: right;
+            font-size: 12px;
+        }
+        .savings .value {
+            color: #e94560;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .savings .label {
+            color: #4ecca3;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .no-railway {
+            color: #888;
+            font-style: italic;
+        }
+        .section-header {
+            color: #e94560;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 20px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #0f3460;
+        }
+        .explanation {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #aaa;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Demo: Travel Times from Origin</h1>
+        <p>Select an origin settlement and see travel times to every other settlement in Saskatchewan.</p>
+    </div>
+    <div class="container">
+        <div class="main-content">
+            <div class="destination-list" id="destinationList"></div>
+        </div>
+        <div class="sidebar">
+            <div class="control-group">
+                <h3>ORIGIN SETTLEMENT</h3>
+                <select id="originSelect">
+                    <option value="">Loading...</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <h3>SORT BY</h3>
+                <div class="sort-controls">
+                    <button class="sort-btn active" data-sort="distance">Distance</button>
+                    <button class="sort-btn" data-sort="name">Name</button>
+                </div>
+            </div>
+
+            <div class="stats-box">
+                <div class="stat-row">
+                    <span>Destinations:</span>
+                    <span class="stat-value" id="destCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Avg walking time:</span>
+                    <span class="stat-value" id="avgWalk">-</span>
+                </div>
+                <div class="stat-row">
+                    <span>Avg railway time:</span>
+                    <span class="stat-value" id="avgRail">-</span>
+                </div>
+                <div class="stat-row">
+                    <span>Avg time saved:</span>
+                    <span class="stat-value" id="avgSaved">-</span>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-bar" style="background: #e94560; width: 40px;"></div>
+                    <span>Walking (5 km/h)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-bar" style="background: #4ecca3; width: 40px;"></div>
+                    <span>Railway (40 km/h)</span>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <strong>Reading the bars:</strong><br><br>
+                Each row shows one destination. The red bar is walking time, green bar is railway time.<br><br>
+                The dramatic difference in bar lengths shows how railways transformed travel across Saskatchewan.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = null;
+        let currentOrigin = 'Saskatoon';
+        let currentSort = 'distance';
+        let destinations = [];
+
+        const speeds = {
+            walking: 5,   // km/h
+            railway: 40   // km/h
+        };
+
+        async function loadData() {
+            const response = await fetch('data/settlement_connections.json');
+            data = await response.json();
+            populateOriginSelect();
+            calculateDestinations();
+            render();
+        }
+
+        function populateOriginSelect() {
+            const select = document.getElementById('originSelect');
+            const settlements = Object.keys(data.settlements).sort();
+
+            select.innerHTML = settlements.map(name =>
+                `<option value="${name}" ${name === currentOrigin ? 'selected' : ''}>${name}</option>`
+            ).join('');
+        }
+
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        function calculateDestinations() {
+            const origin = data.settlements[currentOrigin];
+            if (!origin) return;
+
+            destinations = [];
+
+            Object.entries(data.settlements).forEach(([name, settlement]) => {
+                if (name === currentOrigin) return;
+
+                const distKm = haversine(origin.lat, origin.lon, settlement.lat, settlement.lon);
+                const walkingHours = distKm / speeds.walking;
+                const railwayHours = distKm / speeds.railway;
+                const savedHours = walkingHours - railwayHours;
+                const savedPercent = (savedHours / walkingHours) * 100;
+
+                destinations.push({
+                    name,
+                    distKm,
+                    walkingHours,
+                    railwayHours,
+                    savedHours,
+                    savedPercent,
+                    hasRailway: settlement.railway_arrives != null
+                });
+            });
+
+            sortDestinations();
+        }
+
+        function sortDestinations() {
+            switch (currentSort) {
+                case 'distance':
+                    destinations.sort((a, b) => a.distKm - b.distKm);
+                    break;
+                case 'name':
+                    destinations.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+            }
+        }
+
+        function formatTime(hours) {
+            if (hours < 1) return Math.round(hours * 60) + ' min';
+            if (hours < 24) return hours.toFixed(1) + ' hrs';
+            const days = hours / 24;
+            return days.toFixed(1) + ' days';
+        }
+
+        function getDistanceColor(distKm, maxDist) {
+            // Interpolate from green (close) to red (far)
+            const ratio = Math.min(distKm / maxDist, 1);
+
+            if (ratio < 0.33) {
+                // Green zone (close)
+                return {
+                    bg: `rgba(78, 204, 163, ${0.08 + ratio * 0.1})`,
+                    border: '#4ecca3'
+                };
+            } else if (ratio < 0.66) {
+                // Yellow zone (medium)
+                return {
+                    bg: `rgba(255, 217, 61, ${0.08 + (ratio - 0.33) * 0.1})`,
+                    border: '#ffd93d'
+                };
+            } else {
+                // Red zone (far)
+                return {
+                    bg: `rgba(233, 69, 96, ${0.08 + (ratio - 0.66) * 0.1})`,
+                    border: '#e94560'
+                };
+            }
+        }
+
+        function render() {
+            const list = document.getElementById('destinationList');
+            const maxWalkHours = Math.max(...destinations.map(d => d.walkingHours));
+            const maxDist = Math.max(...destinations.map(d => d.distKm));
+
+            list.innerHTML = destinations.map(dest => {
+                const walkWidth = (dest.walkingHours / maxWalkHours) * 100;
+                const railWidth = (dest.railwayHours / maxWalkHours) * 100;
+                const colors = getDistanceColor(dest.distKm, maxDist);
+
+                return `
+                    <div class="destination-row" style="background: ${colors.bg}; border-left-color: ${colors.border};">
+                        <div class="dest-name">
+                            ${dest.name}
+                            <div class="distance">${dest.distKm.toFixed(0)} km</div>
+                        </div>
+                        <div class="time-bars">
+                            <div class="time-bar-row">
+                                <span class="time-label">Walk</span>
+                                <div class="time-bar walking" style="width: ${walkWidth}%"></div>
+                                <span style="margin-left: 8px; font-size: 12px; color: #e94560; font-weight: bold;">${formatTime(dest.walkingHours)}</span>
+                            </div>
+                            <div class="time-bar-row">
+                                <span class="time-label">Rail</span>
+                                <div class="time-bar railway" style="width: ${railWidth}%"></div>
+                                <span style="margin-left: 8px; font-size: 12px; color: #4ecca3; font-weight: bold;">${formatTime(dest.railwayHours)}</span>
+                            </div>
+                        </div>
+                        <div class="savings">
+                            <div class="value">${formatTime(dest.walkingHours)}</div>
+                            <div class="label">→ ${formatTime(dest.railwayHours)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update stats
+            const totalWalk = destinations.reduce((sum, d) => sum + d.walkingHours, 0);
+            const totalRail = destinations.reduce((sum, d) => sum + d.railwayHours, 0);
+            const totalSaved = destinations.reduce((sum, d) => sum + d.savedHours, 0);
+            const count = destinations.length;
+
+            document.getElementById('destCount').textContent = count;
+            document.getElementById('avgWalk').textContent = formatTime(totalWalk / count);
+            document.getElementById('avgRail').textContent = formatTime(totalRail / count);
+            document.getElementById('avgSaved').textContent = formatTime(totalSaved / count);
+
+            // Setup scroll-triggered animations
+            setTimeout(setupScrollAnimations, 10);
+        }
+
+        // Event listeners
+        document.getElementById('originSelect').addEventListener('change', (e) => {
+            currentOrigin = e.target.value;
+            calculateDestinations();
+            render();
+        });
+
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSort = btn.dataset.sort;
+                sortDestinations();
+                render();
+            });
+        });
+
+        // Intersection Observer for animating bars when they come into view
+        function setupScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.2,
+                rootMargin: '0px'
+            });
+
+            document.querySelectorAll('.destination-row').forEach(row => {
+                observer.observe(row);
+            });
+        }
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
