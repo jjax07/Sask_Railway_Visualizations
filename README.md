@@ -116,6 +116,41 @@ Interactive network graph visualization showing all 429 Saskatchewan settlements
 - GTPR: Purple (#6c5ce7)
 - Other/No railway: Gray (#888)
 
+### 5. Travel Time Comparison (Isochrone)
+
+Compare how far you could travel by walking, wagon, or railway in the same amount of time. This visualization demonstrates how railways dramatically expanded the reachable world for Saskatchewan settlers.
+
+**Features:**
+- Select any settlement as the center point
+- Choose travel time: 30 min, 1 hour, 2 hours, 4 hours, or 8 hours
+- Toggle visibility of walking, wagon, and railway range circles
+- Year slider (1882-1920) to see network expansion over time
+- Full network pathfinding calculates actual railway distances to ALL settlements
+
+**Transport Modes:**
+| Mode | Speed | 1-Hour Range |
+|------|-------|--------------|
+| Walking | 5 km/h | 5 km |
+| Horse & Wagon | 10 km/h | 10 km |
+| Railway | 40 km/h | 40 km |
+
+**Visual Elements:**
+- **Gray circle (solid)**: Walking range
+- **Yellow circle (solid)**: Wagon range
+- **Green circle (dashed)**: Railway range (theoretical)
+- **Green markers**: Settlements actually reachable by railway within time limit
+- Markers color-coded by fastest mode of access
+
+**Key Metrics:**
+- Settlement counts by mode (walking, wagon, railway)
+- Railway expansion factor (how many more settlements reachable by rail vs walking)
+
+**Technical Implementation:**
+- Uses Dijkstra's algorithm on the railway network graph
+- Calculates shortest path railway distances from selected hub to all settlements
+- Filters by year - only shows connections that existed by selected year
+- Railway reachability based on actual track routes, not straight-line distance
+
 ## Project Structure
 
 ```
@@ -125,6 +160,7 @@ Sask_Railway_Visualizations/
 ├── settlement_explorer.html   # Settlement explorer visualization
 ├── railway_timeline.html      # Railway network timeline
 ├── network_graph.html         # Network graph visualization
+├── isochrone.html             # Travel time comparison visualization
 ├── data/
 │   ├── settlements.json              # 429 settlements with coordinates & railway info
 │   ├── settlement_connections.json   # Pre-calculated connections with railway distances
@@ -358,4 +394,4 @@ This project is for academic research purposes.
 ---
 
 *Created January 2026*
-*Last updated: January 23, 2026*
+*Last updated: January 30, 2026*

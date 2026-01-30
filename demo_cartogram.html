@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Demo: Time-Warped Cartogram</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -24,9 +25,28 @@
             display: flex;
             height: calc(100vh - 120px);
         }
-        #canvas {
+        .view-container {
             flex: 1;
-            background: #1a1a2e;
+            min-width: 0;
+            position: relative;
+        }
+        #map {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            transition: opacity 0.3s;
+        }
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
         }
         .sidebar {
             width: 300px;
@@ -111,7 +131,10 @@
         <p>Settlements reposition based on travel time from a central hub. Railway-connected places appear closer; distant places stay far.</p>
     </div>
     <div class="container">
-        <canvas id="canvas"></canvas>
+        <div class="view-container">
+            <div id="map"></div>
+            <canvas id="canvas"></canvas>
+        </div>
         <div class="sidebar">
             <div class="control-group">
                 <h3>CENTER POINT</h3>
@@ -168,8 +191,10 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         let data = null;
+        let map = null;
         let currentView = 'geo'; // 'geo' or 'time'
         let animating = false;
         let morphProgress = 0;
@@ -178,6 +203,29 @@
 
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+
+        // Initialize Leaflet map
+        function initMap() {
+            map = L.map('map', {
+                center: [52.0, -106.0],
+                zoom: 6,
+                zoomControl: false,
+                attributionControl: false
+            });
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Disable map interaction - we just want it as a background
+            map.dragging.disable();
+            map.touchZoom.disable();
+            map.doubleClickZoom.disable();
+            map.scrollWheelZoom.disable();
+            map.boxZoom.disable();
+            map.keyboard.disable();
+        }
 
         // Settlement positions
         let settlements = [];
@@ -188,7 +236,6 @@
 
             // Populate hub selector
             const hubSelect = document.getElementById('hubSelect');
-            const majorCities = ['Saskatoon', 'Regina', 'Moose Jaw', 'Prince Albert', 'Swift Current', 'Yorkton'];
 
             Object.keys(data.settlements).sort().forEach(name => {
                 const option = document.createElement('option');
@@ -198,13 +245,15 @@
                 hubSelect.appendChild(option);
             });
 
-            processSettlements();
-            resizeCanvas();
-            draw();
+            // Wait for map to be ready, then initialize
+            setTimeout(() => {
+                resizeCanvas();
+            }, 200);
         }
 
         function processSettlements() {
             settlements = [];
+            if (!map || !data) return;
             const hub = data.settlements[hubName];
             if (!hub) return;
 
@@ -214,7 +263,7 @@
                 hubConnections[conn.to] = conn;
             });
 
-            // Calculate bounds for geographic view
+            // Fit map to show all settlements with padding
             let minLat = Infinity, maxLat = -Infinity;
             let minLon = Infinity, maxLon = -Infinity;
 
@@ -225,14 +274,14 @@
                 maxLon = Math.max(maxLon, s.lon);
             });
 
-            const padding = 60;
-            const width = canvas.width - padding * 2;
-            const height = canvas.height - padding * 2;
+            // Update map bounds to fit all settlements
+            map.fitBounds([[minLat, minLon], [maxLat, maxLon]], { padding: [40, 40] });
 
             Object.entries(data.settlements).forEach(([name, s]) => {
-                // Geographic position
-                const geoX = padding + ((s.lon - minLon) / (maxLon - minLon)) * width;
-                const geoY = padding + ((maxLat - s.lat) / (maxLat - minLat)) * height;
+                // Geographic position from Leaflet projection
+                const point = map.latLngToContainerPoint([s.lat, s.lon]);
+                const geoX = point.x;
+                const geoY = point.y;
 
                 // Calculate time-distance position
                 const conn = hubConnections[name];
@@ -265,8 +314,9 @@
                 const timeRadius = travelTimeHours * 30;
 
                 // Keep same angle from hub
-                const hubGeoX = padding + ((hub.lon - minLon) / (maxLon - minLon)) * width;
-                const hubGeoY = padding + ((maxLat - hub.lat) / (maxLat - minLat)) * height;
+                const hubPoint = map.latLngToContainerPoint([hub.lat, hub.lon]);
+                const hubGeoX = hubPoint.x;
+                const hubGeoY = hubPoint.y;
 
                 const angle = Math.atan2(geoY - hubGeoY, geoX - hubGeoX);
                 const timeX = hubGeoX + Math.cos(angle) * timeRadius;
@@ -295,8 +345,17 @@
         }
 
         function draw() {
-            ctx.fillStyle = '#1a1a2e';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Clear canvas (transparent when in geo mode, solid when in time mode)
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw background only when morphing away from geo view
+            if (morphProgress > 0) {
+                ctx.fillStyle = `rgba(26, 26, 46, ${morphProgress})`;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Fade map based on morph progress
+            document.getElementById('map').style.opacity = 1 - morphProgress;
 
             // Draw settlements
             settlements.forEach(s => {
@@ -397,12 +456,18 @@
         }
 
         function resizeCanvas() {
-            const container = canvas.parentElement;
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            const container = document.querySelector('.view-container');
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+            if (map) {
+                map.invalidateSize();
+            }
             if (data) {
-                processSettlements();
-                draw();
+                // Small delay to let map update its size
+                setTimeout(() => {
+                    processSettlements();
+                    draw();
+                }, 100);
             }
         }
 
@@ -426,6 +491,7 @@
         window.addEventListener('resize', resizeCanvas);
 
         // Initialize
+        initMap();
         loadData();
     </script>
 </body>

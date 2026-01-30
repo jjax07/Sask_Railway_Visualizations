@@ -26,6 +26,7 @@
         }
         #canvas {
             flex: 1;
+            min-width: 0;
             background: #1a1a2e;
         }
         .sidebar {
@@ -160,7 +161,7 @@
                 <div class="hub-select">
                     <button class="hub-btn active" data-hub="Saskatoon">Saskatoon</button>
                     <button class="hub-btn active" data-hub="Regina">Regina</button>
-                    <button class="hub-btn active" data-hub="Moose Jaw">Moose Jaw</button>
+                    <button class="hub-btn active" data-hub="Moosejaw">Moose Jaw</button>
                     <button class="hub-btn active" data-hub="Prince Albert">Prince Albert</button>
                 </div>
             </div>
@@ -181,16 +182,20 @@
 
             <div class="stats-box">
                 <div class="stat-row">
-                    <span>Settlements with railway:</span>
-                    <span class="stat-value" id="connectedCount">0</span>
+                    <span>Space compression:</span>
+                    <span class="stat-value" id="compressionRatio">1.0x</span>
                 </div>
                 <div class="stat-row">
-                    <span>Isolated settlements:</span>
-                    <span class="stat-value" id="isolatedCount">0</span>
+                    <span>Avg travel to hub:</span>
+                    <span class="stat-value" id="avgTravelTime">-</span>
                 </div>
                 <div class="stat-row">
-                    <span>Avg pull distance:</span>
-                    <span class="stat-value" id="avgPull">0 km</span>
+                    <span>Within 2 hrs of hub:</span>
+                    <span class="stat-value" id="accessibleCount">0%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Time saved vs walking:</span>
+                    <span class="stat-value" id="timeSaved">0%</span>
                 </div>
             </div>
 
@@ -201,11 +206,19 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-dot" style="background: #4ecca3;"></div>
-                    <span>Railway-connected (pulled in)</span>
+                    <span>&lt;1 hr to hub (40 km)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #ffd93d;"></div>
+                    <span>1-2 hrs to hub (40-80 km)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #ff9f43;"></div>
+                    <span>2-4 hrs to hub (80-160 km)</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-dot" style="background: #666;"></div>
-                    <span>Isolated (drifts outward)</span>
+                    <span>&gt;4 hrs or no railway</span>
                 </div>
             </div>
 
@@ -214,6 +227,14 @@
                 Railway junctions act like "gravity wells." Connected settlements are pulled toward hubs proportional to how fast railways could reach them.<br><br>
                 Isolated settlements (no railway) drift to the edges, representing their relative remoteness in travel time.<br><br>
                 This visualizes how railways restructured the perceived geography of Saskatchewan.
+            </div>
+
+            <div class="explanation">
+                <strong>How the Simulation Works:</strong><br><br>
+                <strong style="color: #4ecca3;">Connected settlements</strong> find their nearest hub and are pulled toward it. The pull strengthens with distance (like a spring).<br><br>
+                <strong style="color: #666;">Isolated settlements</strong> receive a gentle push away from the center, drifting to the edges.<br><br>
+                <strong style="color: #e94560;">Hubs</strong> stay anchored near their geographic positions.<br><br>
+                Friction slows all movement to prevent endless bouncing. The "Gravity Strength" slider scales all forces.
             </div>
         </div>
     </div>
@@ -225,7 +246,7 @@
         let animationId = null;
         let currentYear = 1920;
         let gravityStrength = 0.5;
-        let activeHubs = new Set(['Saskatoon', 'Regina', 'Moose Jaw', 'Prince Albert']);
+        let activeHubs = new Set(['Saskatoon', 'Regina', 'Moosejaw', 'Prince Albert']);
 
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -237,6 +258,20 @@
             resizeCanvas();
             draw();
         }
+
+        // Haversine distance in km
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        // Pixels per km for current view
+        let pixelsPerKm = 1;
 
         function initSettlements() {
             settlements = [];
@@ -256,6 +291,10 @@
             const width = canvas.width - padding * 2;
             const height = canvas.height - padding * 2;
 
+            // Calculate pixels per km (approximate)
+            const latSpanKm = haversine(minLat, minLon, maxLat, minLon);
+            pixelsPerKm = height / latSpanKm;
+
             Object.entries(data.settlements).forEach(([name, s]) => {
                 const geoX = padding + ((s.lon - minLon) / (maxLon - minLon)) * width;
                 const geoY = padding + ((maxLat - s.lat) / (maxLat - minLat)) * height;
@@ -271,23 +310,94 @@
                     isHub,
                     hasRailway,
                     railwayArrives: s.railway_arrives,
-                    lat: s.lat, lon: s.lon
+                    lat: s.lat, lon: s.lon,
+                    distToHubKm: Infinity,
+                    travelTimeHrs: Infinity
                 });
             });
 
+            calculateAccessibility();
             updateStats();
         }
 
-        function updateStats() {
-            let connected = 0, isolated = 0;
+        function calculateAccessibility() {
+            const hubs = settlements.filter(s => s.isHub && activeHubs.has(s.name));
 
             settlements.forEach(s => {
-                if (s.hasRailway) connected++;
-                else isolated++;
+                if (s.isHub) {
+                    s.distToHubKm = 0;
+                    s.travelTimeHrs = 0;
+                    return;
+                }
+
+                // Find nearest hub (geographic distance)
+                let nearestDistKm = Infinity;
+                hubs.forEach(hub => {
+                    const distKm = haversine(s.lat, s.lon, hub.lat, hub.lon);
+                    if (distKm < nearestDistKm) {
+                        nearestDistKm = distKm;
+                    }
+                });
+
+                s.distToHubKm = nearestDistKm;
+
+                // Calculate travel time based on mode
+                if (s.hasRailway) {
+                    // Railway: 40 km/h
+                    s.travelTimeHrs = nearestDistKm / 40;
+                } else {
+                    // Walking: 5 km/h
+                    s.travelTimeHrs = nearestDistKm / 5;
+                }
+            });
+        }
+
+        function getAccessibilityColor(settlement) {
+            if (settlement.isHub) return '#e94560';
+            if (!settlement.hasRailway) return '#666';
+
+            const hours = settlement.travelTimeHrs;
+            if (hours <= 1) return '#4ecca3';      // Green: <1 hr
+            if (hours <= 2) return '#ffd93d';      // Yellow: 1-2 hrs
+            if (hours <= 4) return '#ff9f43';      // Orange: 2-4 hrs
+            return '#666';                          // Gray: >4 hrs
+        }
+
+        function updateStats() {
+            let totalRailwayTime = 0;
+            let totalWalkingTime = 0;
+            let within2hrs = 0;
+            let count = 0;
+
+            settlements.forEach(s => {
+                if (s.isHub) return;
+                count++;
+
+                const distKm = s.distToHubKm;
+                const walkingTime = distKm / 5;  // 5 km/h
+                const railwayTime = s.hasRailway ? distKm / 40 : walkingTime;  // 40 km/h if railway
+
+                totalWalkingTime += walkingTime;
+                totalRailwayTime += railwayTime;
+
+                if (railwayTime <= 2) within2hrs++;
             });
 
-            document.getElementById('connectedCount').textContent = connected;
-            document.getElementById('isolatedCount').textContent = isolated;
+            // Space compression ratio
+            const compression = totalWalkingTime > 0 ? (totalWalkingTime / totalRailwayTime).toFixed(1) : 1;
+            document.getElementById('compressionRatio').textContent = compression + 'x';
+
+            // Average travel time
+            const avgTime = count > 0 ? (totalRailwayTime / count).toFixed(1) : 0;
+            document.getElementById('avgTravelTime').textContent = avgTime + ' hrs';
+
+            // Percentage within 2 hours
+            const accessiblePct = count > 0 ? Math.round((within2hrs / count) * 100) : 0;
+            document.getElementById('accessibleCount').textContent = accessiblePct + '%';
+
+            // Time saved vs walking
+            const timeSavedPct = totalWalkingTime > 0 ? Math.round((1 - totalRailwayTime / totalWalkingTime) * 100) : 0;
+            document.getElementById('timeSaved').textContent = timeSavedPct + '%';
         }
 
         function calculateGravity() {
@@ -376,10 +486,45 @@
             ctx.fillStyle = '#1a1a2e';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            const hubs = settlements.filter(s => s.isHub && activeHubs.has(s.name));
+
+            // Draw time rings around hubs (1hr, 2hr, 4hr at 40 km/h)
+            const timeRings = [
+                { hours: 1, km: 40, color: 'rgba(78, 204, 163, 0.15)', label: '1 hr' },
+                { hours: 2, km: 80, color: 'rgba(255, 217, 61, 0.1)', label: '2 hrs' },
+                { hours: 4, km: 160, color: 'rgba(255, 159, 67, 0.08)', label: '4 hrs' }
+            ];
+
+            // Draw rings largest first
+            [...timeRings].reverse().forEach(ring => {
+                const radiusPx = ring.km * pixelsPerKm;
+                hubs.forEach(hub => {
+                    ctx.beginPath();
+                    ctx.arc(hub.x, hub.y, radiusPx, 0, Math.PI * 2);
+                    ctx.fillStyle = ring.color;
+                    ctx.fill();
+                    ctx.strokeStyle = ring.color.replace(/[\d.]+\)$/, '0.4)');
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                });
+            });
+
+            // Draw ring labels for first hub
+            if (hubs.length > 0) {
+                const hub = hubs[0];
+                ctx.font = '10px sans-serif';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                timeRings.forEach(ring => {
+                    const radiusPx = ring.km * pixelsPerKm;
+                    ctx.fillText(ring.label + ' (' + ring.km + ' km)', hub.x + radiusPx + 5, hub.y);
+                });
+            }
+
             // Draw connections to hubs (faint lines)
             ctx.strokeStyle = 'rgba(78, 204, 163, 0.1)';
             ctx.lineWidth = 1;
-            const hubs = settlements.filter(s => s.isHub && activeHubs.has(s.name));
 
             settlements.forEach(s => {
                 if (!s.isHub && s.hasRailway) {
@@ -401,16 +546,12 @@
                 }
             });
 
-            // Draw settlements (non-hubs first)
+            // Draw settlements (non-hubs first) with accessibility colors
             settlements.filter(s => !s.isHub).forEach(s => {
                 ctx.beginPath();
-                if (s.hasRailway) {
-                    ctx.arc(s.x, s.y, 4, 0, Math.PI * 2);
-                    ctx.fillStyle = '#4ecca3';
-                } else {
-                    ctx.arc(s.x, s.y, 3, 0, Math.PI * 2);
-                    ctx.fillStyle = '#666';
-                }
+                const radius = s.hasRailway ? 4 : 3;
+                ctx.arc(s.x, s.y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = getAccessibilityColor(s);
                 ctx.fill();
             });
 
@@ -493,6 +634,7 @@
             settlements.forEach(s => {
                 s.hasRailway = s.railwayArrives && s.railwayArrives <= currentYear;
             });
+            calculateAccessibility();
             updateStats();
             if (!animating) draw();
         });
@@ -513,6 +655,8 @@
                 settlements.forEach(s => {
                     s.isHub = activeHubs.has(s.name);
                 });
+                calculateAccessibility();
+                updateStats();
                 if (!animating) draw();
             });
         });
