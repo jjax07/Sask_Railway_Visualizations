@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo: Gravity Models Comparison</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 { color: #e94560; margin-bottom: 10px; }
+        .header p { color: #aaa; max-width: 800px; margin: 0 auto; }
+        .container {
+            display: flex;
+            height: calc(100vh - 120px);
+        }
+        #canvas {
+            flex: 1;
+            min-width: 0;
+            background: #1a1a2e;
+        }
+        .sidebar {
+            width: 350px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .control-group {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .control-group h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .btn:hover { background: #ff6b6b; }
+        .btn.secondary {
+            background: transparent;
+            border: 2px solid #e94560;
+            color: #e94560;
+        }
+        .btn.secondary:hover {
+            background: rgba(233, 69, 96, 0.2);
+        }
+        .mode-select {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .mode-btn {
+            padding: 12px;
+            border: 2px solid #0f3460;
+            background: #1a1a2e;
+            color: #aaa;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .mode-btn:hover {
+            border-color: #e94560;
+            color: #e94560;
+        }
+        .mode-btn.active {
+            border-color: #e94560;
+            background: #e94560;
+            color: white;
+        }
+        .mode-btn .mode-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        .mode-btn .mode-desc {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        .year-display {
+            font-size: 48px;
+            text-align: center;
+            color: #e94560;
+            margin: 10px 0;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .explanation {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #aaa;
+            margin-top: 15px;
+            border-left: 3px solid #e94560;
+        }
+        .explanation strong { color: #4ecca3; }
+        .legend {
+            margin-top: 15px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .stats-box {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #0f3460;
+            font-size: 13px;
+        }
+        .stat-value { color: #4ecca3; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Gravity Models: What Should "Pull" Mean?</h1>
+        <p>Compare four different interpretations of how railways create "gravitational pull" on settlements.</p>
+    </div>
+    <div class="container">
+        <canvas id="canvas"></canvas>
+        <div class="sidebar">
+            <div class="control-group">
+                <h3>GRAVITY MODEL</h3>
+                <div class="mode-select">
+                    <button class="mode-btn active" data-mode="time-compression">
+                        <div class="mode-title">1. Travel Time Compression</div>
+                        <div class="mode-desc">Pull = how much faster railway is vs walking</div>
+                    </button>
+                    <button class="mode-btn" data-mode="time-space">
+                        <div class="mode-title">2. Time-Space Map</div>
+                        <div class="mode-desc">Distance = actual travel time to hub</div>
+                    </button>
+                    <button class="mode-btn" data-mode="connectivity">
+                        <div class="mode-title">3. Network Connectivity</div>
+                        <div class="mode-desc">Pull = number of railway lines serving town</div>
+                    </button>
+                    <button class="mode-btn" data-mode="importance">
+                        <div class="mode-title">4. Settlement Importance</div>
+                        <div class="mode-desc">Pull = how early railway arrived (proxy for importance)</div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>ANIMATION</h3>
+                <button class="btn" id="animateBtn">Start Animation</button>
+                <button class="btn secondary" id="resetBtn">Reset to Geographic</button>
+            </div>
+
+            <div class="control-group">
+                <h3>YEAR</h3>
+                <div class="year-display" id="yearDisplay">1920</div>
+                <input type="range" id="yearSlider" min="1882" max="1920" value="1920">
+            </div>
+
+            <div class="stats-box">
+                <div class="stat-row">
+                    <span>Railway settlements:</span>
+                    <span class="stat-value" id="connectedCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Isolated settlements:</span>
+                    <span class="stat-value" id="isolatedCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span>Avg displacement:</span>
+                    <span class="stat-value" id="avgDisplacement">0 px</span>
+                </div>
+            </div>
+
+            <div class="explanation" id="modeExplanation">
+                <strong>Travel Time Compression:</strong><br><br>
+                Settlements are pulled toward hubs based on how much the railway improved travel time.<br><br>
+                A town where railway cut travel from 20 hours to 1 hour (20x improvement) is pulled much harder than one where it went from 4 hours to 1 hour (4x improvement).<br><br>
+                <em>This shows the transformative impact of railways on each settlement.</em>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #e94560; width: 20px; height: 20px;"></div>
+                    <span>Hub (Saskatoon)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #4ecca3;"></div>
+                    <span>Railway-connected</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #666;"></div>
+                    <span>Isolated (no railway)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = null;
+        let settlements = [];
+        let animating = false;
+        let animationId = null;
+        let currentYear = 1920;
+        let currentMode = 'time-compression';
+
+        // Hub is Saskatoon for simplicity
+        const HUB_NAME = 'Saskatoon';
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const modeExplanations = {
+            'time-compression': `<strong>Travel Time Compression:</strong><br><br>
+                Settlements move to positions representing their travel time from Saskatoon. Railway towns compress dramatically inward; isolated towns stay at their "walking distance."<br><br>
+                <strong style="color:#4ecca3">Distant railway towns</strong> move the most - a town 200km away goes from 40 hours walking to 5 hours by train, a massive compression.<br><br>
+                <strong style="color:#666">Isolated towns</strong> barely move - they're stuck at walking pace, so their position reflects that slow travel time.<br><br>
+                <em>The gap between green and gray dots shows the railway's transformative impact.</em>`,
+
+            'time-space': `<strong>Time-Space Map:</strong><br><br>
+                Settlements move to positions where distance from hub = travel time.<br><br>
+                Railway towns cluster close to the hub (fast travel), while isolated towns stay far (slow walking pace).<br><br>
+                <em>The final layout is a map of accessibility, not geography.</em>`,
+
+            'connectivity': `<strong>Network Connectivity:</strong><br><br>
+                Settlements are pulled based on how many railway lines serve them.<br><br>
+                Towns with multiple railways (major junctions) are pulled strongly. Single-line towns pulled moderately. No railway = pushed outward.<br><br>
+                <em>This shows which settlements became railway network nodes.</em>`,
+
+            'importance': `<strong>Settlement Importance:</strong><br><br>
+                Settlements are pulled based on when the railway arrived - earlier = more important.<br><br>
+                Towns on the 1882 CPR mainline are pulled hardest. Later branch line towns pulled less. Railway arrival date is a proxy for economic importance.<br><br>
+                <em>This shows the hierarchy of settlements in the railway network.</em>`
+        };
+
+        async function loadData() {
+            const response = await fetch('data/settlement_connections.json');
+            data = await response.json();
+            initSettlements();
+            resizeCanvas();
+            draw();
+        }
+
+        // Haversine distance in km
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        function initSettlements() {
+            settlements = [];
+
+            // Calculate bounds
+            let minLat = Infinity, maxLat = -Infinity;
+            let minLon = Infinity, maxLon = -Infinity;
+
+            Object.values(data.settlements).forEach(s => {
+                minLat = Math.min(minLat, s.lat);
+                maxLat = Math.max(maxLat, s.lat);
+                minLon = Math.min(minLon, s.lon);
+                maxLon = Math.max(maxLon, s.lon);
+            });
+
+            const padding = 80;
+            const width = canvas.width - padding * 2;
+            const height = canvas.height - padding * 2;
+
+            Object.entries(data.settlements).forEach(([name, s]) => {
+                const geoX = padding + ((s.lon - minLon) / (maxLon - minLon)) * width;
+                const geoY = padding + ((maxLat - s.lat) / (maxLat - minLat)) * height;
+
+                const isHub = name === HUB_NAME;
+                const hasRailway = s.railway_arrives && s.railway_arrives <= currentYear;
+                const railwayCount = s.railways ? s.railways.filter(r => r.year <= currentYear).length : 0;
+
+                settlements.push({
+                    name,
+                    geoX, geoY,
+                    x: geoX, y: geoY,
+                    vx: 0, vy: 0,
+                    isHub,
+                    hasRailway,
+                    railwayArrives: s.railway_arrives,
+                    railwayCount,
+                    lat: s.lat, lon: s.lon
+                });
+            });
+
+            updateStats();
+        }
+
+        function getHub() {
+            return settlements.find(s => s.isHub);
+        }
+
+        function updateStats() {
+            let connected = 0, isolated = 0;
+            settlements.forEach(s => {
+                if (s.hasRailway) connected++;
+                else isolated++;
+            });
+            document.getElementById('connectedCount').textContent = connected;
+            document.getElementById('isolatedCount').textContent = isolated;
+        }
+
+        function calculateGravity() {
+            const hub = getHub();
+            if (!hub) return;
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            settlements.forEach(s => {
+                if (s.isHub) {
+                    // Hub anchored to geographic position
+                    s.targetX = s.geoX;
+                    s.targetY = s.geoY;
+                    return;
+                }
+
+                let force = 0;
+                let targetX, targetY;
+
+                // Calculate distance to hub in km
+                const distKm = haversine(s.lat, s.lon, hub.lat, hub.lon);
+                const walkingTimeHrs = distKm / 5;  // 5 km/h walking
+                const railwayTimeHrs = distKm / 40; // 40 km/h railway
+
+                switch (currentMode) {
+                    case 'time-compression':
+                        // Settlements move to positions representing their travel time
+                        // Railway towns compress inward, isolated towns stay at "walking distance"
+
+                        // Direction from hub to this settlement (preserved)
+                        const tcDirX = s.geoX - hub.geoX;
+                        const tcDirY = s.geoY - hub.geoY;
+                        const tcDirDist = Math.hypot(tcDirX, tcDirY) || 1;
+
+                        // Scale: 20 pixels per hour of travel time
+                        const pxPerHour = 25;
+
+                        if (s.hasRailway) {
+                            // Railway: position at railway travel time (compressed)
+                            const targetDist = railwayTimeHrs * pxPerHour;
+                            targetX = hub.x + (tcDirX / tcDirDist) * targetDist;
+                            targetY = hub.y + (tcDirY / tcDirDist) * targetDist;
+                            // Further settlements move faster (more dramatic compression)
+                            force = 0.03 + (distKm / 500) * 0.05;
+                        } else {
+                            // Isolated: position at walking travel time (stays far)
+                            const targetDist = walkingTimeHrs * pxPerHour;
+                            targetX = hub.x + (tcDirX / tcDirDist) * targetDist;
+                            targetY = hub.y + (tcDirY / tcDirDist) * targetDist;
+                            force = 0.02;
+                        }
+                        break;
+
+                    case 'time-space':
+                        // Position based on travel time
+                        // Railway: 40 km/h, Walking: 5 km/h
+                        const travelTime = s.hasRailway ? railwayTimeHrs : walkingTimeHrs;
+                        // Scale: 1 hour = 30 pixels from hub
+                        const targetDist = travelTime * 30;
+
+                        // Direction from hub to current geo position
+                        const dirX = s.geoX - hub.geoX;
+                        const dirY = s.geoY - hub.geoY;
+                        const dirDist = Math.hypot(dirX, dirY) || 1;
+
+                        targetX = hub.x + (dirX / dirDist) * targetDist;
+                        targetY = hub.y + (dirY / dirDist) * targetDist;
+                        force = 0.05;
+                        break;
+
+                    case 'connectivity':
+                        // Pull based on number of railway lines
+                        if (s.hasRailway) {
+                            // More railways = stronger pull (1-4 lines typically)
+                            force = (s.railwayCount / 4) * 0.1;
+                            targetX = hub.x;
+                            targetY = hub.y;
+                        } else {
+                            force = 0.01;
+                            const dx = s.x - centerX;
+                            const dy = s.y - centerY;
+                            const dist = Math.hypot(dx, dy) || 1;
+                            targetX = s.x + (dx / dist) * 100;
+                            targetY = s.y + (dy / dist) * 100;
+                        }
+                        break;
+
+                    case 'importance':
+                        // Pull based on how early railway arrived (earlier = more pull)
+                        if (s.hasRailway) {
+                            // 1882 is earliest, 1920 is latest in our range
+                            const yearsEarly = 1920 - s.railwayArrives; // 0-38
+                            const importance = yearsEarly / 38; // 0-1, higher = earlier
+                            force = (0.2 + importance * 0.8) * 0.08;
+                            targetX = hub.x;
+                            targetY = hub.y;
+                        } else {
+                            force = 0.01;
+                            const dx = s.x - centerX;
+                            const dy = s.y - centerY;
+                            const dist = Math.hypot(dx, dy) || 1;
+                            targetX = s.x + (dx / dist) * 100;
+                            targetY = s.y + (dy / dist) * 100;
+                        }
+                        break;
+                }
+
+                // Smooth lerp toward target (no bouncing)
+                // Store target for lerping
+                s.targetX = targetX;
+                s.targetY = targetY;
+            });
+
+            // Update positions with smooth lerp
+            const lerpSpeed = 0.02; // Slow, smooth movement
+            let totalDisplacement = 0;
+            let count = 0;
+
+            settlements.forEach(s => {
+                if (s.targetX !== undefined && s.targetY !== undefined) {
+                    // Lerp toward target
+                    s.x += (s.targetX - s.x) * lerpSpeed;
+                    s.y += (s.targetY - s.y) * lerpSpeed;
+                }
+
+                // Keep in bounds
+                s.x = Math.max(20, Math.min(canvas.width - 20, s.x));
+                s.y = Math.max(20, Math.min(canvas.height - 20, s.y));
+
+                if (!s.isHub) {
+                    totalDisplacement += Math.hypot(s.x - s.geoX, s.y - s.geoY);
+                    count++;
+                }
+            });
+
+            document.getElementById('avgDisplacement').textContent =
+                Math.round(totalDisplacement / count) + ' px';
+        }
+
+        function draw() {
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const hub = getHub();
+
+            // Draw time rings for time-space mode
+            if (currentMode === 'time-space' && hub) {
+                const rings = [
+                    { hours: 1, color: 'rgba(78, 204, 163, 0.15)' },
+                    { hours: 2, color: 'rgba(255, 217, 61, 0.1)' },
+                    { hours: 4, color: 'rgba(255, 159, 67, 0.08)' },
+                    { hours: 8, color: 'rgba(102, 102, 102, 0.05)' }
+                ];
+
+                [...rings].reverse().forEach(ring => {
+                    const radius = ring.hours * 30; // 30px per hour
+                    ctx.beginPath();
+                    ctx.arc(hub.x, hub.y, radius, 0, Math.PI * 2);
+                    ctx.fillStyle = ring.color;
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                    ctx.setLineDash([5, 5]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Label
+                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                    ctx.font = '10px sans-serif';
+                    ctx.fillText(ring.hours + 'hr', hub.x + radius + 5, hub.y);
+                });
+            }
+
+            // Draw connections to hub
+            if (hub) {
+                ctx.strokeStyle = 'rgba(78, 204, 163, 0.15)';
+                ctx.lineWidth = 1;
+
+                settlements.forEach(s => {
+                    if (!s.isHub && s.hasRailway) {
+                        ctx.beginPath();
+                        ctx.moveTo(s.x, s.y);
+                        ctx.lineTo(hub.x, hub.y);
+                        ctx.stroke();
+                    }
+                });
+            }
+
+            // Draw settlements
+            settlements.filter(s => !s.isHub).forEach(s => {
+                ctx.beginPath();
+
+                let radius = 4;
+                let color = '#666';
+
+                if (s.hasRailway) {
+                    color = '#4ecca3';
+
+                    // Vary size based on mode
+                    if (currentMode === 'connectivity') {
+                        radius = 3 + s.railwayCount * 2;
+                    } else if (currentMode === 'importance' && s.railwayArrives) {
+                        const yearsEarly = 1920 - s.railwayArrives;
+                        radius = 3 + (yearsEarly / 38) * 5;
+                    }
+                } else {
+                    radius = 3;
+                }
+
+                ctx.arc(s.x, s.y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+            });
+
+            // Draw hub
+            if (hub) {
+                // Glow
+                const gradient = ctx.createRadialGradient(hub.x, hub.y, 0, hub.x, hub.y, 50);
+                gradient.addColorStop(0, 'rgba(233, 69, 96, 0.4)');
+                gradient.addColorStop(1, 'rgba(233, 69, 96, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(hub.x, hub.y, 50, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Hub dot
+                ctx.beginPath();
+                ctx.arc(hub.x, hub.y, 12, 0, Math.PI * 2);
+                ctx.fillStyle = '#e94560';
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Label
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(hub.name, hub.x, hub.y - 22);
+            }
+
+            if (animating) {
+                calculateGravity();
+                animationId = requestAnimationFrame(draw);
+            }
+        }
+
+        function startAnimation() {
+            if (animating) {
+                animating = false;
+                document.getElementById('animateBtn').textContent = 'Resume Animation';
+            } else {
+                animating = true;
+                document.getElementById('animateBtn').textContent = 'Pause';
+                draw();
+            }
+        }
+
+        function reset() {
+            animating = false;
+            if (animationId) cancelAnimationFrame(animationId);
+            document.getElementById('animateBtn').textContent = 'Start Animation';
+
+            settlements.forEach(s => {
+                s.x = s.geoX;
+                s.y = s.geoY;
+                s.vx = 0;
+                s.vy = 0;
+            });
+
+            draw();
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            if (data) {
+                initSettlements();
+                draw();
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('modeExplanation').innerHTML = modeExplanations[mode];
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+
+            reset();
+        }
+
+        // Event listeners
+        document.getElementById('animateBtn').addEventListener('click', startAnimation);
+        document.getElementById('resetBtn').addEventListener('click', reset);
+
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => setMode(btn.dataset.mode));
+        });
+
+        document.getElementById('yearSlider').addEventListener('input', (e) => {
+            currentYear = parseInt(e.target.value);
+            document.getElementById('yearDisplay').textContent = currentYear;
+
+            settlements.forEach(s => {
+                const sData = data.settlements[s.name];
+                s.hasRailway = sData.railway_arrives && sData.railway_arrives <= currentYear;
+                s.railwayCount = sData.railways ? sData.railways.filter(r => r.year <= currentYear).length : 0;
+            });
+            updateStats();
+            if (!animating) draw();
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        loadData();
+    </script>
+</body>
+</html>
