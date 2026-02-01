@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Race Animation - Saskatchewan Railway Visualizations</title>
+    <title>Travel Time Comparison - Saskatchewan Railway Visualizations</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         * {
@@ -65,14 +65,15 @@
         }
         .control-group {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 15px;
             border-radius: 5px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .control-group h3 {
             color: #e94560;
-            margin-bottom: 10px;
-            font-size: 14px;
+            margin-bottom: 5px;
+            font-size: 13px;
+            text-align: center;
         }
         select {
             width: 100%;
@@ -88,11 +89,26 @@
             outline: none;
             border-color: #e94560;
         }
-        .year-display {
-            font-size: 48px;
-            text-align: center;
+        .year-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .year-row label {
             color: #e94560;
-            margin: 10px 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .year-row input[type="range"] {
+            flex: 1;
+            margin: 0;
+        }
+        .year-display {
+            font-size: 16px;
+            font-weight: bold;
+            color: #e94560;
+            min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
@@ -101,14 +117,14 @@
         .play-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .play-controls button {
             background: #e94560;
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
             font-size: 14px;
@@ -130,8 +146,8 @@
         .speed-control {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-top: 10px;
+            justify-content: center;
+            gap: 8px;
         }
         .speed-control label {
             color: #aaa;
@@ -143,32 +159,35 @@
         }
         .stats-box {
             background: #1a1a2e;
-            padding: 15px;
+            padding: 8px 12px;
             border-radius: 5px;
-            margin-top: 15px;
+            margin-top: 5px;
+            margin-bottom: 10px;
         }
         .route-info {
             text-align: center;
-            padding: 10px;
+            padding: 5px 10px;
             background: #1a1a2e;
             border-radius: 5px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         .route-info .route-label {
-            color: #888;
-            font-size: 12px;
+            color: #e94560;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 3px;
         }
         .route-info .route-names {
             color: #e94560;
-            font-size: 18px;
+            font-size: 15px;
             font-weight: bold;
         }
         .stat-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 4px 0;
             border-bottom: 1px solid #0f3460;
-            font-size: 13px;
+            font-size: 12px;
         }
         .stat-row:last-child {
             border-bottom: none;
@@ -182,32 +201,34 @@
         .stat-value.grey { color: #666; }
 
         .progress-section {
-            margin-top: 15px;
+            margin-top: 8px;
         }
         .progress-item {
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
         .progress-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
         .progress-label {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
+            gap: 5px;
+            font-size: 12px;
         }
         .progress-label .icon {
-            font-size: 18px;
+            font-size: 14px;
+            display: inline-block;
+            transform: scaleX(-1);
         }
         .progress-time {
             font-weight: bold;
-            font-size: 13px;
+            font-size: 11px;
         }
         .progress-bar-bg {
-            height: 24px;
+            height: 12px;
             background: #1a1a2e;
             border-radius: 4px;
             overflow: hidden;
@@ -216,14 +237,8 @@
         .progress-bar {
             height: 100%;
             border-radius: 4px;
+            min-width: 4px;
             transition: width 0.1s linear;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding-right: 8px;
-            font-size: 11px;
-            font-weight: bold;
-            color: #1a1a2e;
         }
         .progress-bar.walking {
             background: linear-gradient(90deg, #ff6b6b, #e94560);
@@ -263,7 +278,9 @@
         }
         .comparison-box h4 {
             color: #e94560;
-            margin-bottom: 10px;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 5px;
         }
         .comparison-value {
             font-size: 32px;
@@ -282,8 +299,9 @@
         }
         .legend h3 {
             color: #e94560;
-            margin-bottom: 10px;
-            font-size: 14px;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 5px;
         }
         .legend-item {
             display: flex;
@@ -334,15 +352,31 @@
             margin-bottom: 10px;
             font-size: 13px;
         }
+        .select-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        .select-row label {
+            color: #aaa;
+            font-size: 12px;
+            min-width: 35px;
+        }
+        .select-row select {
+            flex: 1;
+            margin: 0;
+        }
         .swap-btn {
+            display: block;
+            margin: 5px auto 0;
             background: transparent;
             border: 1px solid #e94560;
             color: #e94560;
-            padding: 5px 10px;
+            padding: 4px 12px;
             border-radius: 3px;
             cursor: pointer;
-            font-size: 12px;
-            margin-top: 5px;
+            font-size: 11px;
         }
         .swap-btn:hover {
             background: #e94560;
@@ -352,8 +386,8 @@
 </head>
 <body>
     <div class="header">
-        <h1>Travel Race Animation</h1>
-        <p>Watch walking, horse & cart, and railway race between settlements. See how railways transformed travel time in Saskatchewan.</p>
+        <h1>Travel Time Comparison</h1>
+        <p>Watch walking, horse & cart, and railway travel between settlements. See how railways transformed travel time in Saskatchewan.</p>
     </div>
     <div class="nav">
         <a href="index.html">Home</a>
@@ -362,57 +396,17 @@
         <a href="network_graph.html">Network Graph</a>
         <a href="isochrone.html">Travel Comparison</a>
         <a href="journey_times.html">Journey Times</a>
-        <a href="travel_race.html">Travel Race</a>
+        <a href="travel_race.html">Travel Time</a>
     </div>
     <div class="container">
         <div id="map"></div>
         <div class="sidebar">
-            <div class="control-group">
-                <h3>ORIGIN</h3>
-                <select id="originSelect">
-                    <option value="">Select origin...</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <h3>DESTINATION</h3>
-                <select id="destSelect">
-                    <option value="">Select destination...</option>
-                </select>
-                <button class="swap-btn" id="swapBtn">Swap Origin/Destination</button>
-            </div>
-
-            <div class="control-group">
-                <h3>YEAR</h3>
-                <div class="year-display" id="yearDisplay">1920</div>
-                <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1920">
-            </div>
-
-            <div id="errorMsg" class="error-msg" style="display: none;"></div>
-
-            <div class="control-group">
-                <h3>RACE CONTROLS</h3>
-                <div class="play-controls">
-                    <button id="startBtn" class="start-btn" disabled>Start Race</button>
-                    <button id="resetBtn" disabled>Reset</button>
-                </div>
-                <div class="speed-control">
-                    <label>Animation Speed:</label>
-                    <select id="speedSelect">
-                        <option value="1">1x (1 hr = 1 sec)</option>
-                        <option value="2">2x</option>
-                        <option value="5" selected>5x</option>
-                        <option value="10">10x</option>
-                        <option value="20">20x</option>
-                    </select>
-                </div>
+            <div class="route-info" id="routeInfo" style="display: none;">
+                <div class="route-label">ROUTE</div>
+                <div class="route-names" id="routeNames">-</div>
             </div>
 
             <div class="stats-box" id="statsBox" style="display: none;">
-                <div class="route-info">
-                    <div class="route-label">Route</div>
-                    <div class="route-names" id="routeNames">-</div>
-                </div>
                 <div class="stat-row">
                     <span>Direct distance:</span>
                     <span class="stat-value" id="directDist">-</span>
@@ -425,7 +419,7 @@
                 <div class="progress-section">
                     <div class="progress-item">
                         <div class="progress-header">
-                            <span class="progress-label"><span class="icon">🚶</span> Walking (5 km/h)</span>
+                            <span class="progress-label"><span class="icon">🧍</span> Walking (5 km/h)</span>
                             <span class="progress-time walking" id="walkTime">0.0 hrs</span>
                         </div>
                         <div class="progress-bar-bg">
@@ -458,8 +452,50 @@
                 </div>
             </div>
 
+            <div class="control-group">
+                <h3>ROUTE SELECTION</h3>
+                <div class="select-row">
+                    <label>From:</label>
+                    <select id="originSelect">
+                        <option value="">Select origin...</option>
+                    </select>
+                </div>
+                <div class="select-row">
+                    <label>To:</label>
+                    <select id="destSelect">
+                        <option value="">Select destination...</option>
+                    </select>
+                </div>
+                <button class="swap-btn" id="swapBtn">Swap</button>
+            </div>
+
+            <div id="errorMsg" class="error-msg" style="display: none;"></div>
+
+            <div class="control-group">
+                <h3>TRAVEL CONTROLS</h3>
+                <div class="year-row">
+                    <label>Year:</label>
+                    <span class="year-display" id="yearDisplay">1920</span>
+                    <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1920">
+                </div>
+                <div class="play-controls">
+                    <button id="startBtn" class="start-btn" disabled>Start</button>
+                    <button id="resetBtn" disabled>Reset</button>
+                </div>
+                <div class="speed-control">
+                    <label>Speed:</label>
+                    <select id="speedSelect">
+                        <option value="1">1x</option>
+                        <option value="2" selected>2x</option>
+                        <option value="5">5x</option>
+                        <option value="10">10x</option>
+                        <option value="20">20x</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="comparison-box" id="comparisonBox" style="display: none;">
-                <h4>Railway Advantage</h4>
+                <h4>RAILWAY ADVANTAGE</h4>
                 <div class="comparison-value" id="speedupValue">-</div>
                 <div class="comparison-label" id="speedupLabel">faster than walking</div>
             </div>
@@ -467,12 +503,8 @@
             <div class="legend">
                 <h3>MAP LEGEND</h3>
                 <div class="legend-item">
-                    <div class="legend-line walking" style="border-style: dashed;"></div>
-                    <span>Walking path (straight line)</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-line horse" style="border-style: dashed;"></div>
-                    <span>Horse path (straight line)</span>
+                    <div class="legend-line" style="background: #ff8c00; border: 1px dashed #ff8c00;"></div>
+                    <span>Direct path (walking/horse)</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-line railway"></div>
@@ -484,7 +516,7 @@
                 <strong>How to use:</strong><br>
                 1. Select origin and destination settlements<br>
                 2. Adjust the year to see railway availability<br>
-                3. Click "Start Race" to watch the animation<br>
+                3. Click "Start" to watch the animation<br>
                 4. Use speed control to adjust animation pace<br><br>
                 <strong>Tip:</strong> Click on map markers to select settlements directly!
             </div>
@@ -508,7 +540,7 @@
         // Animation state
         let isAnimating = false;
         let animationStartTime = null;
-        let animationSpeed = 5;
+        let animationSpeed = 2;
         let animationFrameId = null;
 
         // Calculated routes
@@ -833,6 +865,7 @@
             hideError();
 
             if (!originSettlement || !destSettlement) {
+                document.getElementById('routeInfo').style.display = 'none';
                 document.getElementById('statsBox').style.display = 'none';
                 document.getElementById('comparisonBox').style.display = 'none';
                 document.getElementById('startBtn').disabled = true;
@@ -872,16 +905,13 @@
                     if (result && result.path) {
                         const geometry = getPathGeometry(result.path);
                         if (geometry && geometry.length >= 2) {
-                            railwayPath = geometry;
-                            // Add snap distance
-                            const originSnapDist = (originMapping.snap_distance_m || 0) / 1000;
-                            const destSnapDist = (destMapping.snap_distance_m || 0) / 1000;
-                            railwayDistanceKm = result.distance + originSnapDist + destSnapDist;
+                            // Prepend origin and append destination coordinates
+                            railwayPath = [[origin.lat, origin.lon], ...geometry, [dest.lat, dest.lon]];
+
+                            // Calculate distance from actual path geometry
+                            railwayDistanceKm = calculatePathLength(railwayPath);
                             railwayTimeHrs = railwayDistanceKm / RAILWAY_SPEED;
                             railwayAvailable = true;
-
-                            // Prepend origin and append destination coordinates
-                            railwayPath = [[origin.lat, origin.lon], ...railwayPath, [dest.lat, dest.lon]];
                         }
                     }
                 }
@@ -913,18 +943,9 @@
 
             if (!originSettlement || !destSettlement) return;
 
-            // Walking path (dashed red)
+            // Direct path for walking/horse (dashed orange)
             walkingLine = L.polyline(walkingPath, {
-                color: '#e94560',
-                weight: 3,
-                opacity: 0.7,
-                dashArray: '10, 10'
-            }).addTo(map);
-
-            // Horse path (dashed yellow, slightly offset)
-            const horseOffset = horsePath.map(p => [p[0] + 0.005, p[1] + 0.005]);
-            horseLine = L.polyline(horseOffset, {
-                color: '#ffd93d',
+                color: '#ff8c00',
                 weight: 3,
                 opacity: 0.7,
                 dashArray: '10, 10'
@@ -942,6 +963,7 @@
 
         // Update stats panel
         function updateStats() {
+            document.getElementById('routeInfo').style.display = 'block';
             document.getElementById('statsBox').style.display = 'block';
             document.getElementById('routeNames').textContent = `${originSettlement} → ${destSettlement}`;
             document.getElementById('directDist').textContent = directDistanceKm.toFixed(1) + ' km';
@@ -1032,7 +1054,7 @@
             // Walking token
             const walkIcon = L.divIcon({
                 className: 'token-icon',
-                html: '<div style="font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">🚶</div>',
+                html: '<div style="font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); transform: scaleX(-1);">🧍</div>',
                 iconSize: [32, 32],
                 iconAnchor: [16, 16]
             });
@@ -1041,7 +1063,7 @@
             // Horse token
             const horseIcon = L.divIcon({
                 className: 'token-icon',
-                html: '<div style="font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">🐴</div>',
+                html: '<div style="font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); transform: scaleX(-1);">🐴</div>',
                 iconSize: [32, 32],
                 iconAnchor: [16, 16]
             });
@@ -1051,7 +1073,7 @@
             if (railwayAvailable) {
                 const railIcon = L.divIcon({
                     className: 'token-icon',
-                    html: '<div style="font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">🚂</div>',
+                    html: '<div style="font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); transform: scaleX(-1);">🚂</div>',
                     iconSize: [32, 32],
                     iconAnchor: [16, 16]
                 });
@@ -1165,7 +1187,7 @@
             if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
             }
-            document.getElementById('startBtn').textContent = 'Start Race';
+            document.getElementById('startBtn').textContent = 'Start';
             document.getElementById('startBtn').classList.add('start-btn');
         }
 
