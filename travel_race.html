@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Race Animation - Saskatchewan Railway Visualizations</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .header {
+            background: #16213e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+        }
+        .header h1 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #aaa;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .nav {
+            background: #0f3460;
+            padding: 10px;
+            text-align: center;
+        }
+        .nav a {
+            color: #e94560;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 15px;
+            border: 1px solid #e94560;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        .nav a:hover {
+            background: #e94560;
+            color: #fff;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 160px);
+        }
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+        .sidebar {
+            width: 380px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .control-group {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .control-group h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #0f3460;
+            background: #1a1a2e;
+            color: #eee;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        select:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        .year-display {
+            font-size: 48px;
+            text-align: center;
+            color: #e94560;
+            margin: 10px 0;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .play-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .play-controls button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .play-controls button:hover {
+            background: #ff6b6b;
+        }
+        .play-controls button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .play-controls button.start-btn {
+            background: #4ecca3;
+        }
+        .play-controls button.start-btn:hover {
+            background: #6ee7b7;
+        }
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .speed-control label {
+            color: #aaa;
+            font-size: 12px;
+        }
+        .speed-control select {
+            width: auto;
+            margin: 0;
+        }
+        .stats-box {
+            background: #1a1a2e;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .route-info {
+            text-align: center;
+            padding: 10px;
+            background: #1a1a2e;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .route-info .route-label {
+            color: #888;
+            font-size: 12px;
+        }
+        .route-info .route-names {
+            color: #e94560;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #0f3460;
+            font-size: 13px;
+        }
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+        .stat-value {
+            font-weight: bold;
+        }
+        .stat-value.walking { color: #ff6b6b; }
+        .stat-value.horse { color: #ffd93d; }
+        .stat-value.railway { color: #4ecca3; }
+        .stat-value.grey { color: #666; }
+
+        .progress-section {
+            margin-top: 15px;
+        }
+        .progress-item {
+            margin-bottom: 15px;
+        }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .progress-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .progress-label .icon {
+            font-size: 18px;
+        }
+        .progress-time {
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .progress-bar-bg {
+            height: 24px;
+            background: #1a1a2e;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.1s linear;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+        .progress-bar.walking {
+            background: linear-gradient(90deg, #ff6b6b, #e94560);
+        }
+        .progress-bar.horse {
+            background: linear-gradient(90deg, #ffd93d, #f0c000);
+        }
+        .progress-bar.railway {
+            background: linear-gradient(90deg, #6ee7b7, #4ecca3);
+        }
+        .progress-bar.disabled {
+            background: #444;
+        }
+        .arrived-badge {
+            display: inline-block;
+            background: #4ecca3;
+            color: #1a1a2e;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        .no-route-msg {
+            color: #666;
+            font-style: italic;
+            font-size: 12px;
+            text-align: center;
+            padding: 10px;
+        }
+        .comparison-box {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .comparison-box h4 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        .comparison-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4ecca3;
+        }
+        .comparison-label {
+            color: #aaa;
+            font-size: 12px;
+        }
+        .legend {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .legend h3 {
+            color: #e94560;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        .legend-line {
+            width: 30px;
+            height: 4px;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        .legend-line.walking {
+            background: #e94560;
+            border: 1px dashed #e94560;
+        }
+        .legend-line.horse {
+            background: #ffd93d;
+            border: 1px dashed #ffd93d;
+        }
+        .legend-line.railway {
+            background: #4ecca3;
+        }
+        .token-icon {
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .instructions {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #aaa;
+            margin-top: 15px;
+        }
+        .instructions strong {
+            color: #e94560;
+        }
+        .error-msg {
+            background: #2a1a1a;
+            border: 1px solid #e94560;
+            color: #e94560;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .swap-btn {
+            background: transparent;
+            border: 1px solid #e94560;
+            color: #e94560;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .swap-btn:hover {
+            background: #e94560;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Travel Race Animation</h1>
+        <p>Watch walking, horse & cart, and railway race between settlements. See how railways transformed travel time in Saskatchewan.</p>
+    </div>
+    <div class="nav">
+        <a href="index.html">Home</a>
+        <a href="settlement_explorer.html">Settlement Explorer</a>
+        <a href="railway_timeline.html">Timeline</a>
+        <a href="network_graph.html">Network Graph</a>
+        <a href="isochrone.html">Travel Comparison</a>
+        <a href="journey_times.html">Journey Times</a>
+        <a href="travel_race.html">Travel Race</a>
+    </div>
+    <div class="container">
+        <div id="map"></div>
+        <div class="sidebar">
+            <div class="control-group">
+                <h3>ORIGIN</h3>
+                <select id="originSelect">
+                    <option value="">Select origin...</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <h3>DESTINATION</h3>
+                <select id="destSelect">
+                    <option value="">Select destination...</option>
+                </select>
+                <button class="swap-btn" id="swapBtn">Swap Origin/Destination</button>
+            </div>
+
+            <div class="control-group">
+                <h3>YEAR</h3>
+                <div class="year-display" id="yearDisplay">1920</div>
+                <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1920">
+            </div>
+
+            <div id="errorMsg" class="error-msg" style="display: none;"></div>
+
+            <div class="control-group">
+                <h3>RACE CONTROLS</h3>
+                <div class="play-controls">
+                    <button id="startBtn" class="start-btn" disabled>Start Race</button>
+                    <button id="resetBtn" disabled>Reset</button>
+                </div>
+                <div class="speed-control">
+                    <label>Animation Speed:</label>
+                    <select id="speedSelect">
+                        <option value="1">1x (1 hr = 1 sec)</option>
+                        <option value="2">2x</option>
+                        <option value="5" selected>5x</option>
+                        <option value="10">10x</option>
+                        <option value="20">20x</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="stats-box" id="statsBox" style="display: none;">
+                <div class="route-info">
+                    <div class="route-label">Route</div>
+                    <div class="route-names" id="routeNames">-</div>
+                </div>
+                <div class="stat-row">
+                    <span>Direct distance:</span>
+                    <span class="stat-value" id="directDist">-</span>
+                </div>
+                <div class="stat-row">
+                    <span>Railway distance:</span>
+                    <span class="stat-value railway" id="railDist">-</span>
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span class="progress-label"><span class="icon">🚶</span> Walking (5 km/h)</span>
+                            <span class="progress-time walking" id="walkTime">0.0 hrs</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar walking" id="walkBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span class="progress-label"><span class="icon">🐴</span> Horse & Cart (10 km/h)</span>
+                            <span class="progress-time horse" id="horseTime">0.0 hrs</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar horse" id="horseBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-item" id="railwayProgress">
+                        <div class="progress-header">
+                            <span class="progress-label"><span class="icon">🚂</span> Railway (40 km/h)</span>
+                            <span class="progress-time railway" id="railTime">0.0 hrs</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar railway" id="railBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="no-route-msg" id="noRouteMsg" style="display: none;">
+                        No railway route available in this year
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-box" id="comparisonBox" style="display: none;">
+                <h4>Railway Advantage</h4>
+                <div class="comparison-value" id="speedupValue">-</div>
+                <div class="comparison-label" id="speedupLabel">faster than walking</div>
+            </div>
+
+            <div class="legend">
+                <h3>MAP LEGEND</h3>
+                <div class="legend-item">
+                    <div class="legend-line walking" style="border-style: dashed;"></div>
+                    <span>Walking path (straight line)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line horse" style="border-style: dashed;"></div>
+                    <span>Horse path (straight line)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-line railway"></div>
+                    <span>Railway path (actual track)</span>
+                </div>
+            </div>
+
+            <div class="instructions">
+                <strong>How to use:</strong><br>
+                1. Select origin and destination settlements<br>
+                2. Adjust the year to see railway availability<br>
+                3. Click "Start Race" to watch the animation<br>
+                4. Use speed control to adjust animation pace<br><br>
+                <strong>Tip:</strong> Click on map markers to select settlements directly!
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Data and state
+        let data = null;
+        let trackData = null;
+        let networkData = null;
+        let mappingData = null;
+        let map = null;
+
+        // Selection state
+        let originSettlement = null;
+        let destSettlement = null;
+        let currentYear = 1920;
+
+        // Animation state
+        let isAnimating = false;
+        let animationStartTime = null;
+        let animationSpeed = 5;
+        let animationFrameId = null;
+
+        // Calculated routes
+        let walkingPath = [];
+        let horsePath = [];
+        let railwayPath = [];
+        let railwayAvailable = false;
+
+        // Distances and times
+        let directDistanceKm = 0;
+        let railwayDistanceKm = 0;
+        let walkingTimeHrs = 0;
+        let horseTimeHrs = 0;
+        let railwayTimeHrs = 0;
+
+        // Speeds in km/h
+        const WALKING_SPEED = 5;
+        const HORSE_SPEED = 10;
+        const RAILWAY_SPEED = 40;
+
+        // Map layers
+        let allMarkers = {};
+        let originMarker = null;
+        let destMarker = null;
+        let walkingLine = null;
+        let horseLine = null;
+        let railwayLine = null;
+        let walkingToken = null;
+        let horseToken = null;
+        let railwayToken = null;
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([52.0, -106.0], 6);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        // Load all data files
+        async function loadData() {
+            try {
+                // Load settlement connections
+                const response = await fetch('data/settlement_connections.json');
+                data = await response.json();
+                console.log('Settlements loaded:', Object.keys(data.settlements).length);
+
+                // Load railway track geometry
+                try {
+                    const trackResponse = await fetch('data/railway_tracks.json');
+                    if (trackResponse.ok) {
+                        trackData = await trackResponse.json();
+                        trackData.lookup = {};
+                        trackData.tracks.forEach(t => {
+                            trackData.lookup[`${t.source}|${t.target}`] = t;
+                            trackData.lookup[`${t.target}|${t.source}`] = t;
+                        });
+                        console.log('Track geometry loaded:', trackData.track_count, 'segments');
+                    }
+                } catch (e) {
+                    console.warn('Could not load track geometry:', e);
+                }
+
+                // Load network graph
+                try {
+                    const networkResponse = await fetch('data/railway_network.json');
+                    if (networkResponse.ok) {
+                        networkData = await networkResponse.json();
+                        console.log('Network loaded:', networkData.stats.node_count, 'nodes');
+                    }
+                } catch (e) {
+                    console.warn('Could not load network:', e);
+                }
+
+                // Load settlement to node mappings
+                try {
+                    const mappingResponse = await fetch('data/settlement_network_mapping.json');
+                    if (mappingResponse.ok) {
+                        mappingData = await mappingResponse.json();
+                        mappingData.lookup = {};
+                        mappingData.mappings.forEach(m => {
+                            mappingData.lookup[m.settlement] = m;
+                        });
+                        console.log('Mappings loaded:', mappingData.mappings.length, 'settlements');
+                    }
+                } catch (e) {
+                    console.warn('Could not load mappings:', e);
+                }
+
+                populateSelectors();
+                addAllSettlementMarkers();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        // Populate origin and destination dropdowns
+        function populateSelectors() {
+            const originSelect = document.getElementById('originSelect');
+            const destSelect = document.getElementById('destSelect');
+            const settlements = Object.keys(data.settlements).sort();
+
+            settlements.forEach(name => {
+                const opt1 = document.createElement('option');
+                opt1.value = name;
+                opt1.textContent = name;
+                originSelect.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = name;
+                opt2.textContent = name;
+                destSelect.appendChild(opt2);
+            });
+        }
+
+        // Add small markers for all settlements
+        function addAllSettlementMarkers() {
+            Object.entries(data.settlements).forEach(([name, settlement]) => {
+                const marker = L.circleMarker([settlement.lat, settlement.lon], {
+                    radius: 4,
+                    fillColor: '#444',
+                    color: '#666',
+                    weight: 1,
+                    opacity: 0.7,
+                    fillOpacity: 0.6
+                }).addTo(map);
+
+                marker.bindPopup(`<b>${name}</b><br><em>Click to select</em>`);
+                marker.on('click', () => {
+                    // If no origin selected, set as origin
+                    if (!originSettlement) {
+                        selectOrigin(name);
+                    } else if (!destSettlement) {
+                        selectDestination(name);
+                    } else {
+                        // Both selected - replace destination
+                        selectDestination(name);
+                    }
+                });
+
+                allMarkers[name] = marker;
+            });
+        }
+
+        // Haversine distance in km
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        // Calculate path length from coordinates
+        function calculatePathLength(coords) {
+            let total = 0;
+            for (let i = 0; i < coords.length - 1; i++) {
+                total += haversineDistance(coords[i][0], coords[i][1], coords[i+1][0], coords[i+1][1]);
+            }
+            return total;
+        }
+
+        // Select origin settlement
+        function selectOrigin(name) {
+            originSettlement = name;
+            document.getElementById('originSelect').value = name;
+
+            // Update marker
+            if (originMarker) map.removeLayer(originMarker);
+            const settlement = data.settlements[name];
+
+            const icon = L.divIcon({
+                className: 'origin-marker',
+                html: '<div style="background:#e94560; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(233,69,96,0.5);"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+            originMarker = L.marker([settlement.lat, settlement.lon], {icon}).addTo(map);
+            originMarker.bindPopup(`<b>${name}</b><br>Origin`);
+
+            // Hide the small background marker
+            if (allMarkers[name]) {
+                allMarkers[name].setStyle({ opacity: 0, fillOpacity: 0 });
+            }
+
+            calculateRoutes();
+        }
+
+        // Select destination settlement
+        function selectDestination(name) {
+            if (name === originSettlement) {
+                showError('Origin and destination must be different');
+                return;
+            }
+
+            destSettlement = name;
+            document.getElementById('destSelect').value = name;
+
+            // Update marker
+            if (destMarker) map.removeLayer(destMarker);
+            const settlement = data.settlements[name];
+
+            const icon = L.divIcon({
+                className: 'dest-marker',
+                html: '<div style="background:#4ecca3; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(78,204,163,0.5);"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+            destMarker = L.marker([settlement.lat, settlement.lon], {icon}).addTo(map);
+            destMarker.bindPopup(`<b>${name}</b><br>Destination`);
+
+            // Hide the small background marker
+            if (allMarkers[name]) {
+                allMarkers[name].setStyle({ opacity: 0, fillOpacity: 0 });
+            }
+
+            calculateRoutes();
+        }
+
+        // Build adjacency list filtered by year
+        function buildAdjacencyList(year) {
+            const adj = {};
+            if (!networkData || !networkData.edges) return adj;
+
+            networkData.edges.forEach(edge => {
+                const edgeYear = edge.year || 1882;
+                if (edgeYear > year) return;
+
+                const source = edge.source;
+                const target = edge.target;
+                const weight = edge.length_m / 1000;
+
+                if (!adj[source]) adj[source] = [];
+                if (!adj[target]) adj[target] = [];
+                adj[source].push({ node: target, weight });
+                adj[target].push({ node: source, weight });
+            });
+
+            return adj;
+        }
+
+        // Dijkstra's algorithm to find shortest path
+        function dijkstra(adj, startNode, endNode) {
+            const dist = {};
+            const prev = {};
+            const visited = new Set();
+            const queue = [];
+
+            dist[startNode] = 0;
+            queue.push({ node: startNode, dist: 0 });
+
+            while (queue.length > 0) {
+                queue.sort((a, b) => a.dist - b.dist);
+                const { node: current } = queue.shift();
+
+                if (visited.has(current)) continue;
+                visited.add(current);
+
+                if (current === endNode) break;
+
+                const neighbors = adj[current] || [];
+                for (const { node: neighbor, weight } of neighbors) {
+                    if (visited.has(neighbor)) continue;
+                    const newDist = dist[current] + weight;
+                    if (dist[neighbor] === undefined || newDist < dist[neighbor]) {
+                        dist[neighbor] = newDist;
+                        prev[neighbor] = current;
+                        queue.push({ node: neighbor, dist: newDist });
+                    }
+                }
+            }
+
+            if (prev[endNode] === undefined && startNode !== endNode) return null;
+
+            // Reconstruct path
+            const path = [];
+            let current = endNode;
+            while (current !== undefined) {
+                path.unshift(current);
+                current = prev[current];
+            }
+
+            return { path, distance: dist[endNode] };
+        }
+
+        // Get track geometry for a path (list of nodes)
+        function getPathGeometry(path) {
+            if (!path || path.length < 2 || !trackData || !trackData.lookup) return null;
+
+            const allCoords = [];
+            for (let i = 0; i < path.length - 1; i++) {
+                const key = `${path[i]}|${path[i+1]}`;
+                const track = trackData.lookup[key];
+                if (track && track.coordinates) {
+                    let coords = track.coordinates.map(c => [c[1], c[0]]); // [lat, lon]
+
+                    if (allCoords.length > 0) {
+                        const lastPoint = allCoords[allCoords.length - 1];
+                        const firstPoint = coords[0];
+                        const lastPointReversed = coords[coords.length - 1];
+
+                        const distToFirst = Math.abs(lastPoint[0] - firstPoint[0]) + Math.abs(lastPoint[1] - firstPoint[1]);
+                        const distToLast = Math.abs(lastPoint[0] - lastPointReversed[0]) + Math.abs(lastPoint[1] - lastPointReversed[1]);
+
+                        if (distToLast < distToFirst) {
+                            coords = coords.reverse();
+                        }
+                    }
+
+                    allCoords.push(...coords);
+                }
+            }
+            return allCoords.length > 0 ? allCoords : null;
+        }
+
+        // Calculate all routes
+        function calculateRoutes() {
+            hideError();
+
+            if (!originSettlement || !destSettlement) {
+                document.getElementById('statsBox').style.display = 'none';
+                document.getElementById('comparisonBox').style.display = 'none';
+                document.getElementById('startBtn').disabled = true;
+                clearPaths();
+                return;
+            }
+
+            const origin = data.settlements[originSettlement];
+            const dest = data.settlements[destSettlement];
+
+            // Calculate straight-line path and distance
+            walkingPath = [[origin.lat, origin.lon], [dest.lat, dest.lon]];
+            horsePath = [[origin.lat, origin.lon], [dest.lat, dest.lon]];
+            directDistanceKm = haversineDistance(origin.lat, origin.lon, dest.lat, dest.lon);
+
+            // Calculate times
+            walkingTimeHrs = directDistanceKm / WALKING_SPEED;
+            horseTimeHrs = directDistanceKm / HORSE_SPEED;
+
+            // Check railway availability
+            railwayAvailable = false;
+            railwayPath = [];
+            railwayDistanceKm = 0;
+            railwayTimeHrs = 0;
+
+            const originHasRailway = origin.railway_arrives && origin.railway_arrives <= currentYear;
+            const destHasRailway = dest.railway_arrives && dest.railway_arrives <= currentYear;
+
+            if (originHasRailway && destHasRailway && mappingData && mappingData.lookup) {
+                const originMapping = mappingData.lookup[originSettlement];
+                const destMapping = mappingData.lookup[destSettlement];
+
+                if (originMapping && destMapping) {
+                    const adj = buildAdjacencyList(currentYear);
+                    const result = dijkstra(adj, originMapping.snap_node, destMapping.snap_node);
+
+                    if (result && result.path) {
+                        const geometry = getPathGeometry(result.path);
+                        if (geometry && geometry.length >= 2) {
+                            railwayPath = geometry;
+                            // Add snap distance
+                            const originSnapDist = (originMapping.snap_distance_m || 0) / 1000;
+                            const destSnapDist = (destMapping.snap_distance_m || 0) / 1000;
+                            railwayDistanceKm = result.distance + originSnapDist + destSnapDist;
+                            railwayTimeHrs = railwayDistanceKm / RAILWAY_SPEED;
+                            railwayAvailable = true;
+
+                            // Prepend origin and append destination coordinates
+                            railwayPath = [[origin.lat, origin.lon], ...railwayPath, [dest.lat, dest.lon]];
+                        }
+                    }
+                }
+            }
+
+            updateStats();
+            drawPaths();
+            fitMapToBounds();
+
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('resetBtn').disabled = false;
+        }
+
+        // Clear all path lines and tokens
+        function clearPaths() {
+            if (walkingLine) map.removeLayer(walkingLine);
+            if (horseLine) map.removeLayer(horseLine);
+            if (railwayLine) map.removeLayer(railwayLine);
+            if (walkingToken) map.removeLayer(walkingToken);
+            if (horseToken) map.removeLayer(horseToken);
+            if (railwayToken) map.removeLayer(railwayToken);
+            walkingLine = horseLine = railwayLine = null;
+            walkingToken = horseToken = railwayToken = null;
+        }
+
+        // Draw path lines on map
+        function drawPaths() {
+            clearPaths();
+
+            if (!originSettlement || !destSettlement) return;
+
+            // Walking path (dashed red)
+            walkingLine = L.polyline(walkingPath, {
+                color: '#e94560',
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '10, 10'
+            }).addTo(map);
+
+            // Horse path (dashed yellow, slightly offset)
+            const horseOffset = horsePath.map(p => [p[0] + 0.005, p[1] + 0.005]);
+            horseLine = L.polyline(horseOffset, {
+                color: '#ffd93d',
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '10, 10'
+            }).addTo(map);
+
+            // Railway path (solid green)
+            if (railwayAvailable && railwayPath.length >= 2) {
+                railwayLine = L.polyline(railwayPath, {
+                    color: '#4ecca3',
+                    weight: 4,
+                    opacity: 0.9
+                }).addTo(map);
+            }
+        }
+
+        // Update stats panel
+        function updateStats() {
+            document.getElementById('statsBox').style.display = 'block';
+            document.getElementById('routeNames').textContent = `${originSettlement} → ${destSettlement}`;
+            document.getElementById('directDist').textContent = directDistanceKm.toFixed(1) + ' km';
+
+            if (railwayAvailable) {
+                document.getElementById('railDist').textContent = railwayDistanceKm.toFixed(1) + ' km';
+                document.getElementById('railDist').className = 'stat-value railway';
+                document.getElementById('railwayProgress').style.display = 'block';
+                document.getElementById('noRouteMsg').style.display = 'none';
+
+                // Show comparison
+                const speedup = walkingTimeHrs / railwayTimeHrs;
+                document.getElementById('comparisonBox').style.display = 'block';
+                document.getElementById('speedupValue').textContent = speedup.toFixed(1) + 'x';
+                document.getElementById('speedupLabel').textContent = 'faster than walking';
+            } else {
+                document.getElementById('railDist').textContent = 'No route';
+                document.getElementById('railDist').className = 'stat-value grey';
+                document.getElementById('railwayProgress').style.display = 'none';
+                document.getElementById('noRouteMsg').style.display = 'block';
+                document.getElementById('comparisonBox').style.display = 'none';
+            }
+
+            // Reset progress bars
+            document.getElementById('walkBar').style.width = '0%';
+            document.getElementById('horseBar').style.width = '0%';
+            document.getElementById('railBar').style.width = '0%';
+            document.getElementById('walkTime').textContent = '0.0 hrs';
+            document.getElementById('horseTime').textContent = '0.0 hrs';
+            document.getElementById('railTime').textContent = '0.0 hrs';
+        }
+
+        // Fit map to show both origin and destination
+        function fitMapToBounds() {
+            if (!originSettlement || !destSettlement) return;
+
+            const origin = data.settlements[originSettlement];
+            const dest = data.settlements[destSettlement];
+
+            const bounds = L.latLngBounds(
+                [origin.lat, origin.lon],
+                [dest.lat, dest.lon]
+            );
+
+            // Include railway path if available
+            if (railwayAvailable && railwayPath.length > 0) {
+                railwayPath.forEach(p => bounds.extend(p));
+            }
+
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        // Get position along a path at a given distance from start
+        function getPositionAlongPath(path, distanceKm) {
+            if (!path || path.length < 2) return path[0];
+
+            let traveled = 0;
+            for (let i = 0; i < path.length - 1; i++) {
+                const segmentDist = haversineDistance(
+                    path[i][0], path[i][1],
+                    path[i+1][0], path[i+1][1]
+                );
+
+                if (traveled + segmentDist >= distanceKm) {
+                    // Interpolate within this segment
+                    const remaining = distanceKm - traveled;
+                    const ratio = remaining / segmentDist;
+                    const lat = path[i][0] + (path[i+1][0] - path[i][0]) * ratio;
+                    const lon = path[i][1] + (path[i+1][1] - path[i][1]) * ratio;
+                    return [lat, lon];
+                }
+
+                traveled += segmentDist;
+            }
+
+            // Reached end
+            return path[path.length - 1];
+        }
+
+        // Create token markers
+        function createTokens() {
+            if (walkingToken) map.removeLayer(walkingToken);
+            if (horseToken) map.removeLayer(horseToken);
+            if (railwayToken) map.removeLayer(railwayToken);
+
+            const origin = data.settlements[originSettlement];
+
+            // Walking token
+            const walkIcon = L.divIcon({
+                className: 'token-icon',
+                html: '<div style="font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">🚶</div>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+            walkingToken = L.marker([origin.lat, origin.lon], { icon: walkIcon, zIndexOffset: 1000 }).addTo(map);
+
+            // Horse token
+            const horseIcon = L.divIcon({
+                className: 'token-icon',
+                html: '<div style="font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">🐴</div>',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+            horseToken = L.marker([origin.lat, origin.lon], { icon: horseIcon, zIndexOffset: 1001 }).addTo(map);
+
+            // Railway token (only if available)
+            if (railwayAvailable) {
+                const railIcon = L.divIcon({
+                    className: 'token-icon',
+                    html: '<div style="font-size: 28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">🚂</div>',
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                });
+                railwayToken = L.marker([origin.lat, origin.lon], { icon: railIcon, zIndexOffset: 1002 }).addTo(map);
+            }
+        }
+
+        // Format time for display
+        function formatTime(hours) {
+            if (hours < 1) return (hours * 60).toFixed(0) + ' min';
+            if (hours < 24) return hours.toFixed(1) + ' hrs';
+            const days = hours / 24;
+            return days.toFixed(1) + ' days';
+        }
+
+        // Animation loop
+        function animationLoop(timestamp) {
+            if (!isAnimating) return;
+
+            if (!animationStartTime) animationStartTime = timestamp;
+
+            // Calculate elapsed simulated time (in hours)
+            const elapsedMs = timestamp - animationStartTime;
+            const elapsedRealSec = elapsedMs / 1000;
+            const elapsedSimHrs = elapsedRealSec * animationSpeed;
+
+            // Calculate distances traveled
+            const walkDistTraveled = Math.min(elapsedSimHrs * WALKING_SPEED, directDistanceKm);
+            const horseDistTraveled = Math.min(elapsedSimHrs * HORSE_SPEED, directDistanceKm);
+            const railDistTraveled = railwayAvailable
+                ? Math.min(elapsedSimHrs * RAILWAY_SPEED, railwayDistanceKm)
+                : 0;
+
+            // Update token positions
+            const walkPos = getPositionAlongPath(walkingPath, walkDistTraveled);
+            const horsePos = getPositionAlongPath(horsePath, horseDistTraveled);
+            walkingToken.setLatLng(walkPos);
+            horseToken.setLatLng(horsePos);
+
+            if (railwayAvailable && railwayToken) {
+                const railPos = getPositionAlongPath(railwayPath, railDistTraveled);
+                railwayToken.setLatLng(railPos);
+            }
+
+            // Update progress bars
+            const walkProgress = (walkDistTraveled / directDistanceKm) * 100;
+            const horseProgress = (horseDistTraveled / directDistanceKm) * 100;
+            document.getElementById('walkBar').style.width = walkProgress + '%';
+            document.getElementById('horseBar').style.width = horseProgress + '%';
+
+            // Update time displays
+            const walkElapsedHrs = walkDistTraveled / WALKING_SPEED;
+            const horseElapsedHrs = horseDistTraveled / HORSE_SPEED;
+            document.getElementById('walkTime').textContent = formatTime(walkElapsedHrs);
+            document.getElementById('horseTime').textContent = formatTime(horseElapsedHrs);
+
+            // Check arrivals
+            const walkArrived = walkDistTraveled >= directDistanceKm;
+            const horseArrived = horseDistTraveled >= directDistanceKm;
+            let railArrived = false;
+
+            if (railwayAvailable) {
+                const railProgress = (railDistTraveled / railwayDistanceKm) * 100;
+                document.getElementById('railBar').style.width = railProgress + '%';
+                const railElapsedHrs = railDistTraveled / RAILWAY_SPEED;
+                document.getElementById('railTime').textContent = formatTime(railElapsedHrs);
+                railArrived = railDistTraveled >= railwayDistanceKm;
+
+                if (railArrived && !document.getElementById('railTime').innerHTML.includes('ARRIVED')) {
+                    document.getElementById('railTime').innerHTML = formatTime(railwayTimeHrs) + '<span class="arrived-badge">ARRIVED</span>';
+                }
+            }
+
+            if (horseArrived && !document.getElementById('horseTime').innerHTML.includes('ARRIVED')) {
+                document.getElementById('horseTime').innerHTML = formatTime(horseTimeHrs) + '<span class="arrived-badge">ARRIVED</span>';
+            }
+
+            if (walkArrived && !document.getElementById('walkTime').innerHTML.includes('ARRIVED')) {
+                document.getElementById('walkTime').innerHTML = formatTime(walkingTimeHrs) + '<span class="arrived-badge">ARRIVED</span>';
+            }
+
+            // Check if all have arrived
+            const allArrived = walkArrived && horseArrived && (!railwayAvailable || railArrived);
+
+            if (allArrived) {
+                stopAnimation();
+                return;
+            }
+
+            animationFrameId = requestAnimationFrame(animationLoop);
+        }
+
+        // Start animation
+        function startAnimation() {
+            if (!originSettlement || !destSettlement) return;
+
+            isAnimating = true;
+            animationStartTime = null;
+            animationSpeed = parseInt(document.getElementById('speedSelect').value);
+
+            createTokens();
+            document.getElementById('startBtn').textContent = 'Pause';
+            document.getElementById('startBtn').classList.remove('start-btn');
+
+            animationFrameId = requestAnimationFrame(animationLoop);
+        }
+
+        // Stop/pause animation
+        function stopAnimation() {
+            isAnimating = false;
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            document.getElementById('startBtn').textContent = 'Start Race';
+            document.getElementById('startBtn').classList.add('start-btn');
+        }
+
+        // Reset animation
+        function resetAnimation() {
+            stopAnimation();
+            animationStartTime = null;
+
+            if (walkingToken) map.removeLayer(walkingToken);
+            if (horseToken) map.removeLayer(horseToken);
+            if (railwayToken) map.removeLayer(railwayToken);
+            walkingToken = horseToken = railwayToken = null;
+
+            updateStats();
+        }
+
+        // Show error message
+        function showError(msg) {
+            const errorDiv = document.getElementById('errorMsg');
+            errorDiv.textContent = msg;
+            errorDiv.style.display = 'block';
+        }
+
+        // Hide error message
+        function hideError() {
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+
+        // Event listeners
+        document.getElementById('originSelect').addEventListener('change', (e) => {
+            if (e.target.value) {
+                // Restore previous origin marker
+                if (originSettlement && allMarkers[originSettlement]) {
+                    allMarkers[originSettlement].setStyle({ opacity: 0.7, fillOpacity: 0.6 });
+                }
+                selectOrigin(e.target.value);
+            }
+        });
+
+        document.getElementById('destSelect').addEventListener('change', (e) => {
+            if (e.target.value) {
+                // Restore previous dest marker
+                if (destSettlement && allMarkers[destSettlement]) {
+                    allMarkers[destSettlement].setStyle({ opacity: 0.7, fillOpacity: 0.6 });
+                }
+                selectDestination(e.target.value);
+            }
+        });
+
+        document.getElementById('yearSlider').addEventListener('input', (e) => {
+            currentYear = parseInt(e.target.value);
+            document.getElementById('yearDisplay').textContent = currentYear;
+            resetAnimation();
+            calculateRoutes();
+        });
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            if (isAnimating) {
+                stopAnimation();
+            } else {
+                startAnimation();
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', resetAnimation);
+
+        document.getElementById('speedSelect').addEventListener('change', (e) => {
+            animationSpeed = parseInt(e.target.value);
+        });
+
+        document.getElementById('swapBtn').addEventListener('click', () => {
+            if (originSettlement && destSettlement) {
+                const tempOrigin = originSettlement;
+                const tempDest = destSettlement;
+
+                // Restore markers
+                if (allMarkers[tempOrigin]) {
+                    allMarkers[tempOrigin].setStyle({ opacity: 0.7, fillOpacity: 0.6 });
+                }
+                if (allMarkers[tempDest]) {
+                    allMarkers[tempDest].setStyle({ opacity: 0.7, fillOpacity: 0.6 });
+                }
+
+                // Clear current selections
+                if (originMarker) map.removeLayer(originMarker);
+                if (destMarker) map.removeLayer(destMarker);
+                originMarker = destMarker = null;
+                originSettlement = destSettlement = null;
+
+                // Re-select swapped
+                selectOrigin(tempDest);
+                selectDestination(tempOrigin);
+            }
+        });
+
+        // Initialize
+        initMap();
+        loadData();
+    </script>
+</body>
+</html>
