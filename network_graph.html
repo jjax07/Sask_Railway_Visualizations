@@ -87,25 +87,25 @@
             pointer-events: none;
         }
         .sidebar {
-            width: 320px;
+            width: 280px;
             background: #16213e;
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
         }
         .view-toggle {
             display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 6px;
+            margin-bottom: 10px;
         }
         .view-toggle button {
             flex: 1;
-            padding: 10px;
+            padding: 8px;
             border: 2px solid #e94560;
             background: transparent;
             color: #e94560;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             transition: all 0.3s;
         }
         .view-toggle button.active {
@@ -116,19 +116,28 @@
             background: rgba(233, 69, 96, 0.2);
         }
         .controls {
-            margin-bottom: 20px;
-        }
-        .controls label {
-            display: block;
             margin-bottom: 10px;
+        }
+        .year-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .year-row label {
             color: #e94560;
+            font-size: 13px;
             font-weight: bold;
         }
+        .year-row input[type="range"] {
+            flex: 1;
+            margin: 0;
+        }
         .year-display {
-            font-size: 48px;
-            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
             color: #e94560;
-            margin: 10px 0;
+            min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
@@ -137,44 +146,44 @@
         .play-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .play-controls button {
             background: #e94560;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
         }
         .play-controls button:hover {
             background: #ff6b6b;
         }
         .section {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .section h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border-bottom: 1px solid #e94560;
             padding-bottom: 5px;
-            font-size: 14px;
+            font-size: 13px;
         }
         .railway-toggles {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 5px;
         }
         .railway-toggle {
             display: flex;
             align-items: center;
             cursor: pointer;
-            padding: 5px;
+            padding: 4px;
             border-radius: 3px;
             transition: background 0.2s;
         }
@@ -185,36 +194,36 @@
             opacity: 0.4;
         }
         .railway-toggle input {
-            margin-right: 8px;
+            margin-right: 6px;
             accent-color: #e94560;
         }
         .railway-color {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 2px;
-            margin-right: 6px;
+            margin-right: 5px;
         }
         .railway-toggle span {
-            font-size: 12px;
+            font-size: 11px;
         }
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
         }
         .stat-box {
             background: #1a1a2e;
-            padding: 10px;
+            padding: 8px;
             border-radius: 5px;
             text-align: center;
         }
         .stat-box .value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #4ecca3;
         }
         .stat-box .label {
-            font-size: 11px;
+            font-size: 10px;
             color: #888;
             margin-top: 2px;
         }
@@ -224,16 +233,16 @@
         .top-hubs li {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            padding: 4px 0;
             border-bottom: 1px solid #1a1a2e;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             transition: background 0.2s;
         }
         .top-hubs li:hover {
             background: #1a1a2e;
-            margin: 0 -5px;
-            padding: 5px;
+            margin: 0 -4px;
+            padding: 4px;
             border-radius: 3px;
         }
         .top-hubs .name {
@@ -244,34 +253,34 @@
             font-weight: bold;
         }
         .legend {
-            margin-top: 15px;
-            padding-top: 10px;
+            margin-top: 10px;
+            padding-top: 8px;
             border-top: 1px solid #1a1a2e;
         }
         .legend-item {
             display: flex;
             align-items: center;
-            font-size: 11px;
+            font-size: 10px;
             color: #888;
-            margin: 5px 0;
+            margin: 4px 0;
         }
         .legend-line {
-            width: 20px;
+            width: 16px;
             height: 3px;
-            margin-right: 8px;
+            margin-right: 6px;
             border-radius: 2px;
         }
         .legend-circle {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            margin-right: 8px;
+            margin-right: 6px;
         }
         .legend-diamond {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             transform: rotate(45deg);
-            margin-right: 8px;
+            margin-right: 6px;
         }
         /* D3 Graph styles */
         .node {
@@ -345,9 +354,11 @@
             </div>
 
             <div class="controls">
-                <label>Year:</label>
-                <div class="year-display" id="yearDisplay">1882</div>
-                <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1882">
+                <div class="year-row">
+                    <label>Year:</label>
+                    <span class="year-display" id="yearDisplay">1882</span>
+                    <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1882">
+                </div>
                 <div class="play-controls">
                     <button id="playBtn">Play</button>
                     <button id="resetBtn">Reset</button>

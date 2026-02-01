@@ -58,28 +58,29 @@
             height: 100%;
         }
         .sidebar {
-            width: 350px;
+            width: 320px;
             background: #16213e;
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
         }
         .settlement-selector {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .settlement-selector label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             color: #e94560;
             font-weight: bold;
+            font-size: 13px;
         }
         .settlement-selector input {
             width: 100%;
-            padding: 12px;
+            padding: 8px 10px;
             border: 2px solid #0f3460;
             border-radius: 5px;
             background: #1a1a2e;
             color: #eee;
-            font-size: 16px;
+            font-size: 14px;
         }
         .settlement-selector input:focus {
             outline: none;
@@ -87,26 +88,28 @@
         }
         .selected-info {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             border-left: 3px solid #e94560;
         }
         .selected-info h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            font-size: 13px;
         }
         .selected-info p {
             color: #ccc;
-            margin: 5px 0;
+            margin: 3px 0;
+            font-size: 12px;
         }
         .selected-info .railway-tag {
             display: inline-block;
             background: #4ecca3;
             color: #1a1a2e;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 3px;
-            font-size: 12px;
+            font-size: 11px;
             margin: 2px;
             font-weight: bold;
         }
@@ -115,19 +118,28 @@
             color: #aaa;
         }
         .controls {
-            margin-bottom: 20px;
-        }
-        .controls label {
-            display: block;
             margin-bottom: 10px;
+        }
+        .year-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .year-row label {
             color: #e94560;
+            font-size: 13px;
             font-weight: bold;
         }
+        .year-row input[type="range"] {
+            flex: 1;
+            margin: 0;
+        }
         .year-display {
-            font-size: 48px;
-            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
             color: #e94560;
-            margin: 10px 0;
+            min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
@@ -135,21 +147,23 @@
         }
         .stats {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .stats h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border-bottom: 1px solid #e94560;
             padding-bottom: 5px;
+            font-size: 13px;
         }
         .stat-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            padding: 4px 0;
             border-bottom: 1px solid #1a1a2e;
+            font-size: 12px;
         }
         .stat-item .value {
             font-weight: bold;
@@ -164,16 +178,17 @@
             color: #ffcc00;
         }
         .settlement-list {
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .settlement-list h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
         .settlement-item {
             background: #0f3460;
-            padding: 10px;
-            margin: 5px 0;
+            padding: 8px;
+            margin: 4px 0;
             border-radius: 3px;
             border-left: 3px solid #4ecca3;
             cursor: pointer;
@@ -196,59 +211,61 @@
         }
         .settlement-item .name {
             font-weight: bold;
+            font-size: 13px;
         }
         .settlement-item .details {
-            font-size: 12px;
+            font-size: 11px;
             color: #aaa;
-            margin-top: 5px;
+            margin-top: 3px;
         }
         .settlement-item .new-badge {
             display: inline-block;
             background: #ffcc00;
             color: #1a1a2e;
-            padding: 1px 6px;
+            padding: 1px 5px;
             border-radius: 3px;
-            font-size: 10px;
+            font-size: 9px;
             margin-left: 5px;
             font-weight: bold;
         }
         .legend {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .legend h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
         .legend-item {
             display: flex;
             align-items: center;
-            margin: 5px 0;
-            font-size: 13px;
+            margin: 4px 0;
+            font-size: 11px;
         }
         .legend-circle {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 8px;
             flex-shrink: 0;
         }
         .play-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .play-controls button {
             background: #e94560;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
         }
         .play-controls button:hover {
             background: #ff6b6b;
@@ -291,9 +308,11 @@
             </div>
 
             <div class="controls">
-                <label>Select Year:</label>
-                <div class="year-display" id="yearDisplay">1890</div>
-                <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1890">
+                <div class="year-row">
+                    <label>Year:</label>
+                    <span class="year-display" id="yearDisplay">1890</span>
+                    <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1890">
+                </div>
                 <div class="play-controls">
                     <button id="playBtn">Play</button>
                     <button id="resetBtn">Reset</button>
@@ -343,7 +362,7 @@
                     <span>Other Settlements</span>
                 </div>
                 <div class="legend-item">
-                    <div style="width:12px; height:12px; background:#ffaa00; transform:rotate(45deg); border:2px solid #fff; margin-right:10px;"></div>
+                    <div style="width:10px; height:10px; background:#ffaa00; transform:rotate(45deg); border:2px solid #fff; margin-right:8px;"></div>
                     <span>Multi-Railway Junction</span>
                 </div>
                 <div class="legend-item">

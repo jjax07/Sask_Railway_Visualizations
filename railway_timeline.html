@@ -63,25 +63,34 @@
             height: 100%;
         }
         .sidebar {
-            width: 300px;
+            width: 280px;
             background: #16213e;
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
         }
         .controls {
-            margin-bottom: 20px;
-        }
-        .controls label {
-            display: block;
             margin-bottom: 10px;
+        }
+        .year-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .year-row label {
             color: #e94560;
+            font-size: 13px;
             font-weight: bold;
         }
+        .year-row input[type="range"] {
+            flex: 1;
+            margin: 0;
+        }
         .year-display {
-            font-size: 48px;
-            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
             color: #e94560;
-            margin: 10px 0;
+            min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
@@ -90,41 +99,43 @@
         .play-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .play-controls button {
             background: #e94560;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
         }
         .play-controls button:hover {
             background: #ff6b6b;
         }
         .legend {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .legend h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border-bottom: 1px solid #e94560;
             padding-bottom: 5px;
+            font-size: 13px;
         }
         .legend-item {
             display: flex;
             align-items: center;
-            margin: 8px 0;
+            margin: 5px 0;
             cursor: pointer;
-            padding: 5px;
+            padding: 4px;
             border-radius: 3px;
             transition: background 0.2s;
+            font-size: 12px;
         }
         .legend-item:hover {
             background: #1a1a2e;
@@ -133,59 +144,61 @@
             opacity: 0.4;
         }
         .legend-circle {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 8px;
             border: 2px solid white;
         }
         .legend-count {
             margin-left: auto;
             background: #1a1a2e;
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 10px;
-            font-size: 12px;
+            font-size: 11px;
         }
         .stats {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .stats h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border-bottom: 1px solid #e94560;
             padding-bottom: 5px;
+            font-size: 13px;
         }
         .stat-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            padding: 4px 0;
             border-bottom: 1px solid #1a1a2e;
+            font-size: 12px;
         }
         .chart-container {
-            height: 200px;
+            height: 150px;
             background: #16213e;
-            padding: 20px;
+            padding: 10px 15px;
             border-top: 1px solid #0f3460;
         }
         .chart {
             display: flex;
             align-items: flex-end;
             justify-content: space-around;
-            height: 150px;
-            padding: 0 20px;
+            height: 110px;
+            padding: 0 10px;
         }
         .chart-bar-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             flex: 1;
-            max-width: 60px;
+            max-width: 50px;
         }
         .chart-bar {
-            width: 40px;
+            width: 30px;
             background: linear-gradient(to top, #e94560, #ff6b6b);
             border-radius: 3px 3px 0 0;
             transition: height 0.5s ease;
@@ -196,31 +209,32 @@
         }
         .chart-bar .count {
             position: absolute;
-            top: -20px;
+            top: -16px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 12px;
+            font-size: 10px;
             color: #fff;
         }
         .chart-label {
-            margin-top: 5px;
-            font-size: 11px;
+            margin-top: 3px;
+            font-size: 10px;
             color: #aaa;
         }
         .info-box {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .info-box h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
         .info-box p {
-            font-size: 13px;
+            font-size: 11px;
             color: #aaa;
-            line-height: 1.5;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -243,9 +257,11 @@
             <div id="map"></div>
             <div class="sidebar">
                 <div class="controls">
-                    <label>Select Year:</label>
-                    <div class="year-display" id="yearDisplay">1882</div>
-                    <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1882">
+                    <div class="year-row">
+                        <label>Year:</label>
+                        <span class="year-display" id="yearDisplay">1882</span>
+                        <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1882">
+                    </div>
                     <div class="play-controls">
                         <button id="playBtn">Play</button>
                         <button id="resetBtn">Reset</button>

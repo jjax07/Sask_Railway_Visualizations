@@ -64,19 +64,28 @@
             overflow-y: auto;
         }
         .controls {
-            margin-bottom: 20px;
-        }
-        .controls label {
-            display: block;
             margin-bottom: 10px;
+        }
+        .year-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .year-row label {
             color: #e94560;
+            font-size: 13px;
             font-weight: bold;
         }
+        .year-row input[type="range"] {
+            flex: 1;
+            margin: 0;
+        }
         .year-display {
-            font-size: 48px;
-            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
             color: #e94560;
-            margin: 10px 0;
+            min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
@@ -84,79 +93,85 @@
         }
         .stats {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .stats h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border-bottom: 1px solid #e94560;
             padding-bottom: 5px;
+            font-size: 13px;
         }
         .stat-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            padding: 4px 0;
             border-bottom: 1px solid #1a1a2e;
+            font-size: 12px;
         }
         .settlement-list {
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .settlement-list h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
         .settlement-item {
             background: #0f3460;
-            padding: 10px;
-            margin: 5px 0;
+            padding: 8px;
+            margin: 4px 0;
             border-radius: 3px;
             border-left: 3px solid #e94560;
         }
         .settlement-item .name {
             font-weight: bold;
+            font-size: 13px;
         }
         .settlement-item .details {
-            font-size: 12px;
+            font-size: 11px;
             color: #aaa;
-            margin-top: 5px;
+            margin-top: 3px;
         }
         .legend {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .legend h3 {
             color: #e94560;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
         .legend-item {
             display: flex;
             align-items: center;
-            margin: 5px 0;
+            margin: 4px 0;
+            font-size: 12px;
         }
         .legend-circle {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 8px;
         }
         .play-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .play-controls button {
             background: #e94560;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
         }
         .play-controls button:hover {
             background: #ff6b6b;
@@ -181,9 +196,11 @@
         <div id="map"></div>
         <div class="sidebar">
             <div class="controls">
-                <label>Select Year:</label>
-                <div class="year-display" id="yearDisplay">1890</div>
-                <input type="range" id="yearSlider" min="1890" max="1920" step="5" value="1890">
+                <div class="year-row">
+                    <label>Year:</label>
+                    <span class="year-display" id="yearDisplay">1890</span>
+                    <input type="range" id="yearSlider" min="1890" max="1920" step="5" value="1890">
+                </div>
                 <div class="play-controls">
                     <button id="playBtn">Play</button>
                     <button id="resetBtn">Reset</button>

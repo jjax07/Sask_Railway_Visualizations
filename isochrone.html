@@ -58,36 +58,52 @@
             height: 100%;
         }
         .sidebar {
-            width: 320px;
+            width: 300px;
             background: #16213e;
-            padding: 20px;
+            padding: 15px;
             overflow-y: auto;
         }
         .control-group {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .control-group h3 {
             color: #e94560;
-            margin-bottom: 10px;
-            font-size: 14px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
         select {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border-radius: 4px;
             border: 1px solid #0f3460;
             background: #1a1a2e;
             color: #eee;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .year-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .year-row label {
+            color: #e94560;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .year-row input[type="range"] {
+            flex: 1;
+            margin: 0;
         }
         .year-display {
-            font-size: 48px;
-            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
             color: #e94560;
-            margin: 10px 0;
+            min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
@@ -96,34 +112,34 @@
         .play-controls {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
         .play-controls button {
             background: #e94560;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
         }
         .play-controls button:hover {
             background: #ff6b6b;
         }
         .time-selector {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
         .time-btn {
-            padding: 8px 16px;
+            padding: 6px 12px;
             border: 2px solid #e94560;
             background: transparent;
             color: #e94560;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
         }
         .time-btn.active {
             background: #e94560;
@@ -132,12 +148,12 @@
         .mode-toggles {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 5px;
         }
         .mode-toggle {
             display: flex;
             align-items: center;
-            padding: 10px;
+            padding: 6px 8px;
             border-radius: 5px;
             cursor: pointer;
             transition: background 0.2s;
@@ -146,30 +162,30 @@
             background: #1a1a2e;
         }
         .mode-toggle input {
-            margin-right: 10px;
+            margin-right: 8px;
         }
         .mode-toggle .color-box {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 3px;
-            margin-right: 10px;
+            margin-right: 8px;
         }
         .mode-toggle .details {
-            font-size: 11px;
+            font-size: 10px;
             color: #888;
         }
         .stats-box {
             background: #1a1a2e;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-top: 15px;
+            margin-top: 10px;
         }
         .stat-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 4px 0;
             border-bottom: 1px solid #0f3460;
-            font-size: 13px;
+            font-size: 12px;
         }
         .stat-row:last-child {
             border-bottom: none;
@@ -180,39 +196,40 @@
         }
         .comparison {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            margin-top: 15px;
+            margin-top: 10px;
         }
         .comparison h3 {
             color: #e94560;
-            margin-bottom: 10px;
-            font-size: 14px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
         .comparison-item {
             display: flex;
             align-items: center;
-            margin: 10px 0;
+            margin: 6px 0;
+            font-size: 12px;
         }
         .comparison-value {
-            width: 70px;
-            font-size: 12px;
+            width: 60px;
+            font-size: 11px;
             font-weight: bold;
             color: #ccc;
         }
         .comparison-bar {
-            height: 20px;
+            height: 16px;
             border-radius: 3px;
-            margin-right: 10px;
+            margin-right: 8px;
         }
         .explanation {
             background: #0f3460;
-            padding: 15px;
+            padding: 10px 12px;
             border-radius: 5px;
-            font-size: 12px;
-            line-height: 1.6;
+            font-size: 11px;
+            line-height: 1.5;
             color: #aaa;
-            margin-top: 15px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -240,8 +257,11 @@
 
             <div class="control-group">
                 <h3>YEAR</h3>
-                <div class="year-display" id="yearDisplay">1920</div>
-                <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1920">
+                <div class="year-row">
+                    <label>Year:</label>
+                    <span class="year-display" id="yearDisplay">1920</span>
+                    <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1920">
+                </div>
                 <div class="play-controls">
                     <button id="playBtn">Play</button>
                     <button id="resetBtn">Reset</button>
@@ -266,7 +286,7 @@
                         <input type="checkbox" id="showWalking" checked>
                         <div class="color-box" style="background: #888;"></div>
                         <div>
-                            <div>Walking</div>
+                            <div style="font-size: 12px;">Walking</div>
                             <div class="details">5 km/h</div>
                         </div>
                     </label>
@@ -274,7 +294,7 @@
                         <input type="checkbox" id="showWagon" checked>
                         <div class="color-box" style="background: #ffd93d;"></div>
                         <div>
-                            <div>Horse & Wagon</div>
+                            <div style="font-size: 12px;">Horse & Wagon</div>
                             <div class="details">10 km/h</div>
                         </div>
                     </label>
@@ -282,7 +302,7 @@
                         <input type="checkbox" id="showRailway" checked>
                         <div class="color-box" style="background: #4ecca3;"></div>
                         <div>
-                            <div>Railway</div>
+                            <div style="font-size: 12px;">Railway</div>
                             <div class="details">40 km/h (actual route)</div>
                         </div>
                     </label>
