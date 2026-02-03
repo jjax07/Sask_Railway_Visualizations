@@ -221,9 +221,13 @@
         .time-bar.walking {
             background: linear-gradient(180deg, #ff6b6b 0%, #e94560 100%);
         }
+        .time-bar.wagon {
+            background: linear-gradient(180deg, #ffb347 0%, #e09530 100%);
+            transition-delay: 0.1s;
+        }
         .time-bar.railway {
             background: linear-gradient(180deg, #6ee7b7 0%, #4ecca3 100%);
-            transition-delay: 0.1s;
+            transition-delay: 0.2s;
         }
         .destination-row.visible .time-bar {
             transform: scaleX(1);
@@ -241,6 +245,7 @@
             font-weight: bold;
         }
         .time-value.walking { color: #e94560; }
+        .time-value.wagon { color: #e09530; }
         .time-value.railway { color: #4ecca3; }
         .time-value.no-route {
             color: #666;
@@ -301,7 +306,7 @@
 <body>
     <div class="header">
         <h1>Journey Times (Network Routing)</h1>
-        <p>Compare walking versus railway travel times using actual railway routes. Select an origin and year to see how the network evolved.</p>
+        <p>Compare walking, horse & cart, and railway travel times using actual railway routes. Select an origin and year to see how the network evolved.</p>
     </div>
     <div class="nav">
         <a href="index.html">Home</a>
@@ -367,6 +372,10 @@
                     <span class="stat-value" id="avgWalk">-</span>
                 </div>
                 <div class="stat-row">
+                    <span>Avg horse & cart:</span>
+                    <span class="stat-value" id="avgWagon">-</span>
+                </div>
+                <div class="stat-row">
                     <span>Avg railway time:</span>
                     <span class="stat-value" id="avgRail">-</span>
                 </div>
@@ -382,6 +391,10 @@
                     <span>Walking (5 km/h, straight-line)</span>
                 </div>
                 <div class="legend-item">
+                    <div class="legend-bar" style="background: linear-gradient(90deg, #ffb347, #e09530); width: 40px;"></div>
+                    <span>Horse & Cart (10 km/h, straight-line)</span>
+                </div>
+                <div class="legend-item">
                     <div class="legend-bar" style="background: linear-gradient(90deg, #6ee7b7, #4ecca3); width: 40px;"></div>
                     <span>Railway (40 km/h, actual route)</span>
                 </div>
@@ -390,13 +403,14 @@
                     <span>No railway route available</span>
                 </div>
                 <p style="font-size: 11px; color: #ccc; margin-top: 10px; font-style: italic;">
-                    Note: Walking distances are straight-line estimates, not based on actual path or road data.
+                    Note: Walking and horse & cart distances are straight-line estimates, not based on actual path or road data.
                 </p>
             </div>
 
             <div class="explanation">
                 <strong>How to read this:</strong><br><br>
                 <span style="color: #e94560;">Red bars</span> = walking time (straight-line distance at 5 km/h)<br><br>
+                <span style="color: #e09530;">Orange bars</span> = horse & cart time (straight-line distance at 10 km/h)<br><br>
                 <span style="color: #4ecca3;">Green bars</span> = railway time (actual track route at 40 km/h)<br><br>
                 <span style="color: #ffd93d;">(CPR → CNoR)</span> = railways used on route (yellow = transfer)<br><br>
                 <span style="color: #666; font-style: italic;">No railway route</span> = destination not reachable by rail in the selected year<br><br>
@@ -428,6 +442,7 @@
 
         const speeds = {
             walking: 5,   // km/h
+            wagon: 10,    // km/h (horse & cart)
             railway: 40   // km/h
         };
 
@@ -586,9 +601,10 @@
             Object.entries(data.settlements).forEach(([name, settlement]) => {
                 if (name === currentOrigin) return;
 
-                // Straight-line distance (for walking)
+                // Straight-line distance (for walking and horse & cart)
                 const directDistKm = haversine(origin.lat, origin.lon, settlement.lat, settlement.lon);
                 const walkingHours = directDistKm / speeds.walking;
+                const wagonHours = directDistKm / speeds.wagon;
 
                 // Railway routing
                 let railwayDistKm = null;
@@ -616,6 +632,7 @@
                     name,
                     directDistKm,
                     walkingHours,
+                    wagonHours,
                     railwayDistKm,
                     railwayHours,
                     hasRailwayRoute,
@@ -700,6 +717,7 @@
 
             list.innerHTML = destinations.map(dest => {
                 const walkWidth = (dest.walkingHours / maxWalkHours) * 100;
+                const wagonWidth = (dest.wagonHours / maxWalkHours) * 100;
                 const railWidth = dest.hasRailwayRoute ? (dest.railwayHours / maxWalkHours) * 100 : 0;
                 const colors = getDistanceColor(dest.directDistKm, maxDist);
 
@@ -760,6 +778,11 @@
                                 <span class="time-value walking">${formatTime(dest.walkingHours)}</span>
                             </div>
                             <div class="time-bar-row">
+                                <span class="time-label">H&C</span>
+                                <div class="time-bar wagon" style="width: ${wagonWidth}%"></div>
+                                <span class="time-value wagon">${formatTime(dest.wagonHours)}</span>
+                            </div>
+                            <div class="time-bar-row">
                                 <span class="time-label">Rail</span>
                                 ${railwayBarHtml}
                                 ${railwayTimeHtml}
@@ -777,6 +800,7 @@
             const unreachable = destinations.filter(d => !d.hasRailwayRoute);
 
             const totalWalk = destinations.reduce((sum, d) => sum + d.walkingHours, 0);
+            const totalWagon = destinations.reduce((sum, d) => sum + d.wagonHours, 0);
             const totalRail = reachable.reduce((sum, d) => sum + d.railwayHours, 0);
             const totalSaved = reachable.reduce((sum, d) => sum + d.savedHours, 0);
             const count = destinations.length;
@@ -785,6 +809,7 @@
             document.getElementById('reachableCount').textContent = reachable.length;
             document.getElementById('unreachableCount').textContent = unreachable.length;
             document.getElementById('avgWalk').textContent = formatTime(totalWalk / count);
+            document.getElementById('avgWagon').textContent = formatTime(totalWagon / count);
 
             if (reachable.length > 0) {
                 document.getElementById('avgRail').textContent = formatTime(totalRail / reachable.length);
