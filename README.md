@@ -205,6 +205,33 @@ Compare how far you could travel by walking, wagon, or railway in the same amoun
 - Filters by year - only shows connections that existed by selected year
 - Railway reachability based on actual track routes, not straight-line distance
 
+### 8. Time-Distance Map
+
+Settlements reposition based on travel time rather than geography. Railways collapse connected settlements together while isolated ones stay far apart.
+
+**Features:**
+- Four transport modes: Geographic, Walking (5 km/h), Horse & Cart (10 km/h), Railway (40 km/h)
+- Stress-minimized layout for railway mode using iterative spring algorithm on ~1,811 connection pairs
+- Year slider (1882-1920) shows network evolution
+- Animated LERP transitions between modes with map opacity fading
+- Canvas overlay on Leaflet dark basemap
+- Hover tooltips with settlement name and railway info
+- Mode-specific color coding matching Journey Times visualization
+
+**Transport Mode Layouts:**
+| Mode | Layout | Color |
+|------|--------|-------|
+| Geographic | Real lat/lon positions, Leaflet map visible | Teal (#4ecca3) |
+| Walking | 1.5x radial expansion from centroid | Red (#e94560) |
+| Horse & Cart | 1.0x reference scale | Orange (#e09530) |
+| Railway | Stress-minimized: rail pairs collapse, isolated nodes at walking distance | Teal (#4ecca3) |
+
+**Technical Details:**
+- Iterative stress minimization: 300 iterations with decaying step size
+- Rail springs use `railway_distance_km / 40 * scale`, non-rail springs use `distance_km / 5 * scale`
+- Rail spring weight 1.0, non-rail weight 0.3, gentle centering force prevents drift
+- Railway layout recomputed on year change, cached otherwise
+
 ## Project Structure
 
 ```
@@ -218,6 +245,7 @@ Sask_Railway_Visualizations/
 ├── journey_times_simple.html  # Simpler journey times (earlier version)
 ├── travel_race.html           # Travelling time simulation (animated race)
 ├── isochrone.html             # Travel time comparison visualization
+├── time_distance.html         # Time-distance map visualization
 ├── data/
 │   ├── settlements.json              # 429 settlements with coordinates & railway info
 │   ├── settlement_connections.json   # Pre-calculated connections with railway distances

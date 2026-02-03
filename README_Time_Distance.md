@@ -61,15 +61,17 @@ container (flex)
 - Railway layout recomputed when year changes
 
 ### Visual Elements
-- **Connection lines**: Rail connections in teal (rgba), walking connections in faint gray
-- **Settlement dots**: Teal (#4ecca3) for rail-connected, gray (#666) for isolated
+- **Settlement dots**: Color-coded by transport mode — red (#e94560) for walking, orange (#e09530) for horse & cart, teal (#4ecca3) for geographic/railway. Isolated settlements always gray (#666).
+- **Connection lines**: Rail connections use the same mode color at low alpha, walking connections in faint gray
 - **Scale bar**: Bottom-left, shows "1 hour" at current mode's speed
-- **Hover labels**: Settlement name + travel info on mouseover
+- **Hover labels**: Settlement name + railway info on mouseover
+- **Legend**: Updates dynamically to match current mode color
 
 ### Controls
-- 4 mode buttons (Geographic, Walking, Horse & Cart, Railway)
+- 4 mode buttons in 2x2 grid, each color-coded to match its mode (teal, red, orange, teal)
 - Year slider (1882–1920) with play/reset — recomputes railway layout on change
 - Follows existing site styling (#1a1a2e, #e94560, #4ecca3)
+- Color scheme matches Journey Times visualization (walking=red, horse & cart=orange, railway=teal)
 
 ## Other File Changes
 
