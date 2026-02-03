@@ -116,7 +116,61 @@ Interactive network graph visualization showing all 429 Saskatchewan settlements
 - GTPR: Purple (#6c5ce7)
 - Other/No railway: Gray (#888)
 
-### 5. Travel Time Comparison (Isochrone)
+### 5. Journey Times (Network Routing)
+
+Compare walking, horse & cart, and railway travel times between any origin settlement and all other settlements. Railway times use actual track routes calculated via Dijkstra's algorithm.
+
+**Features:**
+- Select any settlement as origin
+- Year slider (1882-1920) shows how railway connections expanded
+- Three transport modes compared side by side with animated bars
+- Railway transfer tracking (shows which railways are used on each route)
+- Sort destinations by distance, name, or railway time
+- Play animation to watch network evolve year by year
+- Statistics panel with averages for all modes
+
+**Transport Modes:**
+| Mode | Speed | Method |
+|------|-------|--------|
+| Walking | 5 km/h | Straight-line (haversine) distance |
+| Horse & Cart | 10 km/h | Straight-line (haversine) distance |
+| Railway | 40 km/h | Actual track route via Dijkstra's algorithm |
+
+**Visual Elements:**
+- **Red bars**: Walking time
+- **Orange bars**: Horse & cart time
+- **Green bars**: Railway time
+- **Yellow text**: Railway transfers (e.g., CPR → CNoR)
+- Color-coded rows by distance (green=near, yellow=mid, red=far)
+- Time savings column shows how much faster rail is vs walking
+
+### 6. Travelling Time Simulation
+
+Watch animated tokens race between two settlements to see how railways transformed travel. A walker, horse & cart, and train travel simultaneously along their routes on an interactive map.
+
+**Features:**
+- Animated race with three tokens (walker, horse & cart, train)
+- Railway follows actual track geometry on the map
+- Adjustable animation speed (1x, 2x, 5x, 10x, 20x)
+- Progress bars and elapsed time for each mode
+- Click map markers to select origin/destination
+- Swap button to reverse route
+- Railway advantage comparison (e.g., "8.4x faster than walking")
+
+**Transport Modes:**
+| Mode | Speed | Route |
+|------|-------|-------|
+| Walking | 5 km/h | Straight line |
+| Horse & Cart | 10 km/h | Straight line |
+| Railway | 40 km/h | Actual track geometry |
+
+**Data Sources:**
+- `settlement_connections.json` - Settlement locations and railway years
+- `railway_tracks.json` - Track geometry with coordinates
+- `railway_network.json` - Network graph with edges
+- `settlement_network_mapping.json` - Settlement to network node mappings
+
+### 7. Travel Time Comparison (Isochrone)
 
 Compare how far you could travel by walking, wagon, or railway in the same amount of time. This visualization demonstrates how railways dramatically expanded the reachable world for Saskatchewan settlers.
 
@@ -160,6 +214,9 @@ Sask_Railway_Visualizations/
 ├── settlement_explorer.html   # Settlement explorer visualization
 ├── railway_timeline.html      # Railway network timeline
 ├── network_graph.html         # Network graph visualization
+├── journey_times.html         # Journey times comparison (network routing)
+├── journey_times_simple.html  # Simpler journey times (earlier version)
+├── travel_race.html           # Travelling time simulation (animated race)
 ├── isochrone.html             # Travel time comparison visualization
 ├── data/
 │   ├── settlements.json              # 429 settlements with coordinates & railway info
@@ -190,6 +247,7 @@ Sask_Railway_Visualizations/
 | `one_hour_corridor.json` | 12 | Settlements within 40 km of Saskatoon |
 | `railway_timeline.json` | 392 | Settlements organized by railway company |
 | `railway_network.json` | 424 nodes, 509 edges | Track network graph from GIS data |
+| `railway_tracks.json` | - | Track geometry with node-to-node coordinates for map rendering |
 | `settlement_network_mapping.json` | 429 | Settlement to network node mappings |
 
 ### Settlement Connections Data Structure
@@ -394,4 +452,4 @@ This project is for academic research purposes.
 ---
 
 *Created January 2026*
-*Last updated: January 30, 2026*
+*Last updated: February 3, 2026*
