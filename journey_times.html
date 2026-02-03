@@ -235,9 +235,10 @@
         .time-label {
             font-size: 10px;
             color: #888;
-            width: 45px;
+            width: 70px;
             text-align: right;
             margin-right: 8px;
+            white-space: nowrap;
         }
         .time-value {
             margin-left: 8px;
@@ -778,7 +779,7 @@
                                 <span class="time-value walking">${formatTime(dest.walkingHours)}</span>
                             </div>
                             <div class="time-bar-row">
-                                <span class="time-label">H&C</span>
+                                <span class="time-label">Horse & Cart</span>
                                 <div class="time-bar wagon" style="width: ${wagonWidth}%"></div>
                                 <span class="time-value wagon">${formatTime(dest.wagonHours)}</span>
                             </div>
