@@ -230,12 +230,12 @@
                     <button class="mode-btn" data-mode="railway">Railway (40 km/h)</button>
                 </div>
             </div>
-            <div class="control-group">
+            <div class="control-group" id="yearControls" style="display:none;">
                 <h3>Year</h3>
                 <div class="year-row">
                     <label>Year</label>
-                    <input type="range" id="yearSlider" min="1882" max="1920" value="1920">
-                    <span class="year-display" id="yearDisplay">1920</span>
+                    <input type="range" id="yearSlider" min="1880" max="1920" value="1880">
+                    <span class="year-display" id="yearDisplay">1880</span>
                 </div>
                 <div class="play-controls">
                     <button id="playBtn">Play</button>
@@ -273,7 +273,7 @@
                 </div>
             </div>
             <div class="explanation">
-                <strong>How it works:</strong> In geographic mode, settlements appear at their real map positions. Other modes reposition settlements so that on-screen distance represents travel time. Railway mode uses stress minimization to place rail-connected settlements closer together, showing how railways shrank perceived distances.
+                <strong>How it works:</strong> In geographic mode, settlements appear at their real map positions. Walking and horse modes expand the map to show travel time as distance. Railway mode keeps the geographic layout but contracts rail-connected settlements toward each other along visible railway lines, while off-rail settlements stay in place. Lines are colored by railway company.
             </div>
         </div>
     </div>
@@ -286,7 +286,7 @@
         let connections = [];
         let settlementsByName = {};
         let currentMode = 'geographic';
-        let currentYear = 1920;
+        let currentYear = 1880;
         let mapOpacity = 1.0;
         let targetMapOpacity = 1.0;
         let railwayLayoutDirty = true;
@@ -305,8 +305,8 @@
 
         // Map init
         const map = L.map('map', {
-            center: [51.2, -105.7],
-            zoom: 6,
+            center: [51.25, -105.5],
+            zoom: 7,
             zoomControl: false,
             dragging: false,
             scrollWheelZoom: false,
@@ -419,14 +419,14 @@
         }
 
         function computeWalkingPositions() {
-            // Radial 1.5x expansion from centroid
+            // Radial 1.2x expansion from centroid
             const cx = settlements.reduce((a, s) => a + s.geoX, 0) / settlements.length;
             const cy = settlements.reduce((a, s) => a + s.geoY, 0) / settlements.length;
             settlements.forEach(s => {
                 const dx = s.geoX - cx;
                 const dy = s.geoY - cy;
-                s.walkX = cx + dx * 1.5;
-                s.walkY = cy + dy * 1.5;
+                s.walkX = cx + dx * 1.2;
+                s.walkY = cy + dy * 1.2;
             });
         }
 
@@ -445,58 +445,63 @@
         function computeRailwayPositions() {
             if (!railwayLayoutDirty && railwayPositions) return;
 
-            // Scale: pixels per hour of travel
-            const w = canvas.width;
-            const h = canvas.height;
-            const scale = Math.min(w, h) / 25; // ~pixels per hour
-
-            // Initialize from geographic
+            // Initialize all positions from geographic
             const pos = settlements.map(s => ({ x: s.geoX, y: s.geoY }));
-            const cx = pos.reduce((a, p) => a + p.x, 0) / pos.length;
-            const cy = pos.reduce((a, p) => a + p.y, 0) / pos.length;
+
+            // Build index for fast lookups
+            const idxMap = new Map();
+            settlements.forEach((s, i) => idxMap.set(s, i));
+
+            // Identify rail-connected settlements (only those move)
+            const railSettlementSet = new Set();
+            const railConns = [];
+            for (const conn of connections) {
+                if (conn.hasRail && conn.railway_distance_km) {
+                    const iFrom = idxMap.get(conn.from);
+                    const iTo = idxMap.get(conn.to);
+                    railSettlementSet.add(iFrom);
+                    railSettlementSet.add(iTo);
+                    // Compression ratio: railway contracts distances
+                    const ratio = conn.railway_distance_km / (8 * conn.distance_km);
+                    railConns.push({ iFrom, iTo, ratio });
+                }
+            }
+
+            // Off-rail settlements stay at geographic positions (never moved)
+            // Only rail-connected settlements participate in stress minimization
 
             const iterations = 300;
             for (let iter = 0; iter < iterations; iter++) {
                 const t = iter / iterations;
-                const stepSize = 0.5 * (1 - t);
+                const stepSize = 0.4 * (1 - t);
 
-                for (let ci = 0; ci < connections.length; ci++) {
-                    const conn = connections[ci];
-                    const iFrom = settlements.indexOf(conn.from);
-                    const iTo = settlements.indexOf(conn.to);
-
-                    // Target distance in pixels (hours * scale)
-                    let targetDist;
-                    let weight;
-                    if (conn.hasRail && conn.railway_distance_km) {
-                        targetDist = (conn.railway_distance_km / 40) * scale;
-                        weight = 1.0;
-                    } else {
-                        targetDist = (conn.distance_km / 5) * scale;
-                        weight = 0.3;
-                    }
-
-                    const dx = pos[iTo].x - pos[iFrom].x;
-                    const dy = pos[iTo].y - pos[iFrom].y;
+                // Stress minimization: pull rail pairs toward compressed distances
+                for (const rc of railConns) {
+                    const dx = pos[rc.iTo].x - pos[rc.iFrom].x;
+                    const dy = pos[rc.iTo].y - pos[rc.iFrom].y;
                     const currentDist = Math.sqrt(dx * dx + dy * dy) || 0.001;
-                    const diff = (currentDist - targetDist) / currentDist;
-                    const moveX = dx * diff * stepSize * weight * 0.5;
-                    const moveY = dy * diff * stepSize * weight * 0.5;
 
-                    pos[iFrom].x += moveX;
-                    pos[iFrom].y += moveY;
-                    pos[iTo].x -= moveX;
-                    pos[iTo].y -= moveY;
+                    // Target distance = current geo distance * compression ratio
+                    const geoDx = settlements[rc.iTo].geoX - settlements[rc.iFrom].geoX;
+                    const geoDy = settlements[rc.iTo].geoY - settlements[rc.iFrom].geoY;
+                    const geoDist = Math.sqrt(geoDx * geoDx + geoDy * geoDy) || 0.001;
+                    const targetDist = geoDist * rc.ratio;
+
+                    const diff = (currentDist - targetDist) / currentDist;
+                    const moveX = dx * diff * stepSize * 0.5;
+                    const moveY = dy * diff * stepSize * 0.5;
+
+                    pos[rc.iFrom].x += moveX;
+                    pos[rc.iFrom].y += moveY;
+                    pos[rc.iTo].x -= moveX;
+                    pos[rc.iTo].y -= moveY;
                 }
 
-                // Gentle centering force
-                const curCx = pos.reduce((a, p) => a + p.x, 0) / pos.length;
-                const curCy = pos.reduce((a, p) => a + p.y, 0) / pos.length;
-                const offX = (cx - curCx) * 0.1;
-                const offY = (cy - curCy) * 0.1;
-                for (let i = 0; i < pos.length; i++) {
-                    pos[i].x += offX;
-                    pos[i].y += offY;
+                // Weak geo-anchoring force to preserve orientation
+                for (const idx of railSettlementSet) {
+                    const s = settlements[idx];
+                    pos[idx].x += (s.geoX - pos[idx].x) * 0.02;
+                    pos[idx].y += (s.geoY - pos[idx].y) * 0.02;
                 }
             }
 
@@ -528,12 +533,19 @@
                 targetMapOpacity = 0.0;
                 settlements.forEach(s => { s.targetX = s.horseX; s.targetY = s.horseY; });
             } else if (mode === 'railway') {
-                targetMapOpacity = 0.0;
+                targetMapOpacity = 0.25;
                 computeRailwayPositions();
                 settlements.forEach((s, i) => {
                     s.targetX = railwayPositions[i].x;
                     s.targetY = railwayPositions[i].y;
                 });
+            }
+            // Show year controls only in railway mode
+            const yearControls = document.getElementById('yearControls');
+            yearControls.style.display = mode === 'railway' ? '' : 'none';
+            if (mode === 'railway') {
+                // Force slider thumb to render at correct position after unhiding
+                yearSlider.value = currentYear;
             }
             updateStats();
             // Update legend colors
@@ -591,7 +603,7 @@
                 playInterval = null;
                 playBtn.textContent = 'Play';
             }
-            yearSlider.value = 1882;
+            yearSlider.value = 1880;
             yearSlider.dispatchEvent(new Event('input'));
         });
 
@@ -654,33 +666,76 @@
             ctx.fillStyle = `rgba(26, 26, 46, ${1 - mapOpacity})`;
             ctx.fillRect(0, 0, w, h);
 
+            // Railway company colors
+            const railwayColors = {
+                'CPR': '#e94560',
+                'CNoR': '#4ecca3',
+                'GTPR': '#f0c040',
+                'QLSRSC': '#a080e0',
+                'Other': '#6090d0'
+            };
+
             // Draw connection lines
+            const isRailMode = currentMode === 'railway';
             const lineColor = currentMode === 'walking' ? 'rgba(233, 69, 96, 0.15)' :
                               currentMode === 'horse' ? 'rgba(224, 149, 48, 0.15)' :
                               'rgba(78, 204, 163, 0.15)';
             for (const c of connections) {
                 if (c.hasRail) {
-                    ctx.strokeStyle = lineColor;
-                    ctx.lineWidth = 1;
+                    if (isRailMode) {
+                        const rc = railwayColors[c.shared_railway] || railwayColors['Other'];
+                        ctx.strokeStyle = rc;
+                        ctx.lineWidth = 2.5;
+                        ctx.globalAlpha = 0.7;
+                    } else {
+                        ctx.strokeStyle = lineColor;
+                        ctx.lineWidth = 1;
+                        ctx.globalAlpha = 1.0;
+                    }
                 } else {
+                    if (isRailMode) continue; // Hide non-rail connections in railway mode
                     ctx.strokeStyle = 'rgba(100, 100, 100, 0.06)';
                     ctx.lineWidth = 0.5;
+                    ctx.globalAlpha = 1.0;
                 }
                 ctx.beginPath();
                 ctx.moveTo(c.from.x, c.from.y);
                 ctx.lineTo(c.to.x, c.to.y);
                 ctx.stroke();
             }
+            ctx.globalAlpha = 1.0;
 
             // Draw settlement dots
             const modeColor = currentMode === 'walking' ? '#e94560' :
                               currentMode === 'horse' ? '#e09530' : '#4ecca3';
             for (const s of settlements) {
-                const r = s.hasRailway ? 3 : 2;
-                ctx.fillStyle = s.hasRailway ? modeColor : '#666';
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-                ctx.fill();
+                if (isRailMode) {
+                    if (s.hasRailway) {
+                        ctx.fillStyle = modeColor;
+                        const r = 3.5;
+                        ctx.beginPath();
+                        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        ctx.fillStyle = 'rgba(100, 100, 100, 0.25)';
+                        const r = 1.5;
+                        ctx.beginPath();
+                        ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                } else if (currentMode === 'geographic') {
+                    const r = s.hasRailway ? 3 : 2;
+                    ctx.fillStyle = s.hasRailway ? modeColor : '#666';
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Walking / horse: all settlements shown in mode color
+                    ctx.fillStyle = modeColor;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
 
             // Scale bar
@@ -693,11 +748,62 @@
         }
 
         function drawScaleBar() {
-            const speed = currentMode === 'geographic' ? null :
-                          currentMode === 'walking' ? 5 :
-                          currentMode === 'horse' ? 10 : 40;
-            if (!speed) return;
+            if (currentMode === 'geographic') return;
 
+            const x = 20;
+            const y = canvas.height - 30;
+
+            if (currentMode === 'railway') {
+                // Show contraction annotation with visual comparison
+                const fullLen = 80;
+                const contractedLen = fullLen / 8;
+
+                // Geographic distance line (dimmed)
+                ctx.strokeStyle = 'rgba(150, 150, 150, 0.4)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 3]);
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + fullLen, y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Contracted railway distance line (bright)
+                ctx.strokeStyle = '#4ecca3';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(x, y + 12);
+                ctx.lineTo(x + contractedLen, y + 12);
+                ctx.stroke();
+
+                // Dots at endpoints
+                ctx.fillStyle = 'rgba(150, 150, 150, 0.4)';
+                ctx.beginPath();
+                ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+                ctx.arc(x + fullLen, y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#4ecca3';
+                ctx.beginPath();
+                ctx.arc(x, y + 12, 2.5, 0, Math.PI * 2);
+                ctx.arc(x + contractedLen, y + 12, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Labels
+                ctx.fillStyle = 'rgba(150, 150, 150, 0.5)';
+                ctx.font = '10px Segoe UI, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('geographic', x + fullLen + 6, y + 4);
+                ctx.fillStyle = '#4ecca3';
+                ctx.fillText('by rail (8\u00d7 closer)', x + contractedLen + 6, y + 16);
+
+                ctx.fillStyle = '#aaa';
+                ctx.font = '10px Segoe UI, sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('40 km/h rail vs 5 km/h walking', x, y - 10);
+                return;
+            }
+
+            const speed = currentMode === 'walking' ? 5 : 10;
             const oneHourKm = speed;
             // Approximate scale: find average km-per-pixel from geo positions
             let totalGeoPixDist = 0;
@@ -719,16 +825,10 @@
 
             let barPx;
             if (currentMode === 'walking') {
-                barPx = oneHourKm / kmPerPx * 1.5; // walking scale factor
-            } else if (currentMode === 'horse') {
-                barPx = oneHourKm / kmPerPx * 1.0;
+                barPx = oneHourKm / kmPerPx * 1.2; // walking scale factor
             } else {
-                // Railway - use stress scale
-                barPx = Math.min(canvas.width, canvas.height) / 25;
+                barPx = oneHourKm / kmPerPx * 1.0;
             }
-
-            const x = 20;
-            const y = canvas.height - 30;
 
             ctx.strokeStyle = '#e94560';
             ctx.lineWidth = 2;
