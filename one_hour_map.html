@@ -128,6 +128,42 @@
         input[type="range"] {
             width: 100%;
             margin: 10px 0;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #4D4E53;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-track {
+            height: 6px;
+            background: #4D4E53;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-progress {
+            height: 6px;
+            background: #f1c730;
+            border-radius: 3px 0 0 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin-top: -5px;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
         }
         .stats {
             background: #252528;
@@ -817,10 +853,21 @@
             updateYear(1890);
         }
 
+        // Update slider track progress
+        function updateSliderTrack(slider) {
+            const min = parseInt(slider.min);
+            const max = parseInt(slider.max);
+            const val = parseInt(slider.value);
+            const percent = ((val - min) / (max - min)) * 100;
+            slider.style.background = `linear-gradient(to right, #f1c730 0%, #f1c730 ${percent}%, #4D4E53 ${percent}%, #4D4E53 100%)`;
+        }
+
         // Update visualization for selected year
         function updateYear(year) {
             document.getElementById('yearDisplay').textContent = year;
-            document.getElementById('yearSlider').value = year;
+            const slider = document.getElementById('yearSlider');
+            slider.value = year;
+            updateSliderTrack(slider);
 
             // Clear existing connection lines
             connectionLines.forEach(line => map.removeLayer(line));

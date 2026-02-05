@@ -13,41 +13,79 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
+            background: #000000;
             color: #eee;
         }
         .header {
-            background: #16213e;
+            background: #1a1a1e;
             padding: 20px;
             text-align: center;
-            border-bottom: 3px solid #e94560;
+            border-bottom: 3px solid #0b6a41;
         }
         .header h1 {
-            color: #e94560;
+            color: #ffffff;
             margin-bottom: 10px;
         }
         .header p {
-            color: #aaa;
+            color: #9A9B9D;
             max-width: 800px;
             margin: 0 auto;
         }
         .nav {
-            background: #0f3460;
+            background: #252528;
             padding: 10px;
             text-align: center;
+            position: relative;
         }
-        .nav a {
-            color: #e94560;
-            text-decoration: none;
-            margin: 0 15px;
-            padding: 5px 15px;
-            border: 1px solid #e94560;
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .nav-btn {
+            color: #f1c730;
+            background: transparent;
+            border: 1px solid #f1c730;
+            padding: 8px 20px;
             border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
             transition: all 0.3s;
         }
-        .nav a:hover {
-            background: #e94560;
+        .nav-btn:hover {
+            background: #f1c730;
+            color: #000;
+        }
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #252528;
+            border: 1px solid #f1c730;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .nav-menu.show {
+            display: block;
+        }
+        .nav-menu a {
+            display: block;
+            color: #f1c730;
+            text-decoration: none;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0b6a41;
             color: #fff;
+        }
+        .nav-menu a.current {
+            color: #0b6a41;
+            font-weight: bold;
         }
         .main-container {
             display: flex;
@@ -64,7 +102,7 @@
         }
         .sidebar {
             width: 280px;
-            background: #16213e;
+            background: #1a1a1e;
             padding: 15px;
             overflow-y: auto;
         }
@@ -78,7 +116,7 @@
             margin-bottom: 8px;
         }
         .year-row label {
-            color: #e94560;
+            color: #f1c730;
             font-size: 13px;
             font-weight: bold;
         }
@@ -89,12 +127,48 @@
         .year-display {
             font-size: 16px;
             font-weight: bold;
-            color: #e94560;
+            color: #f1c730;
             min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
             margin: 10px 0;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #4D4E53;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-track {
+            height: 6px;
+            background: #4D4E53;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-progress {
+            height: 6px;
+            background: #f1c730;
+            border-radius: 3px 0 0 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin-top: -5px;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
         }
         .play-controls {
             display: flex;
@@ -103,7 +177,7 @@
             margin-bottom: 8px;
         }
         .play-controls button {
-            background: #e94560;
+            background: #0b6a41;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -112,18 +186,18 @@
             font-size: 13px;
         }
         .play-controls button:hover {
-            background: #ff6b6b;
+            background: #0d8550;
         }
         .legend {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
         }
         .legend h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
-            border-bottom: 1px solid #e94560;
+            border-bottom: 1px solid #0b6a41;
             padding-bottom: 5px;
             font-size: 13px;
         }
@@ -138,7 +212,7 @@
             font-size: 12px;
         }
         .legend-item:hover {
-            background: #1a1a2e;
+            background: #000000;
         }
         .legend-item.inactive {
             opacity: 0.4;
@@ -152,21 +226,21 @@
         }
         .legend-count {
             margin-left: auto;
-            background: #1a1a2e;
+            background: #000000;
             padding: 2px 6px;
             border-radius: 10px;
             font-size: 11px;
         }
         .stats {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
         }
         .stats h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
-            border-bottom: 1px solid #e94560;
+            border-bottom: 1px solid #0b6a41;
             padding-bottom: 5px;
             font-size: 13px;
         }
@@ -174,14 +248,14 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
-            border-bottom: 1px solid #1a1a2e;
+            border-bottom: 1px solid #000000;
             font-size: 12px;
         }
         .chart-container {
             height: 150px;
-            background: #16213e;
+            background: #1a1a1e;
             padding: 10px 15px;
-            border-top: 1px solid #0f3460;
+            border-top: 1px solid #252528;
         }
         .chart {
             display: flex;
@@ -199,13 +273,13 @@
         }
         .chart-bar {
             width: 30px;
-            background: linear-gradient(to top, #e94560, #ff6b6b);
+            background: linear-gradient(to top, #0b6a41, #0d8550);
             border-radius: 3px 3px 0 0;
             transition: height 0.5s ease;
             position: relative;
         }
         .chart-bar.highlighted {
-            background: linear-gradient(to top, #4ecca3, #7fff00);
+            background: linear-gradient(to top, #f1c730, #ffdd55);
         }
         .chart-bar .count {
             position: absolute;
@@ -218,22 +292,22 @@
         .chart-label {
             margin-top: 3px;
             font-size: 10px;
-            color: #aaa;
+            color: #9A9B9D;
         }
         .info-box {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
         }
         .info-box h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
             font-size: 13px;
         }
         .info-box p {
             font-size: 11px;
-            color: #aaa;
+            color: #9A9B9D;
             line-height: 1.4;
         }
     </style>
@@ -244,15 +318,21 @@
         <p>Watch as different railway companies expanded across Saskatchewan from 1882 to 1920. Click on railway names in the legend to show/hide them.</p>
     </div>
     <div class="nav">
-        <a href="index.html">Home</a>
-        <a href="one_hour_map.html">Saskatoon Corridor</a>
-        <a href="settlement_explorer.html">Settlement Explorer</a>
-        <a href="railway_timeline.html">Railway Timeline</a>
-        <a href="network_graph.html">Network Graph</a>
-        <a href="isochrone.html">Travel Comparison</a>
-        <a href="travel_race.html">Time Simulation</a>
-        <a href="time_distance.html">Time-Distance</a>
-        <a href="transport_eras.html">Transport Eras</a>
+        <div class="nav-dropdown">
+            <button class="nav-btn" id="navBtn">Other Visualizations ▼</button>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="one_hour_map.html">Saskatoon Corridor</a>
+                <a href="settlement_explorer.html">Settlement Explorer</a>
+                <a href="railway_timeline.html" class="current">Railway Timeline</a>
+                <a href="network_graph.html">Network Graph</a>
+                <a href="isochrone.html">Travel Comparison</a>
+                <a href="journey_times.html">Journey Times</a>
+                <a href="travel_race.html">Time Simulation</a>
+                <a href="time_distance.html">Time-Distance</a>
+                <a href="transport_eras.html">Transport Eras</a>
+            </div>
+        </div>
     </div>
     <div class="main-container">
         <div class="map-container">
@@ -273,17 +353,17 @@
                 <div class="legend">
                     <h3>Railway Companies</h3>
                     <div class="legend-item" data-railway="CPR">
-                        <div class="legend-circle" style="background: #e94560;"></div>
+                        <div class="legend-circle" style="background: #c75d38;"></div>
                         <span>CPR (Canadian Pacific)</span>
                         <span class="legend-count" id="count-CPR">0</span>
                     </div>
                     <div class="legend-item" data-railway="QLSRSC">
-                        <div class="legend-circle" style="background: #4ecca3;"></div>
+                        <div class="legend-circle" style="background: #0b6a41;"></div>
                         <span>QLSRSC</span>
                         <span class="legend-count" id="count-QLSRSC">0</span>
                     </div>
                     <div class="legend-item" data-railway="CNoR">
-                        <div class="legend-circle" style="background: #ffd93d;"></div>
+                        <div class="legend-circle" style="background: #f1c730;"></div>
                         <span>CNoR (Canadian Northern)</span>
                         <span class="legend-count" id="count-CNoR">0</span>
                     </div>
@@ -293,7 +373,7 @@
                         <span class="legend-count" id="count-GTPR">0</span>
                     </div>
                     <div class="legend-item" data-railway="Other">
-                        <div class="legend-circle" style="background: #888;"></div>
+                        <div class="legend-circle" style="background: #9A9B9D;"></div>
                         <span>Other Railways</span>
                         <span class="legend-count" id="count-Other">0</span>
                     </div>
@@ -329,6 +409,15 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Nav dropdown toggle
+        document.getElementById('navBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('navMenu').classList.toggle('show');
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('navMenu').classList.remove('show');
+        });
+
         let data = null;
         let map = null;
         let markers = {};
@@ -337,11 +426,11 @@
         let playInterval = null;
 
         const railwayColors = {
-            CPR: '#e94560',
-            QLSRSC: '#4ecca3',
-            CNoR: '#ffd93d',
+            CPR: '#c75d38',
+            QLSRSC: '#0b6a41',
+            CNoR: '#f1c730',
             GTPR: '#6c5ce7',
-            Other: '#888'
+            Other: '#9A9B9D'
         };
 
         function initMap() {
@@ -425,9 +514,19 @@
             }
         }
 
+        function updateSliderTrack(slider) {
+            const min = parseInt(slider.min);
+            const max = parseInt(slider.max);
+            const val = parseInt(slider.value);
+            const percent = ((val - min) / (max - min)) * 100;
+            slider.style.background = `linear-gradient(to right, #f1c730 0%, #f1c730 ${percent}%, #4D4E53 ${percent}%, #4D4E53 100%)`;
+        }
+
         function updateYear(year) {
             document.getElementById('yearDisplay').textContent = year;
-            document.getElementById('yearSlider').value = year;
+            const slider = document.getElementById('yearSlider');
+            slider.value = year;
+            updateSliderTrack(slider);
 
             const counts = {CPR: 0, QLSRSC: 0, CNoR: 0, GTPR: 0, Other: 0};
             let totalWithRailway = 0;
