@@ -13,41 +13,79 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
+            background: #000000;
             color: #eee;
         }
         .header {
-            background: #16213e;
+            background: #1a1a1e;
             padding: 20px;
             text-align: center;
-            border-bottom: 3px solid #e94560;
+            border-bottom: 3px solid #0b6a41;
         }
         .header h1 {
-            color: #e94560;
+            color: #ffffff;
             margin-bottom: 10px;
         }
         .header p {
-            color: #aaa;
+            color: #9A9B9D;
             max-width: 800px;
             margin: 0 auto;
         }
         .nav {
-            background: #0f3460;
+            background: #252528;
             padding: 10px;
             text-align: center;
+            position: relative;
         }
-        .nav a {
-            color: #e94560;
-            text-decoration: none;
-            margin: 0 15px;
-            padding: 5px 15px;
-            border: 1px solid #e94560;
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .nav-btn {
+            color: #f1c730;
+            background: transparent;
+            border: 1px solid #f1c730;
+            padding: 8px 20px;
             border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
             transition: all 0.3s;
         }
-        .nav a:hover {
-            background: #e94560;
+        .nav-btn:hover {
+            background: #f1c730;
+            color: #000;
+        }
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #252528;
+            border: 1px solid #f1c730;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .nav-menu.show {
+            display: block;
+        }
+        .nav-menu a {
+            display: block;
+            color: #f1c730;
+            text-decoration: none;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0b6a41;
             color: #fff;
+        }
+        .nav-menu a.current {
+            color: #0b6a41;
+            font-weight: bold;
         }
         .container {
             display: flex;
@@ -59,18 +97,18 @@
         }
         .sidebar {
             width: 300px;
-            background: #16213e;
+            background: #1a1a1e;
             padding: 15px;
             overflow-y: auto;
         }
         .control-group {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-bottom: 10px;
         }
         .control-group h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
             font-size: 13px;
         }
@@ -78,8 +116,8 @@
             width: 100%;
             padding: 8px;
             border-radius: 4px;
-            border: 1px solid #0f3460;
-            background: #1a1a2e;
+            border: 1px solid #252528;
+            background: #000000;
             color: #eee;
             margin-bottom: 8px;
             font-size: 13px;
@@ -91,7 +129,7 @@
             margin-bottom: 8px;
         }
         .year-row label {
-            color: #e94560;
+            color: #f1c730;
             font-size: 13px;
             font-weight: bold;
         }
@@ -102,12 +140,48 @@
         .year-display {
             font-size: 16px;
             font-weight: bold;
-            color: #e94560;
+            color: #f1c730;
             min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
             margin: 10px 0;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #4D4E53;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-track {
+            height: 6px;
+            background: #4D4E53;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-progress {
+            height: 6px;
+            background: #f1c730;
+            border-radius: 3px 0 0 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin-top: -5px;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
         }
         .play-controls {
             display: flex;
@@ -116,7 +190,7 @@
             margin-bottom: 8px;
         }
         .play-controls button {
-            background: #e94560;
+            background: #0b6a41;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -125,7 +199,7 @@
             font-size: 13px;
         }
         .play-controls button:hover {
-            background: #ff6b6b;
+            background: #0d8550;
         }
         .time-selector {
             display: flex;
@@ -134,15 +208,15 @@
         }
         .time-btn {
             padding: 6px 12px;
-            border: 2px solid #e94560;
+            border: 2px solid #0b6a41;
             background: transparent;
-            color: #e94560;
+            color: #0b6a41;
             border-radius: 5px;
             cursor: pointer;
             font-size: 12px;
         }
         .time-btn.active {
-            background: #e94560;
+            background: #0b6a41;
             color: white;
         }
         .mode-toggles {
@@ -159,7 +233,7 @@
             transition: background 0.2s;
         }
         .mode-toggle:hover {
-            background: #1a1a2e;
+            background: #000000;
         }
         .mode-toggle input {
             margin-right: 8px;
@@ -172,10 +246,10 @@
         }
         .mode-toggle .details {
             font-size: 10px;
-            color: #888;
+            color: #9A9B9D;
         }
         .stats-box {
-            background: #1a1a2e;
+            background: #000000;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
@@ -184,24 +258,24 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
-            border-bottom: 1px solid #0f3460;
+            border-bottom: 1px solid #252528;
             font-size: 12px;
         }
         .stat-row:last-child {
             border-bottom: none;
         }
         .stat-value {
-            color: #4ecca3;
+            color: #f1c730;
             font-weight: bold;
         }
         .comparison {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
         }
         .comparison h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
             font-size: 13px;
         }
@@ -223,12 +297,12 @@
             margin-right: 8px;
         }
         .explanation {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             font-size: 11px;
             line-height: 1.5;
-            color: #aaa;
+            color: #9A9B9D;
             margin-top: 10px;
         }
     </style>
@@ -239,15 +313,21 @@
         <p>Compare how far you could travel in the same amount of time by different modes. Railways dramatically expanded the reachable world.</p>
     </div>
     <div class="nav">
-        <a href="index.html">Home</a>
-        <a href="one_hour_map.html">Saskatoon Corridor</a>
-        <a href="settlement_explorer.html">Settlement Explorer</a>
-        <a href="railway_timeline.html">Railway Timeline</a>
-        <a href="network_graph.html">Network Graph</a>
-        <a href="isochrone.html">Travel Comparison</a>
-        <a href="travel_race.html">Time Simulation</a>
-        <a href="time_distance.html">Time-Distance</a>
-        <a href="transport_eras.html">Transport Eras</a>
+        <div class="nav-dropdown">
+            <button class="nav-btn" id="navBtn">Other Visualizations ▼</button>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="one_hour_map.html">Saskatoon Corridor</a>
+                <a href="settlement_explorer.html">Settlement Explorer</a>
+                <a href="railway_timeline.html">Railway Timeline</a>
+                <a href="network_graph.html">Network Graph</a>
+                <a href="isochrone.html" class="current">Travel Comparison</a>
+                <a href="journey_times.html">Journey Times</a>
+                <a href="travel_race.html">Time Simulation</a>
+                <a href="time_distance.html">Time-Distance</a>
+                <a href="transport_eras.html">Transport Eras</a>
+            </div>
+        </div>
     </div>
     <div class="container">
         <div id="map"></div>
@@ -286,7 +366,7 @@
                 <div class="mode-toggles">
                     <label class="mode-toggle">
                         <input type="checkbox" id="showWalking" checked>
-                        <div class="color-box" style="background: #888;"></div>
+                        <div class="color-box" style="background: #9A9B9D;"></div>
                         <div>
                             <div style="font-size: 12px;">Walking</div>
                             <div class="details">5 km/h</div>
@@ -294,7 +374,7 @@
                     </label>
                     <label class="mode-toggle">
                         <input type="checkbox" id="showWagon" checked>
-                        <div class="color-box" style="background: #ffd93d;"></div>
+                        <div class="color-box" style="background: #f1c730;"></div>
                         <div>
                             <div style="font-size: 12px;">Horse & Wagon</div>
                             <div class="details">10 km/h</div>
@@ -302,7 +382,7 @@
                     </label>
                     <label class="mode-toggle">
                         <input type="checkbox" id="showRailway" checked>
-                        <div class="color-box" style="background: #4ecca3;"></div>
+                        <div class="color-box" style="background: #0b6a41;"></div>
                         <div>
                             <div style="font-size: 12px;">Railway</div>
                             <div class="details">40 km/h (actual route)</div>
@@ -315,17 +395,17 @@
                 <h3>DISTANCE IN <span id="timeLabel">1 HOUR</span></h3>
                 <div class="comparison-item">
                     <span class="comparison-value" id="walkValue">5 km</span>
-                    <div class="comparison-bar" id="walkBar" style="background: #888;"></div>
+                    <div class="comparison-bar" id="walkBar" style="background: #9A9B9D;"></div>
                     <span>Walking</span>
                 </div>
                 <div class="comparison-item">
                     <span class="comparison-value" id="wagonValue">10 km</span>
-                    <div class="comparison-bar" id="wagonBar" style="background: #ffd93d;"></div>
+                    <div class="comparison-bar" id="wagonBar" style="background: #f1c730;"></div>
                     <span>Wagon</span>
                 </div>
                 <div class="comparison-item">
                     <span class="comparison-value" id="railValue">40 km</span>
-                    <div class="comparison-bar" id="railBar" style="background: #4ecca3;"></div>
+                    <div class="comparison-bar" id="railBar" style="background: #0b6a41;"></div>
                     <span>Railway</span>
                 </div>
             </div>
@@ -350,8 +430,8 @@
             </div>
 
             <div class="explanation">
-                <strong>Circles</strong> show theoretical range for each travel speed.<br><br>
-                <strong>Railway reach</strong> (dashed circle) uses <em>actual track routes</em> to determine which settlements are reachable. Green markers appear only where railways were connected by the selected year.<br><br>
+                <strong>Circles</strong> show theoretical range for walking and wagon travel speeds.<br><br>
+                <strong>Railway reach</strong> uses <em>actual track routes</em> to determine which settlements are reachable. Green markers appear only where railways were connected by the selected year.<br><br>
                 Use the <strong>year slider</strong> to see how the railway network expanded travel possibilities over time.
             </div>
         </div>
@@ -359,6 +439,24 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Nav dropdown toggle
+        document.getElementById('navBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('navMenu').classList.toggle('show');
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('navMenu').classList.remove('show');
+        });
+
+        // Update slider track progress
+        function updateSliderTrack(slider) {
+            const min = parseInt(slider.min);
+            const max = parseInt(slider.max);
+            const val = parseInt(slider.value);
+            const percent = ((val - min) / (max - min)) * 100;
+            slider.style.background = `linear-gradient(to right, #f1c730 0%, #f1c730 ${percent}%, #4D4E53 ${percent}%, #4D4E53 100%)`;
+        }
+
         let data = null;
         let networkData = null;
         let mappingData = null;
@@ -592,22 +690,13 @@
             }
 
             // Draw circles (largest first so smaller ones are on top)
-            if (document.getElementById('showRailway').checked) {
-                circles.railway = L.circle([hub.lat, hub.lon], {
-                    radius: railDist * 1000,
-                    color: '#4ecca3',
-                    fillColor: '#4ecca3',
-                    fillOpacity: 0.1,
-                    weight: 3,
-                    dashArray: '10, 10'
-                }).addTo(map);
-            }
+            // Railway circle removed - actual railway reach depends on track routes, not straight-line distance
 
             if (document.getElementById('showWagon').checked) {
                 circles.wagon = L.circle([hub.lat, hub.lon], {
                     radius: wagonDist * 1000,
-                    color: '#ffd93d',
-                    fillColor: '#ffd93d',
+                    color: '#f1c730',
+                    fillColor: '#f1c730',
                     fillOpacity: 0.15,
                     weight: 3
                 }).addTo(map);
@@ -616,8 +705,8 @@
             if (document.getElementById('showWalking').checked) {
                 circles.walking = L.circle([hub.lat, hub.lon], {
                     radius: walkDist * 1000,
-                    color: '#888',
-                    fillColor: '#888',
+                    color: '#9A9B9D',
+                    fillColor: '#9A9B9D',
                     fillOpacity: 0.2,
                     weight: 3
                 }).addTo(map);
@@ -626,7 +715,7 @@
             // Add hub marker
             const hubIcon = L.divIcon({
                 className: 'hub-marker',
-                html: '<div style="background:#e94560; width:20px; height:20px; border-radius:50%; border:3px solid white;"></div>',
+                html: '<div style="background:#0b6a41; width:20px; height:20px; border-radius:50%; border:3px solid white;"></div>',
                 iconSize: [20, 20],
                 iconAnchor: [10, 10]
             });
@@ -663,19 +752,27 @@
                 let color, radius;
                 let popupText = `<b>${name}</b><br>Direct: ${directDist.toFixed(1)} km`;
 
-                if (inRailRange && showRailway) {
-                    // Reachable by railway - green, slightly larger marker
-                    color = '#4ecca3';
+                // Prioritize innermost circle for walking/wagon, but railway markers are separate
+                if (inWalkRange) {
+                    // Walking range (innermost) - grey
+                    color = '#9A9B9D';
+                    radius = 3;
+                } else if (inWagonRange) {
+                    // Wagon range only (not walking) - gold
+                    color = '#f1c730';
+                    radius = 3;
+                } else if (inRailRange && showRailway) {
+                    // Railway only (outside walking/wagon range) - green
+                    color = '#0b6a41';
                     radius = 4;
                     popupText += `<br>By rail: ${railwayDist.toFixed(1)} km`;
-                } else if (inWagonRange) {
-                    color = '#ffd93d';
-                    radius = 3;
-                } else if (inWalkRange) {
-                    color = '#888';
-                    radius = 3;
                 } else {
                     return;
+                }
+
+                // Add railway info to popup if reachable by rail
+                if (inRailRange && showRailway && !popupText.includes('By rail')) {
+                    popupText += `<br>By rail: ${railwayDist.toFixed(1)} km`;
                 }
 
                 const marker = L.circleMarker([s.lat, s.lon], {
@@ -737,6 +834,7 @@
         document.getElementById('yearSlider').addEventListener('input', (e) => {
             currentYear = parseInt(e.target.value);
             document.getElementById('yearDisplay').textContent = currentYear;
+            updateSliderTrack(e.target);
             lastYear = null; // Force recalculation
             updateVisualization();
         });
@@ -761,8 +859,10 @@
                         isPlaying = false;
                         return;
                     }
-                    document.getElementById('yearSlider').value = currentYear;
+                    const slider = document.getElementById('yearSlider');
+                    slider.value = currentYear;
                     document.getElementById('yearDisplay').textContent = currentYear;
+                    updateSliderTrack(slider);
                     lastYear = null; // Force recalculation
                     updateVisualization();
                 }, 500);
@@ -772,8 +872,10 @@
         function reset() {
             if (isPlaying) togglePlay();
             currentYear = 1882;
-            document.getElementById('yearSlider').value = currentYear;
+            const slider = document.getElementById('yearSlider');
+            slider.value = currentYear;
             document.getElementById('yearDisplay').textContent = currentYear;
+            updateSliderTrack(slider);
             lastYear = null; // Force recalculation
             updateVisualization();
         }
@@ -781,6 +883,7 @@
         // Initialize
         initMap();
         loadData();
+        updateSliderTrack(document.getElementById('yearSlider'));
     </script>
 </body>
 </html>
