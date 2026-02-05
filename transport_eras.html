@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transport Eras - Saskatchewan Railway Visualizations</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #3a3b3c;
+            color: #eee;
+        }
+        .header {
+            background: #0b6a41;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #f1c730;
+        }
+        .header h1 { color: #ffffff; margin-bottom: 10px; }
+        .header p { color: #D6D6D4; max-width: 800px; margin: 0 auto; }
+        .nav {
+            background: #4D4E53;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .nav-btn {
+            color: #f1c730;
+            background: transparent;
+            border: 1px solid #f1c730;
+            padding: 8px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .nav-btn:hover {
+            background: #f1c730;
+            color: #000;
+        }
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4D4E53;
+            border: 1px solid #f1c730;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .nav-menu.show {
+            display: block;
+        }
+        .nav-menu a {
+            display: block;
+            color: #f1c730;
+            text-decoration: none;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0b6a41;
+            color: #fff;
+        }
+        .nav-menu a.current {
+            color: #0b6a41;
+            font-weight: bold;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 160px);
+        }
+        .view-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        #map {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+        #overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .sidebar {
+            width: 300px;
+            background: #4D4E53;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .control-group {
+            background: #3a3b3c;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 12px;
+        }
+        .control-group h3 {
+            color: #f1c730;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .stage-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .stage-desc {
+            font-size: 12px;
+            color: #D6D6D4;
+            line-height: 1.4;
+        }
+        .slider-container {
+            margin: 15px 0;
+        }
+        #eraSlider {
+            width: 100%;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #9A9B9D;
+            margin-top: 5px;
+        }
+        .play-controls {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .play-controls button {
+            background: #0b6a41;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .play-controls button:hover {
+            background: #0d8550;
+        }
+        .legend {
+            margin-top: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 6px 0;
+            font-size: 11px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .legend-line {
+            width: 20px;
+            height: 3px;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .explanation {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(11, 106, 65, 0.15);
+            border-left: 3px solid #0b6a41;
+            border-radius: 3px;
+            font-size: 11px;
+            color: #D6D6D4;
+            line-height: 1.5;
+        }
+        .stats-box {
+            background: #2a2b2c;
+            padding: 10px 12px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid #4D4E53;
+            font-size: 12px;
+        }
+        .stat-row:last-child { border-bottom: none; }
+        .stat-value { color: #f1c730; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Transport Eras</h1>
+        <p>Scrub through four transport eras and watch settlements shift from geographic positions through walking, horse & cart, and railway time-distance layouts.</p>
+    </div>
+    <div class="nav">
+        <div class="nav-dropdown">
+            <button class="nav-btn" id="navBtn">Other Visualizations ▼</button>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="one_hour_map.html">Saskatoon Corridor</a>
+                <a href="settlement_explorer.html">Settlement Explorer</a>
+                <a href="railway_timeline.html">Railway Timeline</a>
+                <a href="network_graph.html">Network Graph</a>
+                <a href="isochrone.html">Travel Comparison</a>
+                <a href="journey_times.html">Journey Times</a>
+                <a href="travel_race.html">Time Simulation</a>
+                <a href="time_distance.html">Time-Distance</a>
+                <a href="transport_eras.html" class="current">Transport Eras</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="view-container" id="viewContainer">
+            <div id="map"></div>
+            <canvas id="overlay"></canvas>
+        </div>
+        <div class="sidebar">
+            <div class="control-group">
+                <h3>Current Era</h3>
+                <div class="stage-name" id="stageName">Geographic</div>
+                <div class="stage-desc" id="stageDesc">Settlements at their true map positions.</div>
+            </div>
+            <div class="control-group">
+                <h3>Era Slider</h3>
+                <div class="slider-container">
+                    <input type="range" id="eraSlider" min="0" max="100" value="0">
+                    <div class="slider-labels">
+                        <span>Geographic</span>
+                        <span>Walking</span>
+                        <span>Horse</span>
+                        <span>Railway</span>
+                    </div>
+                </div>
+                <div class="play-controls">
+                    <button id="playBtn">Play</button>
+                    <button id="resetBtn">Reset</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <h3>Legend</h3>
+                <div class="legend" id="legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #9A9B9D;"></div>
+                        <span>Geographic</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #c75d38;"></div>
+                        <span>Walking (5 km/h)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #f1c730;"></div>
+                        <span>Horse & Cart (10 km/h)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #0b6a41;"></div>
+                        <span>Railway (40 km/h)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <h3>Statistics</h3>
+                <div class="stats-box">
+                    <div class="stat-row"><span>Settlements</span><span class="stat-value" id="statTotal">429</span></div>
+                    <div class="stat-row"><span>Rail-connected (1920)</span><span class="stat-value" id="statRail">0</span></div>
+                    <div class="stat-row"><span>Current stage</span><span class="stat-value" id="statStage">0%</span></div>
+                </div>
+            </div>
+            <div class="explanation">
+                <strong>How it works:</strong> Drag the slider to transition through transport eras. Geographic shows true positions. Walking (5 km/h) and Horse & Cart (10 km/h) expand the map to show travel time as distance. Railway (40 km/h) contracts rail-connected settlements together, showing how trains shrank effective distances.
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    // Nav dropdown toggle
+    document.getElementById('navBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('navMenu').classList.toggle('show');
+    });
+    document.addEventListener('click', function() {
+        document.getElementById('navMenu').classList.remove('show');
+    });
+
+    (function() {
+        // State
+        let settlements = [];
+        let connections = [];
+        let settlementsByName = {};
+        let railwayPositions = null;
+        let isPlaying = false;
+        let playStartTime = null;
+        let playPauseUntil = null;
+        let sliderValue = 0;
+        let hoveredSettlement = null;
+
+        // Fixed year for railway calculations
+        const RAILWAY_YEAR = 1920;
+
+        // DOM
+        const viewContainer = document.getElementById('viewContainer');
+        const canvas = document.getElementById('overlay');
+        const ctx = canvas.getContext('2d');
+        const eraSlider = document.getElementById('eraSlider');
+        const playBtn = document.getElementById('playBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Map init
+        const map = L.map('map', {
+            center: [51.25, -105.5],
+            zoom: 7,
+            zoomControl: false,
+            dragging: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false,
+            boxZoom: false,
+            keyboard: false,
+            attributionControl: false
+        });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // Resize canvas
+        function resizeCanvas() {
+            const rect = viewContainer.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            map.invalidateSize();
+            recomputePositions();
+        });
+
+        // Load data
+        let railwayNetwork = null;
+        let settlementMapping = null;
+        let railConnections = []; // Actual railway connections from network graph
+
+        Promise.all([
+            fetch('data/settlement_connections.json').then(r => r.json()),
+            fetch('data/railway_network.json').then(r => r.json()),
+            fetch('data/settlement_network_mapping.json').then(r => r.json())
+        ]).then(([connData, networkData, mappingData]) => {
+            railwayNetwork = networkData;
+            settlementMapping = mappingData;
+            processData(connData);
+            buildRailwayConnections();
+            resizeCanvas();
+            recomputePositions();
+            // Reset slider to start
+            sliderValue = 0;
+            eraSlider.value = 0;
+            updateUI(0);
+            requestAnimationFrame(animate);
+        });
+
+        function processData(data) {
+            const settData = data.settlements;
+            const connData = data.connections;
+
+            // Build settlements array
+            Object.keys(settData).forEach(name => {
+                const s = settData[name];
+                const obj = {
+                    name: name,
+                    lat: s.lat,
+                    lon: s.lon,
+                    railwayArrives: s.railway_arrives || null,
+                    firstRailway: s.first_railway || null,
+                    hasRailway: false,
+                    networkNode: null,
+                    geoX: 0, geoY: 0,
+                    walkX: 0, walkY: 0,
+                    horseX: 0, horseY: 0,
+                    railX: 0, railY: 0,
+                    x: 0, y: 0
+                };
+                obj.hasRailway = obj.railwayArrives !== null && obj.railwayArrives <= RAILWAY_YEAR;
+                settlements.push(obj);
+                settlementsByName[name] = obj;
+            });
+
+            // Build geographic connections (for walking/horse modes)
+            const seen = new Set();
+            for (const fromName of Object.keys(connData)) {
+                for (const entry of connData[fromName]) {
+                    const toName = entry.to;
+                    const key = [fromName, toName].sort().join('|');
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    const fromS = settlementsByName[fromName];
+                    const toS = settlementsByName[toName];
+                    if (!fromS || !toS) continue;
+                    connections.push({
+                        from: fromS,
+                        to: toS,
+                        distance_km: entry.distance_km,
+                        isGeoConnection: true
+                    });
+                }
+            }
+
+            // Update stats
+            document.getElementById('statTotal').textContent = settlements.length;
+            document.getElementById('statRail').textContent = settlements.filter(s => s.hasRailway).length;
+        }
+
+        function buildRailwayConnections() {
+            // Map settlements to network nodes
+            for (const m of settlementMapping.mappings) {
+                if (settlementsByName[m.settlement]) {
+                    settlementsByName[m.settlement].networkNode = m.snap_node;
+                }
+            }
+
+            // Build adjacency list from railway network
+            // Include ALL edges - we trust settlement railway_arrives dates for filtering
+            const adj = new Map();
+            for (const edge of railwayNetwork.edges) {
+                if (!adj.has(edge.source)) adj.set(edge.source, []);
+                if (!adj.has(edge.target)) adj.set(edge.target, []);
+                adj.get(edge.source).push({ node: edge.target, railway: edge.builder_name, year: edge.built_year });
+                adj.get(edge.target).push({ node: edge.source, railway: edge.builder_name, year: edge.built_year });
+            }
+
+            // Map nodes to settlements
+            const nodeToSettlement = new Map();
+            for (const s of settlements) {
+                if (s.networkNode && s.hasRailway) {
+                    nodeToSettlement.set(s.networkNode, s);
+                }
+            }
+
+            // For each rail-connected settlement, find nearest neighbors along each rail branch
+            const railConnSeen = new Set();
+            for (const startSettlement of settlements) {
+                if (!startSettlement.hasRailway || !startSettlement.networkNode) continue;
+
+                // BFS but stop when we hit another settlement on each branch
+                const visited = new Set([startSettlement.networkNode]);
+                const queue = [{ node: startSettlement.networkNode, railway: startSettlement.firstRailway }];
+
+                while (queue.length > 0) {
+                    const { node, railway } = queue.shift();
+                    const neighbors = adj.get(node) || [];
+
+                    for (const { node: nextNode, railway: edgeRailway, year } of neighbors) {
+                        if (visited.has(nextNode)) continue;
+                        visited.add(nextNode);
+
+                        // Check if this node has a settlement
+                        const targetSettlement = nodeToSettlement.get(nextNode);
+                        if (targetSettlement && targetSettlement !== startSettlement) {
+                            // Found a settlement - add connection but DON'T continue past it
+                            const key = [startSettlement.name, targetSettlement.name].sort().join('|');
+                            if (!railConnSeen.has(key)) {
+                                railConnSeen.add(key);
+                                railConnections.push({
+                                    from: startSettlement,
+                                    to: targetSettlement,
+                                    railway: edgeRailway,
+                                    hasRail: true
+                                });
+                            }
+                            // Don't add to queue - stop at this settlement
+                        } else {
+                            // No settlement here - continue BFS
+                            queue.push({ node: nextNode, railway: edgeRailway });
+                        }
+                    }
+                }
+            }
+
+            console.log(`Built ${railConnections.length} railway connections from network graph`);
+        }
+
+        function recomputePositions() {
+            // Geographic positions from map projection
+            settlements.forEach(s => {
+                const pt = map.latLngToContainerPoint([s.lat, s.lon]);
+                s.geoX = pt.x;
+                s.geoY = pt.y;
+            });
+
+            // Centroid for radial scaling
+            const cx = settlements.reduce((a, s) => a + s.geoX, 0) / settlements.length;
+            const cy = settlements.reduce((a, s) => a + s.geoY, 0) / settlements.length;
+
+            // Walking: 1.2x radial expansion
+            settlements.forEach(s => {
+                const dx = s.geoX - cx;
+                const dy = s.geoY - cy;
+                s.walkX = cx + dx * 1.2;
+                s.walkY = cy + dy * 1.2;
+            });
+
+            // Horse: 1.0x (same as geographic scale)
+            settlements.forEach(s => {
+                const dx = s.geoX - cx;
+                const dy = s.geoY - cy;
+                s.horseX = cx + dx * 1.0;
+                s.horseY = cy + dy * 1.0;
+            });
+
+            // Railway: stress-minimized positions
+            computeRailwayPositions();
+
+        }
+
+        function computeRailwayPositions() {
+            const pos = settlements.map(s => ({ x: s.geoX, y: s.geoY }));
+            const idxMap = new Map();
+            settlements.forEach((s, i) => idxMap.set(s, i));
+
+            const railSettlementSet = new Set();
+            const railConns = [];
+
+            // Use actual railway connections from network graph
+            for (const conn of railConnections) {
+                const iFrom = idxMap.get(conn.from);
+                const iTo = idxMap.get(conn.to);
+                if (iFrom === undefined || iTo === undefined) continue;
+                railSettlementSet.add(iFrom);
+                railSettlementSet.add(iTo);
+                // Railway travel is ~8x faster than walking, so compress to 1/8 distance
+                railConns.push({ iFrom, iTo, ratio: 1/8 });
+            }
+
+            const iterations = 300;
+            for (let iter = 0; iter < iterations; iter++) {
+                const t = iter / iterations;
+                const stepSize = 0.4 * (1 - t);
+
+                for (const rc of railConns) {
+                    const dx = pos[rc.iTo].x - pos[rc.iFrom].x;
+                    const dy = pos[rc.iTo].y - pos[rc.iFrom].y;
+                    const currentDist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+
+                    const geoDx = settlements[rc.iTo].geoX - settlements[rc.iFrom].geoX;
+                    const geoDy = settlements[rc.iTo].geoY - settlements[rc.iFrom].geoY;
+                    const geoDist = Math.sqrt(geoDx * geoDx + geoDy * geoDy) || 0.001;
+                    const targetDist = geoDist * rc.ratio;
+
+                    const diff = (currentDist - targetDist) / currentDist;
+                    const moveX = dx * diff * stepSize * 0.5;
+                    const moveY = dy * diff * stepSize * 0.5;
+
+                    pos[rc.iFrom].x += moveX;
+                    pos[rc.iFrom].y += moveY;
+                    pos[rc.iTo].x -= moveX;
+                    pos[rc.iTo].y -= moveY;
+                }
+
+                for (const idx of railSettlementSet) {
+                    const s = settlements[idx];
+                    pos[idx].x += (s.geoX - pos[idx].x) * 0.02;
+                    pos[idx].y += (s.geoY - pos[idx].y) * 0.02;
+                }
+            }
+
+            settlements.forEach((s, i) => {
+                s.railX = pos[i].x;
+                s.railY = pos[i].y;
+            });
+        }
+
+        // Interpolation helpers
+        function lerp(a, b, t) {
+            return a + (b - a) * t;
+        }
+
+        function lerpColor(c1, c2, t) {
+            // c1, c2 are [r,g,b] arrays
+            return [
+                Math.round(lerp(c1[0], c2[0], t)),
+                Math.round(lerp(c1[1], c2[1], t)),
+                Math.round(lerp(c1[2], c2[2], t))
+            ];
+        }
+
+        function rgbToStr(rgb) {
+            return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+        }
+
+        // Color definitions (USask palette)
+        const COLOR_GEO = [154, 155, 157];   // #9A9B9D Cool Grey 7
+        const COLOR_WALK = [199, 93, 56];    // #c75d38 warm rust
+        const COLOR_HORSE = [241, 199, 48];  // #f1c730 USask Gold
+        const COLOR_RAIL = [11, 106, 65];    // #0b6a41 USask Green
+
+        // Get stage info from slider value
+        function getStageInfo(val) {
+            if (val <= 25) {
+                return {
+                    stage: 'geographic',
+                    name: 'Geographic',
+                    desc: 'Settlements at their true map positions.',
+                    localT: val / 25,
+                    fromStage: 'geographic',
+                    toStage: 'walking'
+                };
+            } else if (val <= 50) {
+                return {
+                    stage: 'walking',
+                    name: 'Walking (5 km/h)',
+                    desc: 'Map expanded to show travel time. At walking pace, everywhere is far apart.',
+                    localT: (val - 25) / 25,
+                    fromStage: 'walking',
+                    toStage: 'horse'
+                };
+            } else if (val <= 75) {
+                return {
+                    stage: 'horse',
+                    name: 'Horse & Cart (10 km/h)',
+                    desc: 'Faster travel contracts the map slightly. Distances are halved compared to walking.',
+                    localT: (val - 50) / 25,
+                    fromStage: 'horse',
+                    toStage: 'railway'
+                };
+            } else {
+                return {
+                    stage: 'railway',
+                    name: 'Railway (40 km/h)',
+                    desc: 'Settlements connected by rail collapse together, showing how trains shrank distances.',
+                    localT: (val - 75) / 25,
+                    fromStage: 'railway',
+                    toStage: 'railway'
+                };
+            }
+        }
+
+        function getPositionForStage(s, stage) {
+            switch(stage) {
+                case 'geographic': return { x: s.geoX, y: s.geoY };
+                case 'walking': return { x: s.walkX, y: s.walkY };
+                case 'horse': return { x: s.horseX, y: s.horseY };
+                case 'railway': return { x: s.railX, y: s.railY };
+            }
+        }
+
+        function getColorForStage(stage) {
+            switch(stage) {
+                case 'geographic': return COLOR_GEO;
+                case 'walking': return COLOR_WALK;
+                case 'horse': return COLOR_HORSE;
+                case 'railway': return COLOR_RAIL;
+            }
+        }
+
+        function getMapOpacity(val) {
+            if (val <= 25) {
+                // Geographic: map visible
+                return 1.0;
+            } else if (val <= 30) {
+                // Quick fade out entering walking
+                return lerp(1.0, 0.0, (val - 25) / 5);
+            } else {
+                // Walking, horse, railway: map hidden
+                return 0.0;
+            }
+        }
+
+        // Update UI based on slider
+        function updateUI(val) {
+            const info = getStageInfo(val);
+            document.getElementById('stageName').textContent = info.name;
+            document.getElementById('stageName').style.color = rgbToStr(getColorForStage(info.stage));
+            document.getElementById('stageDesc').textContent = info.desc;
+            document.getElementById('statStage').textContent = Math.round(val) + '%';
+        }
+
+        // Slider input
+        eraSlider.addEventListener('input', () => {
+            sliderValue = parseFloat(eraSlider.value);
+            updateUI(sliderValue);
+        });
+
+        // Play/pause
+        const SLIDER_INCREMENT = 0.08; // Fixed increment per frame (~20 sec for full animation at 60fps)
+
+        playBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                isPlaying = false;
+                playBtn.textContent = 'Play';
+            } else {
+                isPlaying = true;
+                playBtn.textContent = 'Pause';
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            isPlaying = false;
+            playBtn.textContent = 'Play';
+            sliderValue = 0;
+            eraSlider.value = 0;
+            updateUI(0);
+        });
+
+        // Animation loop
+        function animate(timestamp) {
+            // Handle auto-play
+            if (isPlaying) {
+                sliderValue = Math.min(100, sliderValue + SLIDER_INCREMENT);
+                eraSlider.value = sliderValue;
+                updateUI(sliderValue);
+
+                if (sliderValue >= 100) {
+                    isPlaying = false;
+                    playBtn.textContent = 'Play';
+                }
+            }
+
+            // Calculate positions and colors based on slider
+            const info = getStageInfo(sliderValue);
+
+            // Determine interpolation between stages
+            let posT = 0;
+            let colorT = 0;
+            let fromColor, toColor;
+
+            if (sliderValue <= 25) {
+                // Geographic stage - stay at geo positions
+                posT = 0;
+                fromColor = COLOR_GEO;
+                toColor = COLOR_GEO;
+                settlements.forEach(s => {
+                    s.x = s.geoX;
+                    s.y = s.geoY;
+                });
+            } else if (sliderValue <= 50) {
+                // Interpolate geo -> walk positions, color geo -> walk
+                const t = (sliderValue - 25) / 25;
+                fromColor = COLOR_GEO;
+                toColor = COLOR_WALK;
+                colorT = Math.min(1, (sliderValue - 25) / 5); // Fast color transition over 5 units
+                settlements.forEach(s => {
+                    s.x = lerp(s.geoX, s.walkX, t);
+                    s.y = lerp(s.geoY, s.walkY, t);
+                });
+            } else if (sliderValue <= 75) {
+                // Interpolate walk -> horse positions, color walk -> horse
+                const t = (sliderValue - 50) / 25;
+                fromColor = COLOR_WALK;
+                toColor = COLOR_HORSE;
+                colorT = Math.min(1, (sliderValue - 50) / 5); // Fast color transition over 5 units
+                settlements.forEach(s => {
+                    s.x = lerp(s.walkX, s.horseX, t);
+                    s.y = lerp(s.walkY, s.horseY, t);
+                });
+            } else {
+                // Interpolate horse -> rail positions, color horse -> rail
+                const t = (sliderValue - 75) / 25;
+                fromColor = COLOR_HORSE;
+                toColor = COLOR_RAIL;
+                colorT = Math.min(1, (sliderValue - 75) / 5); // Fast color transition over 5 units
+                settlements.forEach(s => {
+                    s.x = lerp(s.horseX, s.railX, t);
+                    s.y = lerp(s.horseY, s.railY, t);
+                });
+            }
+
+            const currentColor = lerpColor(fromColor, toColor, colorT);
+            const mapOpacity = getMapOpacity(sliderValue);
+            document.getElementById('map').style.opacity = mapOpacity;
+
+            // Draw
+            draw(currentColor, info.stage, sliderValue);
+            requestAnimationFrame(animate);
+        }
+
+        function draw(modeColor, stage, val) {
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const mapOpacity = getMapOpacity(val);
+
+            // Dark background matching CartoDB dark tiles - fully opaque when not in geographic
+            const bgAlpha = val <= 25 ? 0 : 1;
+            ctx.fillStyle = `rgba(13, 13, 13, ${bgAlpha})`;
+            ctx.fillRect(0, 0, w, h);
+
+            // Railway company colors (unused but kept for reference)
+            const railwayColors = {
+                'CPR': '#c75d38',
+                'CNoR': '#0b6a41',
+                'GTPR': '#f1c730',
+                'QLSRSC': '#9A9B9D',
+                'Other': '#4D4E53'
+            };
+
+            const isRailStage = stage === 'railway';
+            const railTransition = val > 75 ? (val - 75) / 25 : 0;
+
+            // No connection lines - just show settlement positions
+
+            // Draw settlements
+            const dotColorStr = rgbToStr(modeColor);
+            for (const s of settlements) {
+                ctx.fillStyle = dotColorStr;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Hover tooltip
+            if (hoveredSettlement) {
+                drawTooltip(hoveredSettlement);
+            }
+        }
+
+        function drawTooltip(s) {
+            const text = s.name;
+            const railInfo = s.hasRailway ?
+                'Railway: ' + s.firstRailway + ' (' + s.railwayArrives + ')' :
+                'No railway by 1920';
+
+            ctx.font = 'bold 12px Segoe UI, sans-serif';
+            const w1 = ctx.measureText(text).width;
+            ctx.font = '10px Segoe UI, sans-serif';
+            const w2 = ctx.measureText(railInfo).width;
+            const boxW = Math.max(w1, w2) + 16;
+            const boxH = 38;
+            const bx = Math.min(s.x + 12, canvas.width - boxW - 10);
+            const by = Math.max(s.y - boxH - 5, 10);
+
+            ctx.fillStyle = 'rgba(77, 78, 83, 0.95)';
+            ctx.strokeStyle = '#f1c730';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.roundRect(bx, by, boxW, boxH, 4);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px Segoe UI, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(text, bx + 8, by + 15);
+            ctx.fillStyle = s.hasRailway ? '#0b6a41' : '#9A9B9D';
+            ctx.font = '10px Segoe UI, sans-serif';
+            ctx.fillText(railInfo, bx + 8, by + 30);
+        }
+
+        // Hover detection
+        canvas.style.pointerEvents = 'auto';
+        viewContainer.addEventListener('mousemove', (e) => {
+            const rect = viewContainer.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            let closest = null;
+            let closestDist = 20;
+            for (const s of settlements) {
+                const d = Math.sqrt((s.x - mx) ** 2 + (s.y - my) ** 2);
+                if (d < closestDist) {
+                    closestDist = d;
+                    closest = s;
+                }
+            }
+            hoveredSettlement = closest;
+        });
+        viewContainer.addEventListener('mouseleave', () => {
+            hoveredSettlement = null;
+        });
+    })();
+    </script>
+</body>
+</html>
