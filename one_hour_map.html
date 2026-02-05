@@ -13,41 +13,79 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
+            background: #000000;
             color: #eee;
         }
         .header {
-            background: #16213e;
+            background: #1a1a1e;
             padding: 20px;
             text-align: center;
-            border-bottom: 3px solid #e94560;
+            border-bottom: 3px solid #0b6a41;
         }
         .header h1 {
-            color: #e94560;
+            color: #ffffff;
             margin-bottom: 10px;
         }
         .header p {
-            color: #aaa;
+            color: #9A9B9D;
             max-width: 800px;
             margin: 0 auto;
         }
         .nav {
-            background: #0f3460;
+            background: #252528;
             padding: 10px;
             text-align: center;
+            position: relative;
         }
-        .nav a {
-            color: #e94560;
-            text-decoration: none;
-            margin: 0 15px;
-            padding: 5px 15px;
-            border: 1px solid #e94560;
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .nav-btn {
+            color: #f1c730;
+            background: transparent;
+            border: 1px solid #f1c730;
+            padding: 8px 20px;
             border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
             transition: all 0.3s;
         }
-        .nav a:hover {
-            background: #e94560;
+        .nav-btn:hover {
+            background: #f1c730;
+            color: #000;
+        }
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #252528;
+            border: 1px solid #f1c730;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .nav-menu.show {
+            display: block;
+        }
+        .nav-menu a {
+            display: block;
+            color: #f1c730;
+            text-decoration: none;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0b6a41;
             color: #fff;
+        }
+        .nav-menu a.current {
+            color: #0b6a41;
+            font-weight: bold;
         }
         .container {
             display: flex;
@@ -59,7 +97,7 @@
         }
         .sidebar {
             width: 320px;
-            background: #16213e;
+            background: #1a1a1e;
             padding: 20px;
             overflow-y: auto;
         }
@@ -73,7 +111,7 @@
             margin-bottom: 8px;
         }
         .year-row label {
-            color: #e94560;
+            color: #f1c730;
             font-size: 13px;
             font-weight: bold;
         }
@@ -84,7 +122,7 @@
         .year-display {
             font-size: 16px;
             font-weight: bold;
-            color: #e94560;
+            color: #f1c730;
             min-width: 35px;
         }
         input[type="range"] {
@@ -92,15 +130,15 @@
             margin: 10px 0;
         }
         .stats {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
         }
         .stats h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
-            border-bottom: 1px solid #e94560;
+            border-bottom: 1px solid #0b6a41;
             padding-bottom: 5px;
             font-size: 13px;
         }
@@ -108,23 +146,23 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
-            border-bottom: 1px solid #1a1a2e;
+            border-bottom: 1px solid #000000;
             font-size: 12px;
         }
         .settlement-list {
             margin-top: 10px;
         }
         .settlement-list h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
             font-size: 13px;
         }
         .settlement-item {
-            background: #0f3460;
+            background: #252528;
             padding: 8px;
             margin: 4px 0;
             border-radius: 3px;
-            border-left: 3px solid #e94560;
+            border-left: 3px solid #0b6a41;
         }
         .settlement-item .name {
             font-weight: bold;
@@ -136,13 +174,13 @@
             margin-top: 3px;
         }
         .legend {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
         }
         .legend h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
             font-size: 13px;
         }
@@ -165,7 +203,7 @@
             margin-bottom: 8px;
         }
         .play-controls button {
-            background: #e94560;
+            background: #0b6a41;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -174,7 +212,7 @@
             font-size: 13px;
         }
         .play-controls button:hover {
-            background: #ff6b6b;
+            background: #0d8550;
         }
     </style>
 </head>
@@ -184,15 +222,21 @@
         <p>Explore which settlements could be reached from Saskatoon within one hour by train (40 km at 40 km/h average speed) as the railway network expanded from 1890 to 1920.</p>
     </div>
     <div class="nav">
-        <a href="index.html">Home</a>
-        <a href="one_hour_map.html">Saskatoon Corridor</a>
-        <a href="settlement_explorer.html">Settlement Explorer</a>
-        <a href="railway_timeline.html">Railway Timeline</a>
-        <a href="network_graph.html">Network Graph</a>
-        <a href="isochrone.html">Travel Comparison</a>
-        <a href="travel_race.html">Time Simulation</a>
-        <a href="time_distance.html">Time-Distance</a>
-        <a href="transport_eras.html">Transport Eras</a>
+        <div class="nav-dropdown">
+            <button class="nav-btn" id="navBtn">Other Visualizations ▼</button>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="one_hour_map.html" class="current">Saskatoon Corridor</a>
+                <a href="settlement_explorer.html">Settlement Explorer</a>
+                <a href="railway_timeline.html">Railway Timeline</a>
+                <a href="network_graph.html">Network Graph</a>
+                <a href="isochrone.html">Travel Comparison</a>
+                <a href="journey_times.html">Journey Times</a>
+                <a href="travel_race.html">Time Simulation</a>
+                <a href="time_distance.html">Time-Distance</a>
+                <a href="transport_eras.html">Transport Eras</a>
+            </div>
+        </div>
     </div>
     <div class="container">
         <div id="map"></div>
@@ -224,23 +268,23 @@
             <div class="legend">
                 <h3>Legend</h3>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #e94560;"></div>
+                    <div class="legend-circle" style="background: #0b6a41;"></div>
                     <span>Saskatoon</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #4ecca3;"></div>
+                    <div class="legend-circle" style="background: #f1c730;"></div>
                     <span>Connected Settlement</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #666; opacity: 0.5;"></div>
+                    <div class="legend-circle" style="background: #9A9B9D; opacity: 0.5;"></div>
                     <span>Not Yet Connected</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: transparent; border: 2px dashed #e94560;"></div>
+                    <div class="legend-circle" style="background: transparent; border: 2px dashed #0b6a41;"></div>
                     <span>40 km Radius (1 hour)</span>
                 </div>
                 <div class="legend-item">
-                    <div style="width: 20px; height: 3px; background: #4ecca3; margin-right: 10px;"></div>
+                    <div style="width: 20px; height: 3px; background: #f1c730; margin-right: 10px;"></div>
                     <span>Railway Route</span>
                 </div>
             </div>
@@ -254,6 +298,15 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Nav dropdown toggle
+        document.getElementById('navBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('navMenu').classList.toggle('show');
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('navMenu').classList.remove('show');
+        });
+
         let data = null;
         let trackData = null;         // Railway track geometry
         let networkData = null;       // Railway network (nodes/edges)
@@ -714,7 +767,7 @@
             // Add Saskatoon marker
             const saskatoonIcon = L.divIcon({
                 className: 'custom-marker',
-                html: '<div style="background:#e94560; width:20px; height:20px; border-radius:50%; border:3px solid white;"></div>',
+                html: '<div style="background:#0b6a41; width:20px; height:20px; border-radius:50%; border:3px solid white;"></div>',
                 iconSize: [20, 20],
                 iconAnchor: [10, 10]
             });
@@ -726,8 +779,8 @@
             // Add 40km radius circle
             radiusCircle = L.circle([data.saskatoon.lat, data.saskatoon.lon], {
                 radius: 40000,
-                color: '#e94560',
-                fillColor: '#e94560',
+                color: '#0b6a41',
+                fillColor: '#0b6a41',
                 fillOpacity: 0.1,
                 dashArray: '10, 10',
                 weight: 2
@@ -737,7 +790,7 @@
             data.settlements.forEach(s => {
                 const marker = L.circleMarker([s.lat, s.lon], {
                     radius: 8,
-                    fillColor: '#666',
+                    fillColor: '#9A9B9D',
                     color: '#fff',
                     weight: 1,
                     opacity: 0.5,
@@ -786,25 +839,25 @@
                     connectedCount++;
                     connectedSettlements.push(s);
                     m.marker.setStyle({
-                        fillColor: '#4ecca3',
+                        fillColor: '#f1c730',
                         opacity: 1,
                         fillOpacity: 0.9
                     });
 
                     // Draw railway connection line (clipped to 40km)
-                    let line = drawRailwayConnection(s.name, '#4ecca3', 3, 0.7);
+                    let line = drawRailwayConnection(s.name, '#f1c730', 3, 0.7);
                     if (!line) {
                         // Fallback to straight line if railway path not found
                         line = L.polyline(
                             [[data.saskatoon.lat, data.saskatoon.lon], [s.lat, s.lon]],
-                            { color: '#4ecca3', weight: 2, opacity: 0.5, dashArray: '5, 5' }
+                            { color: '#f1c730', weight: 2, opacity: 0.5, dashArray: '5, 5' }
                         );
                     }
                     line.addTo(map);
                     connectionLines.push(line);
                 } else {
                     m.marker.setStyle({
-                        fillColor: '#666',
+                        fillColor: '#9A9B9D',
                         opacity: 0.5,
                         fillOpacity: 0.5
                     });
@@ -830,7 +883,7 @@
             });
 
             document.getElementById('connectedCount').textContent = connectedCount;
-            document.getElementById('settlementList').innerHTML = listHTML || '<p style="color:#666;">No settlements connected yet</p>';
+            document.getElementById('settlementList').innerHTML = listHTML || '<p style="color:#9A9B9D;">No settlements connected yet</p>';
         }
 
         // Play animation
