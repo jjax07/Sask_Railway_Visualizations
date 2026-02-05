@@ -90,8 +90,39 @@ From `usask_freelancers_guide.pdf`:
 | White | #ffffff | Header text |
 | Black | #000000 | Canvas background |
 
+## USask Branding Rollout (2026-02-05)
+
+The USask branding has been applied to the following visualizations:
+
+| Visualization | File | Status |
+|---------------|------|--------|
+| Transport Eras | `transport_eras.html` | ✅ Complete |
+| One Hour Corridor | `one_hour_map.html` | ✅ Complete |
+| Railway Timeline | `railway_timeline.html` | ✅ Complete |
+| Settlement Explorer | `settlement_explorer.html` | ✅ Complete |
+| Travel Time Comparison | `isochrone.html` | ✅ Complete |
+| Network Graph | `network_graph.html` | Pending |
+| Journey Times | `journey_times.html` | Pending |
+| Time Simulation | `travel_race.html` | Pending |
+| Time-Distance | `time_distance.html` | Pending |
+| Home/Index | `index.html` | Pending |
+
+### Common branding elements applied:
+
+1. **Dark backgrounds**: `#1a1a1e` (header/sidebar), `#252528` (panels), `#000000` (body)
+2. **Dropdown navigation**: Replaced horizontal nav links with "Other Visualizations ▼" dropdown
+3. **USask color palette**: Green (#0b6a41), Gold (#f1c730), Cool Grey (#9A9B9D, #4D4E53)
+4. **Gold progress sliders**: Year sliders show gold progress on grey track
+5. **Consistent button styling**: Green buttons with hover states
+
+### Visualization-specific notes:
+
+- **Railway Timeline**: Railway company colors updated (CPR=rust, QLSRSC=green, CNoR=gold, GTPR=purple)
+- **Settlement Explorer**: Rust (#c75d38) used for "newly connected" to distinguish from selected (green)
+- **Travel Time Comparison**: Railway radius circle removed; settlements colored by innermost travel circle
+
 ## Future work
 
-- Apply USask branding to all other visualizations
-- Consider adding optional connection lines toggle
+- Complete USask branding for remaining visualizations
+- Consider adding optional connection lines toggle to Transport Eras
 - Potential year slider for railway era (currently fixed at 1920)
