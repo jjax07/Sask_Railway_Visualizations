@@ -14,41 +14,79 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
+            background: #000000;
             color: #eee;
         }
         .header {
-            background: #16213e;
+            background: #1a1a1e;
             padding: 20px;
             text-align: center;
-            border-bottom: 3px solid #e94560;
+            border-bottom: 3px solid #0b6a41;
         }
         .header h1 {
-            color: #e94560;
+            color: #ffffff;
             margin-bottom: 10px;
         }
         .header p {
-            color: #aaa;
+            color: #9A9B9D;
             max-width: 800px;
             margin: 0 auto;
         }
         .nav {
-            background: #0f3460;
+            background: #252528;
             padding: 10px;
             text-align: center;
+            position: relative;
         }
-        .nav a {
-            color: #e94560;
-            text-decoration: none;
-            margin: 0 15px;
-            padding: 5px 15px;
-            border: 1px solid #e94560;
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .nav-btn {
+            color: #f1c730;
+            background: transparent;
+            border: 1px solid #f1c730;
+            padding: 8px 20px;
             border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
             transition: all 0.3s;
         }
-        .nav a:hover {
-            background: #e94560;
+        .nav-btn:hover {
+            background: #f1c730;
+            color: #000;
+        }
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #252528;
+            border: 1px solid #f1c730;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .nav-menu.show {
+            display: block;
+        }
+        .nav-menu a {
+            display: block;
+            color: #f1c730;
+            text-decoration: none;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0b6a41;
             color: #fff;
+        }
+        .nav-menu a.current {
+            color: #0b6a41;
+            font-weight: bold;
         }
         .container {
             display: flex;
@@ -73,7 +111,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #1a1a2e;
+            background: #000000;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.5s;
@@ -88,7 +126,7 @@
         }
         .sidebar {
             width: 280px;
-            background: #16213e;
+            background: #1a1a1e;
             padding: 15px;
             overflow-y: auto;
         }
@@ -100,20 +138,20 @@
         .view-toggle button {
             flex: 1;
             padding: 8px;
-            border: 2px solid #e94560;
+            border: 2px solid #0b6a41;
             background: transparent;
-            color: #e94560;
+            color: #0b6a41;
             border-radius: 5px;
             cursor: pointer;
             font-size: 11px;
             transition: all 0.3s;
         }
         .view-toggle button.active {
-            background: #e94560;
+            background: #0b6a41;
             color: #fff;
         }
         .view-toggle button:hover:not(.active) {
-            background: rgba(233, 69, 96, 0.2);
+            background: rgba(11, 106, 65, 0.2);
         }
         .controls {
             margin-bottom: 10px;
@@ -125,7 +163,7 @@
             margin-bottom: 8px;
         }
         .year-row label {
-            color: #e94560;
+            color: #f1c730;
             font-size: 13px;
             font-weight: bold;
         }
@@ -136,12 +174,48 @@
         .year-display {
             font-size: 16px;
             font-weight: bold;
-            color: #e94560;
+            color: #f1c730;
             min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
             margin: 10px 0;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #4D4E53;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-track {
+            height: 6px;
+            background: #4D4E53;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-progress {
+            height: 6px;
+            background: #f1c730;
+            border-radius: 3px 0 0 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin-top: -5px;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
         }
         .play-controls {
             display: flex;
@@ -150,7 +224,7 @@
             margin-bottom: 8px;
         }
         .play-controls button {
-            background: #e94560;
+            background: #0b6a41;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -159,18 +233,18 @@
             font-size: 13px;
         }
         .play-controls button:hover {
-            background: #ff6b6b;
+            background: #0d8550;
         }
         .section {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-bottom: 10px;
         }
         .section h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
-            border-bottom: 1px solid #e94560;
+            border-bottom: 1px solid #0b6a41;
             padding-bottom: 5px;
             font-size: 13px;
         }
@@ -188,14 +262,14 @@
             transition: background 0.2s;
         }
         .railway-toggle:hover {
-            background: #1a1a2e;
+            background: #000000;
         }
         .railway-toggle.inactive {
             opacity: 0.4;
         }
         .railway-toggle input {
             margin-right: 6px;
-            accent-color: #e94560;
+            accent-color: #0b6a41;
         }
         .railway-color {
             width: 10px;
@@ -212,7 +286,7 @@
             gap: 8px;
         }
         .stat-box {
-            background: #1a1a2e;
+            background: #000000;
             padding: 8px;
             border-radius: 5px;
             text-align: center;
@@ -220,7 +294,7 @@
         .stat-box .value {
             font-size: 20px;
             font-weight: bold;
-            color: #4ecca3;
+            color: #f1c730;
         }
         .stat-box .label {
             font-size: 10px;
@@ -234,13 +308,13 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
-            border-bottom: 1px solid #1a1a2e;
+            border-bottom: 1px solid #000000;
             font-size: 12px;
             cursor: pointer;
             transition: background 0.2s;
         }
         .top-hubs li:hover {
-            background: #1a1a2e;
+            background: #000000;
             margin: 0 -4px;
             padding: 4px;
             border-radius: 3px;
@@ -249,13 +323,13 @@
             color: #ccc;
         }
         .top-hubs .degree {
-            color: #4ecca3;
+            color: #f1c730;
             font-weight: bold;
         }
         .legend {
             margin-top: 10px;
             padding-top: 8px;
-            border-top: 1px solid #1a1a2e;
+            border-top: 1px solid #000000;
         }
         .legend-item {
             display: flex;
@@ -282,6 +356,29 @@
             transform: rotate(45deg);
             margin-right: 6px;
         }
+        .network-explanation {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(26, 26, 30, 0.9);
+            border: 1px solid #0b6a41;
+            border-radius: 5px;
+            padding: 10px 14px;
+            max-width: 360px;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #9A9B9D;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            z-index: 500;
+        }
+        .network-explanation strong {
+            color: #f1c730;
+        }
+        .network-explanation.visible {
+            opacity: 1;
+        }
         /* D3 Graph styles */
         .node {
             cursor: pointer;
@@ -304,8 +401,8 @@
         }
         .tooltip {
             position: absolute;
-            background: #16213e;
-            border: 1px solid #e94560;
+            background: #1a1a1e;
+            border: 1px solid #f1c730;
             padding: 8px 12px;
             border-radius: 4px;
             font-size: 12px;
@@ -334,20 +431,30 @@
         <p>Interactive network graph showing all 429 Saskatchewan settlements as nodes and railway connections as edges. Toggle between Geographic and Network views.</p>
     </div>
     <div class="nav">
-        <a href="index.html">Home</a>
-        <a href="one_hour_map.html">Saskatoon Corridor</a>
-        <a href="settlement_explorer.html">Settlement Explorer</a>
-        <a href="railway_timeline.html">Railway Timeline</a>
-        <a href="network_graph.html">Network Graph</a>
-        <a href="isochrone.html">Travel Comparison</a>
-        <a href="travel_race.html">Time Simulation</a>
-        <a href="time_distance.html">Time-Distance</a>
-        <a href="transport_eras.html">Transport Eras</a>
+        <div class="nav-dropdown">
+            <button class="nav-btn" id="navBtn">Other Visualizations ▼</button>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="one_hour_map.html">Saskatoon Corridor</a>
+                <a href="settlement_explorer.html">Settlement Explorer</a>
+                <a href="railway_timeline.html">Railway Timeline</a>
+                <a href="network_graph.html" class="current">Network Graph</a>
+                <a href="isochrone.html">Travel Comparison</a>
+                <a href="journey_times.html">Journey Times</a>
+                <a href="travel_race.html">Time Simulation</a>
+                <a href="time_distance.html">Time-Distance</a>
+                <a href="transport_eras.html">Transport Eras</a>
+            </div>
+        </div>
     </div>
     <div class="container">
         <div class="view-container">
             <div id="map"></div>
             <svg id="graph"></svg>
+            <div class="network-explanation" id="networkExplanation">
+                <strong>Network Topology View</strong><br>
+                Geography is removed. Settlements are arranged by connectivity alone — linked settlements pull together, forming clusters. Larger nodes are major hubs with many connections. This reveals the structure of the railway network: tightly connected corridors, peripheral endpoints, and central junctions.
+            </div>
         </div>
         <div class="sidebar">
             <div class="view-toggle">
@@ -372,17 +479,17 @@
                 <div class="railway-toggles">
                     <label class="railway-toggle" data-railway="CPR">
                         <input type="checkbox" checked>
-                        <div class="railway-color" style="background: #e94560;"></div>
+                        <div class="railway-color" style="background: #c75d38;"></div>
                         <span>CPR</span>
                     </label>
                     <label class="railway-toggle" data-railway="QLSRSC">
                         <input type="checkbox" checked>
-                        <div class="railway-color" style="background: #4ecca3;"></div>
+                        <div class="railway-color" style="background: #0b6a41;"></div>
                         <span>QLSRSC</span>
                     </label>
                     <label class="railway-toggle" data-railway="CNoR">
                         <input type="checkbox" checked>
-                        <div class="railway-color" style="background: #ffd93d;"></div>
+                        <div class="railway-color" style="background: #f1c730;"></div>
                         <span>CNoR</span>
                     </label>
                     <label class="railway-toggle" data-railway="GTPR">
@@ -429,15 +536,15 @@
 
             <div class="legend">
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #e94560;"></div>
+                    <div class="legend-circle" style="background: #c75d38;"></div>
                     <span>CPR settlement</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #4ecca3;"></div>
+                    <div class="legend-circle" style="background: #0b6a41;"></div>
                     <span>QLSRSC settlement</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #ffd93d;"></div>
+                    <div class="legend-circle" style="background: #f1c730;"></div>
                     <span>CNoR settlement</span>
                 </div>
                 <div class="legend-item">
@@ -445,7 +552,7 @@
                     <span>GTPR settlement</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-diamond" style="background: #e94560;"></div>
+                    <div class="legend-diamond" style="background: #c75d38;"></div>
                     <span>Multi-railway junction</span>
                 </div>
                 <div class="legend-item">
@@ -459,11 +566,20 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Nav dropdown toggle
+        document.getElementById('navBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('navMenu').classList.toggle('show');
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('navMenu').classList.remove('show');
+        });
+
         // Railway colors
         const railwayColors = {
-            CPR: '#e94560',
-            QLSRSC: '#4ecca3',
-            CNoR: '#ffd93d',
+            CPR: '#c75d38',
+            QLSRSC: '#0b6a41',
+            CNoR: '#f1c730',
             GTPR: '#6c5ce7',
             Other: '#888'
         };
@@ -502,7 +618,7 @@
             });
 
             // Use CartoDB Voyager (lighter, more muted than dark theme)
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
                 subdomains: 'abcd',
                 maxZoom: 19
@@ -747,6 +863,7 @@
                 .attr('fill', d => railwayColors[d.first_railway] || '#666')
                 .on('mouseover', showTooltip)
                 .on('mouseout', hideTooltip);
+
         }
 
         // ==================== VIEW SWITCHING ====================
@@ -759,6 +876,7 @@
             document.getElementById('forceBtn').classList.toggle('active', view === 'force');
             document.getElementById('map').classList.toggle('hidden', view === 'force');
             document.getElementById('graph').classList.toggle('active', view === 'force');
+            document.getElementById('networkExplanation').classList.toggle('visible', view === 'force');
 
             if (view === 'force') {
                 animateToForce();
@@ -791,13 +909,24 @@
                 .attr('y1', d => d.source.forceY)
                 .attr('x2', d => d.target.forceX)
                 .attr('y2', d => d.target.forceY);
+
         }
 
         // ==================== VISUALIZATION UPDATE ====================
 
+        function updateSliderTrack(slider) {
+            const min = parseInt(slider.min);
+            const max = parseInt(slider.max);
+            const val = parseInt(slider.value);
+            const percent = ((val - min) / (max - min)) * 100;
+            slider.style.background = `linear-gradient(to right, #f1c730 0%, #f1c730 ${percent}%, #4D4E53 ${percent}%, #4D4E53 100%)`;
+        }
+
         function updateVisualization() {
-            const year = parseInt(document.getElementById('yearSlider').value);
+            const slider = document.getElementById('yearSlider');
+            const year = parseInt(slider.value);
             document.getElementById('yearDisplay').textContent = year;
+            updateSliderTrack(slider);
 
             // Reset degrees
             Object.keys(nodeDegrees).forEach(name => nodeDegrees[name] = 0);

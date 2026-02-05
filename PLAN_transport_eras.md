@@ -101,8 +101,8 @@ The USask branding has been applied to the following visualizations:
 | Railway Timeline | `railway_timeline.html` | ✅ Complete |
 | Settlement Explorer | `settlement_explorer.html` | ✅ Complete |
 | Travel Time Comparison | `isochrone.html` | ✅ Complete |
-| Network Graph | `network_graph.html` | Pending |
-| Journey Times | `journey_times.html` | Pending |
+| Journey Times | `journey_times.html` | ✅ Complete |
+| Network Graph | `network_graph.html` | ✅ Complete |
 | Time Simulation | `travel_race.html` | Pending |
 | Time-Distance | `time_distance.html` | Pending |
 | Home/Index | `index.html` | Pending |
@@ -120,6 +120,8 @@ The USask branding has been applied to the following visualizations:
 - **Railway Timeline**: Railway company colors updated (CPR=rust, QLSRSC=green, CNoR=gold, GTPR=purple)
 - **Settlement Explorer**: Rust (#c75d38) used for "newly connected" to distinguish from selected (green)
 - **Travel Time Comparison**: Railway radius circle removed; settlements colored by innermost travel circle
+- **Journey Times**: Added "Time Saved" sort option; row background colors now adapt to active sort mode (distance, rail time, time saved use contextual coloring; name sort has no coloring); time bar colors updated to rust/gold/green
+- **Network Graph**: Railway company colors aligned with timeline (CPR=rust, QLSRSC=green, CNoR=gold, GTPR=purple); dark Leaflet tile layer; network topology explanation panel appears in force-directed view
 
 ## Future work
 
