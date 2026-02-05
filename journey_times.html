@@ -8,35 +8,73 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
+            background: #000000;
             color: #eee;
             min-height: 100vh;
         }
         .header {
-            background: #16213e;
+            background: #1a1a1e;
             padding: 20px;
             text-align: center;
-            border-bottom: 3px solid #e94560;
+            border-bottom: 3px solid #0b6a41;
         }
-        .header h1 { color: #e94560; margin-bottom: 10px; }
-        .header p { color: #aaa; max-width: 800px; margin: 0 auto; }
+        .header h1 { color: #ffffff; margin-bottom: 10px; }
+        .header p { color: #9A9B9D; max-width: 800px; margin: 0 auto; }
         .nav {
-            background: #0f3460;
+            background: #252528;
             padding: 10px;
             text-align: center;
+            position: relative;
         }
-        .nav a {
-            color: #e94560;
-            text-decoration: none;
-            margin: 0 15px;
-            padding: 5px 15px;
-            border: 1px solid #e94560;
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .nav-btn {
+            color: #f1c730;
+            background: transparent;
+            border: 1px solid #f1c730;
+            padding: 8px 20px;
             border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
             transition: all 0.3s;
         }
-        .nav a:hover {
-            background: #e94560;
+        .nav-btn:hover {
+            background: #f1c730;
+            color: #000;
+        }
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #252528;
+            border: 1px solid #f1c730;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .nav-menu.show {
+            display: block;
+        }
+        .nav-menu a {
+            display: block;
+            color: #f1c730;
+            text-decoration: none;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0b6a41;
             color: #fff;
+        }
+        .nav-menu a.current {
+            color: #0b6a41;
+            font-weight: bold;
         }
         .container {
             display: flex;
@@ -49,33 +87,33 @@
         }
         .sidebar {
             width: 280px;
-            background: #16213e;
+            background: #1a1a1e;
             padding: 15px;
             overflow-y: auto;
         }
         .control-group {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-bottom: 10px;
         }
         .control-group h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
             font-size: 13px;
         }
         select {
             width: 100%;
             padding: 8px;
-            background: #1a1a2e;
+            background: #000000;
             color: #eee;
-            border: 2px solid #0f3460;
+            border: 2px solid #4D4E53;
             border-radius: 5px;
             font-size: 13px;
         }
         select:focus {
             outline: none;
-            border-color: #e94560;
+            border-color: #0b6a41;
         }
         .year-row {
             display: flex;
@@ -84,7 +122,7 @@
             margin-bottom: 8px;
         }
         .year-row label {
-            color: #e94560;
+            color: #f1c730;
             font-size: 13px;
             font-weight: bold;
         }
@@ -95,12 +133,48 @@
         .year-display {
             font-size: 16px;
             font-weight: bold;
-            color: #e94560;
+            color: #f1c730;
             min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
             margin: 10px 0;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #4D4E53;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-track {
+            height: 6px;
+            background: #4D4E53;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-progress {
+            height: 6px;
+            background: #f1c730;
+            border-radius: 3px 0 0 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin-top: -5px;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
         }
         .play-controls {
             display: flex;
@@ -109,7 +183,7 @@
             margin-bottom: 8px;
         }
         .play-controls button {
-            background: #e94560;
+            background: #0b6a41;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -118,10 +192,10 @@
             font-size: 13px;
         }
         .play-controls button:hover {
-            background: #ff6b6b;
+            background: #0d8550;
         }
         .stats-box {
-            background: #1a1a2e;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
@@ -130,11 +204,11 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
-            border-bottom: 1px solid #0f3460;
+            border-bottom: 1px solid #000000;
             font-size: 12px;
         }
-        .stat-value { color: #4ecca3; font-weight: bold; }
-        .stat-value.warning { color: #ffd93d; }
+        .stat-value { color: #f1c730; font-weight: bold; }
+        .stat-value.warning { color: #f1c730; }
         .legend {
             margin-top: 10px;
         }
@@ -157,16 +231,16 @@
         .sort-btn {
             flex: 1;
             padding: 6px;
-            background: #1a1a2e;
+            background: #000000;
             color: #aaa;
-            border: 2px solid #0f3460;
+            border: 2px solid #4D4E53;
             border-radius: 5px;
             cursor: pointer;
             font-size: 10px;
         }
         .sort-btn.active {
-            border-color: #e94560;
-            color: #e94560;
+            border-color: #f1c730;
+            color: #f1c730;
         }
         .destination-list {
             display: flex;
@@ -219,14 +293,14 @@
             transition: transform 0.6s ease-out;
         }
         .time-bar.walking {
-            background: linear-gradient(180deg, #ff6b6b 0%, #e94560 100%);
+            background: linear-gradient(180deg, #d4714e 0%, #c75d38 100%);
         }
         .time-bar.wagon {
-            background: linear-gradient(180deg, #ffb347 0%, #e09530 100%);
+            background: linear-gradient(180deg, #f5d654 0%, #f1c730 100%);
             transition-delay: 0.1s;
         }
         .time-bar.railway {
-            background: linear-gradient(180deg, #6ee7b7 0%, #4ecca3 100%);
+            background: linear-gradient(180deg, #2d9f6f 0%, #0b6a41 100%);
             transition-delay: 0.2s;
         }
         .destination-row.visible .time-bar {
@@ -245,16 +319,16 @@
             font-size: 12px;
             font-weight: bold;
         }
-        .time-value.walking { color: #e94560; }
-        .time-value.wagon { color: #e09530; }
-        .time-value.railway { color: #4ecca3; }
+        .time-value.walking { color: #c75d38; }
+        .time-value.wagon { color: #f1c730; }
+        .time-value.railway { color: #2d9f6f; }
         .time-value.no-route {
             color: #666;
             font-style: italic;
             font-weight: normal;
         }
         .transfers {
-            color: #ffd93d;
+            color: #f1c730;
             font-size: 11px;
             margin-left: 6px;
         }
@@ -263,12 +337,12 @@
             font-size: 12px;
         }
         .savings .value {
-            color: #e94560;
+            color: #c75d38;
             font-weight: bold;
             font-size: 14px;
         }
         .savings .label {
-            color: #4ecca3;
+            color: #2d9f6f;
             font-size: 14px;
             font-weight: bold;
         }
@@ -278,7 +352,7 @@
             font-size: 12px;
         }
         .explanation {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             font-size: 11px;
@@ -287,15 +361,15 @@
             margin-top: 10px;
         }
         .origin-no-railway {
-            background: #2a1a1a;
-            border: 1px solid #e94560;
+            background: #1a1a1e;
+            border: 1px solid #f1c730;
             padding: 15px;
             border-radius: 5px;
             margin-bottom: 20px;
             text-align: center;
         }
         .origin-no-railway h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 5px;
         }
         .origin-no-railway p {
@@ -310,14 +384,21 @@
         <p>Compare walking, horse & cart, and railway travel times using actual railway routes. Select an origin and year to see how the network evolved.</p>
     </div>
     <div class="nav">
-        <a href="index.html">Home</a>
-        <a href="settlement_explorer.html">Settlement Explorer</a>
-        <a href="railway_timeline.html">Timeline</a>
-        <a href="network_graph.html">Network Graph</a>
-        <a href="isochrone.html">Travel Comparison</a>
-        <a href="travel_race.html">Time Simulation</a>
-        <a href="time_distance.html">Time-Distance</a>
-        <a href="transport_eras.html">Transport Eras</a>
+        <div class="nav-dropdown">
+            <button class="nav-btn" id="navBtn">Other Visualizations ▼</button>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="one_hour_map.html">Saskatoon Corridor</a>
+                <a href="settlement_explorer.html">Settlement Explorer</a>
+                <a href="railway_timeline.html">Railway Timeline</a>
+                <a href="network_graph.html">Network Graph</a>
+                <a href="isochrone.html">Travel Comparison</a>
+                <a href="journey_times.html" class="current">Journey Times</a>
+                <a href="travel_race.html">Time Simulation</a>
+                <a href="time_distance.html">Time-Distance</a>
+                <a href="transport_eras.html">Transport Eras</a>
+            </div>
+        </div>
     </div>
     <div class="container">
         <div class="main-content">
@@ -354,6 +435,7 @@
                     <button class="sort-btn active" data-sort="distance">Distance</button>
                     <button class="sort-btn" data-sort="name">Name</button>
                     <button class="sort-btn" data-sort="railway">Rail Time</button>
+                    <button class="sort-btn" data-sort="saved">Time Saved</button>
                 </div>
             </div>
 
@@ -390,15 +472,15 @@
 
             <div class="legend">
                 <div class="legend-item">
-                    <div class="legend-bar" style="background: linear-gradient(90deg, #ff6b6b, #e94560); width: 40px;"></div>
+                    <div class="legend-bar" style="background: linear-gradient(90deg, #d4714e, #c75d38); width: 40px;"></div>
                     <span>Walking (5 km/h, straight-line)</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-bar" style="background: linear-gradient(90deg, #ffb347, #e09530); width: 40px;"></div>
+                    <div class="legend-bar" style="background: linear-gradient(90deg, #f5d654, #f1c730); width: 40px;"></div>
                     <span>Horse & Cart (10 km/h, straight-line)</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-bar" style="background: linear-gradient(90deg, #6ee7b7, #4ecca3); width: 40px;"></div>
+                    <div class="legend-bar" style="background: linear-gradient(90deg, #2d9f6f, #0b6a41); width: 40px;"></div>
                     <span>Railway (40 km/h, actual route)</span>
                 </div>
                 <div class="legend-item">
@@ -412,10 +494,10 @@
 
             <div class="explanation">
                 <strong>How to read this:</strong><br><br>
-                <span style="color: #e94560;">Red bars</span> = walking time (straight-line distance at 5 km/h)<br><br>
-                <span style="color: #e09530;">Orange bars</span> = horse & cart time (straight-line distance at 10 km/h)<br><br>
-                <span style="color: #4ecca3;">Green bars</span> = railway time (actual track route at 40 km/h)<br><br>
-                <span style="color: #ffd93d;">(CPR → CNoR)</span> = railways used on route (yellow = transfer)<br><br>
+                <span style="color: #c75d38;">Rust bars</span> = walking time (straight-line distance at 5 km/h)<br><br>
+                <span style="color: #f1c730;">Gold bars</span> = horse & cart time (straight-line distance at 10 km/h)<br><br>
+                <span style="color: #2d9f6f;">Green bars</span> = railway time (actual track route at 40 km/h)<br><br>
+                <span style="color: #f1c730;">(CPR → CNoR)</span> = railways used on route (gold = transfer)<br><br>
                 <span style="color: #666; font-style: italic;">No railway route</span> = destination not reachable by rail in the selected year<br><br>
                 Use the <strong>year slider</strong> to see how railway connections expanded over time.
             </div>
@@ -435,6 +517,15 @@
     </div>
 
     <script>
+        // Nav dropdown toggle
+        document.getElementById('navBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('navMenu').classList.toggle('show');
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('navMenu').classList.remove('show');
+        });
+
         let data = null;
         let currentOrigin = 'Saskatoon';
         let currentSort = 'distance';
@@ -666,6 +757,15 @@
                         return a.railwayHours - b.railwayHours;
                     });
                     break;
+                case 'saved':
+                    // Sort by time saved (walking - railway), most saved first
+                    destinations.sort((a, b) => {
+                        if (a.hasRailwayRoute && !b.hasRailwayRoute) return -1;
+                        if (!a.hasRailwayRoute && b.hasRailwayRoute) return 1;
+                        if (!a.hasRailwayRoute && !b.hasRailwayRoute) return a.directDistKm - b.directDistKm;
+                        return b.savedHours - a.savedHours;
+                    });
+                    break;
             }
         }
 
@@ -676,23 +776,25 @@
             return days.toFixed(1) + ' days';
         }
 
-        function getDistanceColor(distKm, maxDist) {
-            const ratio = Math.min(distKm / maxDist, 1);
+        function getRowColor(value, maxValue, invert) {
+            const ratio = Math.min(value / maxValue, 1);
+            // When inverted (e.g. time saved), high values are good (green)
+            const r = invert ? 1 - ratio : ratio;
 
-            if (ratio < 0.33) {
+            if (r < 0.33) {
                 return {
-                    bg: `rgba(78, 204, 163, ${0.08 + ratio * 0.1})`,
-                    border: '#4ecca3'
+                    bg: `rgba(11, 106, 65, ${0.08 + r * 0.1})`,
+                    border: '#0b6a41'
                 };
-            } else if (ratio < 0.66) {
+            } else if (r < 0.66) {
                 return {
-                    bg: `rgba(255, 217, 61, ${0.08 + (ratio - 0.33) * 0.1})`,
-                    border: '#ffd93d'
+                    bg: `rgba(241, 199, 48, ${0.08 + (r - 0.33) * 0.1})`,
+                    border: '#f1c730'
                 };
             } else {
                 return {
-                    bg: `rgba(233, 69, 96, ${0.08 + (ratio - 0.66) * 0.1})`,
-                    border: '#e94560'
+                    bg: `rgba(199, 93, 56, ${0.08 + (r - 0.66) * 0.1})`,
+                    border: '#c75d38'
                 };
             }
         }
@@ -717,12 +819,25 @@
 
             const maxWalkHours = Math.max(...destinations.map(d => d.walkingHours));
             const maxDist = Math.max(...destinations.map(d => d.directDistKm));
+            const maxSaved = Math.max(...destinations.map(d => d.savedHours), 1);
+            const maxRailHours = Math.max(...destinations.filter(d => d.hasRailwayRoute).map(d => d.railwayHours), 1);
 
             list.innerHTML = destinations.map(dest => {
                 const walkWidth = (dest.walkingHours / maxWalkHours) * 100;
                 const wagonWidth = (dest.wagonHours / maxWalkHours) * 100;
                 const railWidth = dest.hasRailwayRoute ? (dest.railwayHours / maxWalkHours) * 100 : 0;
-                const colors = getDistanceColor(dest.directDistKm, maxDist);
+                let colors;
+                if (currentSort === 'saved') {
+                    colors = getRowColor(dest.savedHours, maxSaved, true);
+                } else if (currentSort === 'railway') {
+                    colors = dest.hasRailwayRoute
+                        ? getRowColor(dest.railwayHours, maxRailHours, false)
+                        : { bg: 'transparent', border: '#4D4E53' };
+                } else if (currentSort === 'name') {
+                    colors = { bg: 'transparent', border: '#4D4E53' };
+                } else {
+                    colors = getRowColor(dest.directDistKm, maxDist, false);
+                }
 
                 // Transfer display - show railways involved
                 let transfersHtml = '';
@@ -750,13 +865,13 @@
                         // Rail is clearly faster
                         savingsHtml = `
                             <div class="label">Save</div>
-                            <div class="value" style="color: #4ecca3;">${formatTime(timeDiff)}</div>
+                            <div class="value" style="color: #2d9f6f;">${formatTime(timeDiff)}</div>
                         `;
                     } else if (timeDiff < -buffer) {
                         // Walking is clearly faster (very indirect rail route)
                         savingsHtml = `
-                            <div class="label" style="color: #ffd93d;">Walk faster</div>
-                            <div class="value" style="color: #ffd93d;">${formatTime(-timeDiff)}</div>
+                            <div class="label" style="color: #f1c730;">Walk faster</div>
+                            <div class="value" style="color: #f1c730;">${formatTime(-timeDiff)}</div>
                         `;
                     } else {
                         // Within 1 hour either way - negligible difference
@@ -826,10 +941,21 @@
             setTimeout(setupScrollAnimations, 10);
         }
 
+        // Update slider track progress (for WebKit)
+        function updateSliderTrack(slider) {
+            const min = parseInt(slider.min);
+            const max = parseInt(slider.max);
+            const val = parseInt(slider.value);
+            const percent = ((val - min) / (max - min)) * 100;
+            slider.style.background = `linear-gradient(to right, #f1c730 0%, #f1c730 ${percent}%, #4D4E53 ${percent}%, #4D4E53 100%)`;
+        }
+
         function updateYear(year) {
             currentYear = year;
             document.getElementById('yearDisplay').textContent = year;
-            document.getElementById('yearSlider').value = year;
+            const slider = document.getElementById('yearSlider');
+            slider.value = year;
+            updateSliderTrack(slider);
             calculateDestinations();
             render();
         }
@@ -907,6 +1033,7 @@
 
         // Initialize
         loadData();
+        updateSliderTrack(document.getElementById('yearSlider'));
     </script>
 </body>
 </html>
