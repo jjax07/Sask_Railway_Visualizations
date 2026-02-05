@@ -13,41 +13,80 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
+            background: #000000;
             color: #eee;
         }
         .header {
-            background: #16213e;
+            background: #1a1a1e;
             padding: 20px;
             text-align: center;
-            border-bottom: 3px solid #e94560;
+            border-bottom: 3px solid #0b6a41;
         }
         .header h1 {
-            color: #e94560;
+            color: #ffffff;
             margin-bottom: 10px;
         }
         .header p {
-            color: #aaa;
+            color: #9A9B9D;
             max-width: 800px;
             margin: 0 auto;
-        }
-        .nav {
-            background: #0f3460;
-            padding: 10px;
             text-align: center;
         }
-        .nav a {
-            color: #e94560;
-            text-decoration: none;
-            margin: 0 15px;
-            padding: 5px 15px;
-            border: 1px solid #e94560;
+        .nav {
+            background: #252528;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .nav-btn {
+            color: #f1c730;
+            background: transparent;
+            border: 1px solid #f1c730;
+            padding: 8px 20px;
             border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
             transition: all 0.3s;
         }
-        .nav a:hover {
-            background: #e94560;
+        .nav-btn:hover {
+            background: #f1c730;
+            color: #000;
+        }
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #252528;
+            border: 1px solid #f1c730;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .nav-menu.show {
+            display: block;
+        }
+        .nav-menu a {
+            display: block;
+            color: #f1c730;
+            text-decoration: none;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0b6a41;
             color: #fff;
+        }
+        .nav-menu a.current {
+            color: #0b6a41;
+            font-weight: bold;
         }
         .container {
             display: flex;
@@ -59,7 +98,7 @@
         }
         .sidebar {
             width: 320px;
-            background: #16213e;
+            background: #1a1a1e;
             padding: 15px;
             overflow-y: auto;
         }
@@ -69,32 +108,32 @@
         .settlement-selector label {
             display: block;
             margin-bottom: 5px;
-            color: #e94560;
+            color: #f1c730;
             font-weight: bold;
             font-size: 13px;
         }
         .settlement-selector input {
             width: 100%;
             padding: 8px 10px;
-            border: 2px solid #0f3460;
+            border: 2px solid #252528;
             border-radius: 5px;
-            background: #1a1a2e;
+            background: #000000;
             color: #eee;
             font-size: 14px;
         }
         .settlement-selector input:focus {
             outline: none;
-            border-color: #e94560;
+            border-color: #0b6a41;
         }
         .selected-info {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-bottom: 10px;
-            border-left: 3px solid #e94560;
+            border-left: 3px solid #0b6a41;
         }
         .selected-info h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 5px;
             font-size: 13px;
         }
@@ -105,8 +144,8 @@
         }
         .selected-info .railway-tag {
             display: inline-block;
-            background: #4ecca3;
-            color: #1a1a2e;
+            background: #f1c730;
+            color: #000000;
             padding: 2px 6px;
             border-radius: 3px;
             font-size: 11px;
@@ -114,8 +153,8 @@
             font-weight: bold;
         }
         .selected-info .railway-tag.future {
-            background: #666;
-            color: #aaa;
+            background: #4D4E53;
+            color: #9A9B9D;
         }
         .controls {
             margin-bottom: 10px;
@@ -127,7 +166,7 @@
             margin-bottom: 8px;
         }
         .year-row label {
-            color: #e94560;
+            color: #f1c730;
             font-size: 13px;
             font-weight: bold;
         }
@@ -138,23 +177,59 @@
         .year-display {
             font-size: 16px;
             font-weight: bold;
-            color: #e94560;
+            color: #f1c730;
             min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
             margin: 10px 0;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #4D4E53;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-track {
+            height: 6px;
+            background: #4D4E53;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-progress {
+            height: 6px;
+            background: #f1c730;
+            border-radius: 3px 0 0 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin-top: -5px;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
         }
         .stats {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
         }
         .stats h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
-            border-bottom: 1px solid #e94560;
+            border-bottom: 1px solid #0b6a41;
             padding-bottom: 5px;
             font-size: 13px;
         }
@@ -162,35 +237,35 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
-            border-bottom: 1px solid #1a1a2e;
+            border-bottom: 1px solid #000000;
             font-size: 12px;
         }
         .stat-item .value {
             font-weight: bold;
         }
         .stat-item .connected {
-            color: #4ecca3;
+            color: #f1c730;
         }
         .stat-item .pending {
-            color: #666;
+            color: #9A9B9D;
         }
         .stat-item .new {
-            color: #ffcc00;
+            color: #c75d38;
         }
         .settlement-list {
             margin-top: 10px;
         }
         .settlement-list h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
             font-size: 13px;
         }
         .settlement-item {
-            background: #0f3460;
+            background: #252528;
             padding: 8px;
             margin: 4px 0;
             border-radius: 3px;
-            border-left: 3px solid #4ecca3;
+            border-left: 3px solid #f1c730;
             cursor: pointer;
             transition: transform 0.2s;
         }
@@ -198,16 +273,16 @@
             transform: translateX(5px);
         }
         .settlement-item.pending {
-            border-left-color: #666;
+            border-left-color: #9A9B9D;
             opacity: 0.7;
         }
         .settlement-item.new-connection {
-            border-left-color: #ffcc00;
+            border-left-color: #c75d38;
             animation: pulse 1s ease-in-out;
         }
         @keyframes pulse {
-            0%, 100% { background: #0f3460; }
-            50% { background: #1a4a3e; }
+            0%, 100% { background: #252528; }
+            50% { background: #3a2a1e; }
         }
         .settlement-item .name {
             font-weight: bold;
@@ -215,13 +290,13 @@
         }
         .settlement-item .details {
             font-size: 11px;
-            color: #aaa;
+            color: #9A9B9D;
             margin-top: 3px;
         }
         .settlement-item .new-badge {
             display: inline-block;
-            background: #ffcc00;
-            color: #1a1a2e;
+            background: #c75d38;
+            color: #ffffff;
             padding: 1px 5px;
             border-radius: 3px;
             font-size: 9px;
@@ -229,13 +304,13 @@
             font-weight: bold;
         }
         .legend {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
         }
         .legend h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
             font-size: 13px;
         }
@@ -259,7 +334,7 @@
             margin-bottom: 8px;
         }
         .play-controls button {
-            background: #e94560;
+            background: #0b6a41;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -268,10 +343,10 @@
             font-size: 13px;
         }
         .play-controls button:hover {
-            background: #ff6b6b;
+            background: #0d8550;
         }
         .no-connections {
-            color: #888;
+            color: #9A9B9D;
             text-align: center;
             padding: 20px;
             font-style: italic;
@@ -284,15 +359,21 @@
         <p>Select any Saskatchewan settlement to see nearby settlements within 40 km (straight-line distance). Shows both direct distance and actual railway distance where available. Use the time slider to see how connectivity evolved from 1882 to 1920.</p>
     </div>
     <div class="nav">
-        <a href="index.html">Home</a>
-        <a href="one_hour_map.html">Saskatoon Corridor</a>
-        <a href="settlement_explorer.html">Settlement Explorer</a>
-        <a href="railway_timeline.html">Railway Timeline</a>
-        <a href="network_graph.html">Network Graph</a>
-        <a href="isochrone.html">Travel Comparison</a>
-        <a href="travel_race.html">Time Simulation</a>
-        <a href="time_distance.html">Time-Distance</a>
-        <a href="transport_eras.html">Transport Eras</a>
+        <div class="nav-dropdown">
+            <button class="nav-btn" id="navBtn">Other Visualizations ▼</button>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="one_hour_map.html">Saskatoon Corridor</a>
+                <a href="settlement_explorer.html" class="current">Settlement Explorer</a>
+                <a href="railway_timeline.html">Railway Timeline</a>
+                <a href="network_graph.html">Network Graph</a>
+                <a href="isochrone.html">Travel Comparison</a>
+                <a href="journey_times.html">Journey Times</a>
+                <a href="travel_race.html">Time Simulation</a>
+                <a href="time_distance.html">Time-Distance</a>
+                <a href="transport_eras.html">Transport Eras</a>
+            </div>
+        </div>
     </div>
     <div class="container">
         <div id="map"></div>
@@ -312,8 +393,8 @@
             <div class="controls">
                 <div class="year-row">
                     <label>Year:</label>
-                    <span class="year-display" id="yearDisplay">1890</span>
-                    <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1890">
+                    <span class="year-display" id="yearDisplay">1882</span>
+                    <input type="range" id="yearSlider" min="1882" max="1920" step="1" value="1882">
                 </div>
                 <div class="play-controls">
                     <button id="playBtn">Play</button>
@@ -344,35 +425,35 @@
             <div class="legend">
                 <h3>Legend</h3>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #e94560;"></div>
+                    <div class="legend-circle" style="background: #0b6a41;"></div>
                     <span>Selected Settlement</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #4ecca3;"></div>
+                    <div class="legend-circle" style="background: #f1c730;"></div>
                     <span>Connected (within 40km)</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #ffcc00;"></div>
+                    <div class="legend-circle" style="background: #c75d38;"></div>
                     <span>Newly Connected This Year</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #888;"></div>
+                    <div class="legend-circle" style="background: #9A9B9D;"></div>
                     <span>Within 40km (pending)</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: #444; width: 8px; height: 8px;"></div>
+                    <div class="legend-circle" style="background: #4D4E53; width: 8px; height: 8px;"></div>
                     <span>Other Settlements</span>
                 </div>
                 <div class="legend-item">
-                    <div style="width:10px; height:10px; background:#ffaa00; transform:rotate(45deg); border:2px solid #fff; margin-right:8px;"></div>
+                    <div style="width:10px; height:10px; background:#c75d38; transform:rotate(45deg); border:2px solid #fff; margin-right:8px;"></div>
                     <span>Multi-Railway Junction</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-circle" style="background: transparent; border: 2px dashed #e94560;"></div>
+                    <div class="legend-circle" style="background: transparent; border: 2px dashed #0b6a41;"></div>
                     <span>40 km Radius</span>
                 </div>
                 <div class="legend-item">
-                    <div style="width: 20px; height: 3px; background: #4ecca3; margin-right: 10px;"></div>
+                    <div style="width: 20px; height: 3px; background: #f1c730; margin-right: 10px;"></div>
                     <span>Railway Route</span>
                 </div>
             </div>
@@ -386,6 +467,24 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Nav dropdown toggle
+        document.getElementById('navBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('navMenu').classList.toggle('show');
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('navMenu').classList.remove('show');
+        });
+
+        // Update slider track progress
+        function updateSliderTrack(slider) {
+            const min = parseInt(slider.min);
+            const max = parseInt(slider.max);
+            const val = parseInt(slider.value);
+            const percent = ((val - min) / (max - min)) * 100;
+            slider.style.background = `linear-gradient(to right, #f1c730 0%, #f1c730 ${percent}%, #4D4E53 ${percent}%, #4D4E53 100%)`;
+        }
+
         let data = null;
         let trackData = null;         // Railway track geometry
         let networkData = null;       // Railway network (nodes/edges)
@@ -499,7 +598,7 @@
                 console.error('Error loading data:', error);
                 document.getElementById('selectedName').textContent = 'Error loading data';
                 document.getElementById('selectedRailways').innerHTML =
-                    '<span style="color: #e94560;">Try: python -m http.server 8080</span>';
+                    '<span style="color: #c75d38;">Try: python -m http.server 8080</span>';
             }
         }
 
@@ -1046,7 +1145,7 @@
                     // Diamond shape for multi-railway junctions
                     const diamondIcon = L.divIcon({
                         className: 'multi-railway-marker',
-                        html: '<div style="width:12px; height:12px; background:#ffaa00; transform:rotate(45deg); border:2px solid #fff;"></div>',
+                        html: '<div style="width:12px; height:12px; background:#c75d38; transform:rotate(45deg); border:2px solid #fff;"></div>',
                         iconSize: [12, 12],
                         iconAnchor: [6, 6]
                     });
@@ -1055,8 +1154,8 @@
                     // Circle for regular settlements
                     marker = L.circleMarker([settlement.lat, settlement.lon], {
                         radius: 3,
-                        fillColor: '#444',
-                        color: '#666',
+                        fillColor: '#4D4E53',
+                        color: '#9A9B9D',
                         weight: 1,
                         opacity: 0.7,
                         fillOpacity: 0.6
@@ -1066,7 +1165,7 @@
                 const railwayInfo = settlement.railways
                     ? settlement.railways.map(r => `${r.railway} (${r.year})`).join(', ')
                     : 'No railway data';
-                const junctionLabel = isMultiRailway ? '<b style="color:#ffaa00;">◆ Railway Junction</b><br>' : '';
+                const junctionLabel = isMultiRailway ? '<b style="color:#c75d38;">◆ Railway Junction</b><br>' : '';
                 marker.bindPopup(`<b>${name}</b><br>${junctionLabel}${railwayInfo}<br><em>Click to explore</em>`);
                 marker.on('click', () => {
                     selectSettlement(name);
@@ -1154,8 +1253,8 @@
                     // circleMarkers - use setStyle
                     marker.setStyle({
                         radius: 3,
-                        fillColor: '#444',
-                        color: '#666',
+                        fillColor: '#4D4E53',
+                        color: '#9A9B9D',
                         weight: 1,
                         opacity: 0.7,
                         fillOpacity: 0.6
@@ -1176,10 +1275,10 @@
             // Center map on selected settlement
             map.setView([settlement.lat, settlement.lon], 9);
 
-            // Add selected settlement marker (larger, red)
+            // Add selected settlement marker (larger, green)
             const selectedIcon = L.divIcon({
                 className: 'custom-marker',
-                html: '<div style="background:#e94560; width:24px; height:24px; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(233,69,96,0.5);"></div>',
+                html: '<div style="background:#0b6a41; width:24px; height:24px; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(11,106,65,0.5);"></div>',
                 iconSize: [24, 24],
                 iconAnchor: [12, 12]
             });
@@ -1196,8 +1295,8 @@
             // Add 40km radius circle
             radiusCircle = L.circle([settlement.lat, settlement.lon], {
                 radius: 40000,
-                color: '#e94560',
-                fillColor: '#e94560',
+                color: '#0b6a41',
+                fillColor: '#0b6a41',
                 fillOpacity: 0.05,
                 dashArray: '10, 10',
                 weight: 2
@@ -1218,7 +1317,7 @@
 
                 const marker = L.circleMarker([connSettlement.lat, connSettlement.lon], {
                     radius: 10,
-                    fillColor: '#666',
+                    fillColor: '#9A9B9D',
                     color: '#fff',
                     weight: 2,
                     opacity: 0.8,
@@ -1231,7 +1330,7 @@
                     ring = L.circleMarker([connSettlement.lat, connSettlement.lon], {
                         radius: 15,
                         fillColor: 'transparent',
-                        color: '#ffaa00',
+                        color: '#c75d38',
                         weight: 3,
                         opacity: 0.9,
                         fillOpacity: 0
@@ -1285,7 +1384,9 @@
         // Update visualization for selected year
         function updateYear(year) {
             document.getElementById('yearDisplay').textContent = year;
-            document.getElementById('yearSlider').value = year;
+            const slider = document.getElementById('yearSlider');
+            slider.value = year;
+            updateSliderTrack(slider);
 
             if (!currentSettlement) return;
 
@@ -1332,9 +1433,9 @@
                     if (isNewThisYear) {
                         newCount++;
                         newSettlements.push(conn);
-                        // Yellow for new connections
+                        // Rust for new connections
                         m.marker.setStyle({
-                            fillColor: '#ffcc00',
+                            fillColor: '#c75d38',
                             color: '#fff',
                             opacity: 1,
                             fillOpacity: 1,
@@ -1342,9 +1443,9 @@
                         });
                     } else {
                         connectedSettlements.push(conn);
-                        // Green for established connections
+                        // Gold for established connections
                         m.marker.setStyle({
-                            fillColor: '#4ecca3',
+                            fillColor: '#f1c730',
                             color: '#fff',
                             opacity: 1,
                             fillOpacity: 0.9,
@@ -1354,7 +1455,7 @@
 
                     // Draw connection using actual railway path
                     const connSettlement = data.settlements[conn.to];
-                    const color = isNewThisYear ? '#ffcc00' : '#4ecca3';
+                    const color = isNewThisYear ? '#c75d38' : '#f1c730';
                     const weight = isNewThisYear ? 4 : 3;
                     const opacity = isNewThisYear ? 0.9 : 0.7;
 
@@ -1381,8 +1482,8 @@
                     pendingCount++;
                     pendingSettlements.push(conn);
                     m.marker.setStyle({
-                        fillColor: '#888',
-                        color: '#aaa',
+                        fillColor: '#9A9B9D',
+                        color: '#4D4E53',
                         opacity: 0.6,
                         fillOpacity: 0.6,
                         radius: 8
