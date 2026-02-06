@@ -13,41 +13,79 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
+            background: #000000;
             color: #eee;
         }
         .header {
-            background: #16213e;
+            background: #1a1a1e;
             padding: 20px;
             text-align: center;
-            border-bottom: 3px solid #e94560;
+            border-bottom: 3px solid #0b6a41;
         }
         .header h1 {
-            color: #e94560;
+            color: #ffffff;
             margin-bottom: 10px;
         }
         .header p {
-            color: #aaa;
+            color: #9A9B9D;
             max-width: 800px;
             margin: 0 auto;
         }
         .nav {
-            background: #0f3460;
+            background: #252528;
             padding: 10px;
             text-align: center;
+            position: relative;
         }
-        .nav a {
-            color: #e94560;
-            text-decoration: none;
-            margin: 0 15px;
-            padding: 5px 15px;
-            border: 1px solid #e94560;
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .nav-btn {
+            color: #f1c730;
+            background: transparent;
+            border: 1px solid #f1c730;
+            padding: 8px 20px;
             border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
             transition: all 0.3s;
         }
-        .nav a:hover {
-            background: #e94560;
+        .nav-btn:hover {
+            background: #f1c730;
+            color: #000;
+        }
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #252528;
+            border: 1px solid #f1c730;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .nav-menu.show {
+            display: block;
+        }
+        .nav-menu a {
+            display: block;
+            color: #f1c730;
+            text-decoration: none;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0b6a41;
             color: #fff;
+        }
+        .nav-menu a.current {
+            color: #0b6a41;
+            font-weight: bold;
         }
         .container {
             display: flex;
@@ -59,35 +97,37 @@
         }
         .sidebar {
             width: 380px;
-            background: #16213e;
+            background: #1a1a1e;
             padding: 20px;
             overflow-y: auto;
         }
         .control-group {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 15px;
             border-radius: 5px;
             margin-bottom: 10px;
         }
         .control-group h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 5px;
             font-size: 13px;
             text-align: center;
+            border-bottom: 1px solid #0b6a41;
+            padding-bottom: 5px;
         }
         select {
             width: 100%;
             padding: 10px;
             border-radius: 4px;
-            border: 1px solid #0f3460;
-            background: #1a1a2e;
+            border: 1px solid #0b6a41;
+            background: #000000;
             color: #eee;
             margin-bottom: 10px;
             font-size: 14px;
         }
         select:focus {
             outline: none;
-            border-color: #e94560;
+            border-color: #f1c730;
         }
         .year-row {
             display: flex;
@@ -96,7 +136,7 @@
             margin-bottom: 8px;
         }
         .year-row label {
-            color: #e94560;
+            color: #f1c730;
             font-size: 16px;
             font-weight: bold;
         }
@@ -107,12 +147,48 @@
         .year-display {
             font-size: 16px;
             font-weight: bold;
-            color: #e94560;
+            color: #f1c730;
             min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
             margin: 10px 0;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #4D4E53;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-track {
+            height: 6px;
+            background: #4D4E53;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-progress {
+            height: 6px;
+            background: #f1c730;
+            border-radius: 3px 0 0 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin-top: -5px;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
         }
         .play-controls {
             display: flex;
@@ -121,7 +197,7 @@
             margin-bottom: 8px;
         }
         .play-controls button {
-            background: #e94560;
+            background: #0b6a41;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -131,17 +207,17 @@
             font-weight: bold;
         }
         .play-controls button:hover {
-            background: #ff6b6b;
+            background: #0d8550;
         }
         .play-controls button:disabled {
             background: #666;
             cursor: not-allowed;
         }
         .play-controls button.start-btn {
-            background: #4ecca3;
+            background: #0b6a41;
         }
         .play-controls button.start-btn:hover {
-            background: #6ee7b7;
+            background: #0d8550;
         }
         .speed-control {
             display: flex;
@@ -150,7 +226,7 @@
             gap: 8px;
         }
         .speed-control label {
-            color: #aaa;
+            color: #9A9B9D;
             font-size: 12px;
         }
         .speed-control select {
@@ -158,7 +234,7 @@
             margin: 0;
         }
         .stats-box {
-            background: #1a1a2e;
+            background: #000000;
             padding: 8px 12px;
             border-radius: 5px;
             margin-top: 5px;
@@ -167,18 +243,18 @@
         .route-info {
             text-align: center;
             padding: 5px 10px;
-            background: #1a1a2e;
+            background: #000000;
             border-radius: 5px;
             margin-bottom: 5px;
         }
         .route-info .route-label {
-            color: #e94560;
+            color: #f1c730;
             font-size: 13px;
             font-weight: bold;
             margin-bottom: 3px;
         }
         .route-info .route-names {
-            color: #e94560;
+            color: #f1c730;
             font-size: 15px;
             font-weight: bold;
         }
@@ -186,7 +262,7 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
-            border-bottom: 1px solid #0f3460;
+            border-bottom: 1px solid #252528;
             font-size: 12px;
         }
         .stat-row:last-child {
@@ -229,7 +305,7 @@
         }
         .progress-bar-bg {
             height: 12px;
-            background: #1a1a2e;
+            background: #000000;
             border-radius: 4px;
             overflow: hidden;
             position: relative;
@@ -241,21 +317,21 @@
             transition: width 0.1s linear;
         }
         .progress-bar.walking {
-            background: linear-gradient(90deg, #ff6b6b, #e94560);
+            background: linear-gradient(90deg, #ff6b6b, #ff6b6b);
         }
         .progress-bar.horse {
             background: linear-gradient(90deg, #ffd93d, #f0c000);
         }
         .progress-bar.railway {
-            background: linear-gradient(90deg, #6ee7b7, #4ecca3);
+            background: linear-gradient(90deg, #4ecca3, #0b6a41);
         }
         .progress-bar.disabled {
             background: #444;
         }
         .arrived-badge {
             display: inline-block;
-            background: #4ecca3;
-            color: #1a1a2e;
+            background: #0b6a41;
+            color: #ffffff;
             padding: 2px 8px;
             border-radius: 3px;
             font-size: 11px;
@@ -270,38 +346,42 @@
             padding: 10px;
         }
         .comparison-box {
-            background: #0f3460;
+            background: #252528;
             padding: 15px;
             border-radius: 5px;
             margin-top: 15px;
             text-align: center;
         }
         .comparison-box h4 {
-            color: #e94560;
+            color: #f1c730;
             font-size: 13px;
             text-align: center;
             margin-bottom: 5px;
+            border-bottom: 1px solid #0b6a41;
+            padding-bottom: 5px;
         }
         .comparison-value {
             font-size: 32px;
             font-weight: bold;
-            color: #4ecca3;
+            color: #f1c730;
         }
         .comparison-label {
-            color: #aaa;
+            color: #9A9B9D;
             font-size: 12px;
         }
         .legend {
-            background: #0f3460;
+            background: #252528;
             padding: 15px;
             border-radius: 5px;
             margin-top: 15px;
         }
         .legend h3 {
-            color: #e94560;
+            color: #f1c730;
             font-size: 13px;
             text-align: center;
             margin-bottom: 5px;
+            border-bottom: 1px solid #0b6a41;
+            padding-bottom: 5px;
         }
         .legend-item {
             display: flex;
@@ -316,8 +396,8 @@
             border-radius: 2px;
         }
         .legend-line.walking {
-            background: #e94560;
-            border: 1px dashed #e94560;
+            background: #ff6b6b;
+            border: 1px dashed #ff6b6b;
         }
         .legend-line.horse {
             background: #ffd93d;
@@ -331,21 +411,21 @@
             text-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
         .instructions {
-            background: #0f3460;
+            background: #252528;
             padding: 15px;
             border-radius: 5px;
             font-size: 12px;
             line-height: 1.6;
-            color: #aaa;
+            color: #9A9B9D;
             margin-top: 15px;
         }
         .instructions strong {
-            color: #e94560;
+            color: #f1c730;
         }
         .error-msg {
-            background: #2a1a1a;
-            border: 1px solid #e94560;
-            color: #e94560;
+            background: #1a1a1e;
+            border: 1px solid #f1c730;
+            color: #f1c730;
             padding: 10px;
             border-radius: 5px;
             text-align: center;
@@ -359,7 +439,7 @@
             margin-bottom: 5px;
         }
         .select-row label {
-            color: #aaa;
+            color: #9A9B9D;
             font-size: 12px;
             min-width: 35px;
         }
@@ -371,16 +451,16 @@
             display: block;
             margin: 5px auto 0;
             background: transparent;
-            border: 1px solid #e94560;
-            color: #e94560;
+            border: 1px solid #f1c730;
+            color: #f1c730;
             padding: 4px 12px;
             border-radius: 3px;
             cursor: pointer;
             font-size: 11px;
         }
         .swap-btn:hover {
-            background: #e94560;
-            color: white;
+            background: #f1c730;
+            color: #000;
         }
     </style>
 </head>
@@ -390,15 +470,21 @@
         <p>Watch walking, horse & cart, and railway travel between settlements. See how railways transformed travel time in Saskatchewan.</p>
     </div>
     <div class="nav">
-        <a href="index.html">Home</a>
-        <a href="settlement_explorer.html">Settlement Explorer</a>
-        <a href="railway_timeline.html">Timeline</a>
-        <a href="network_graph.html">Network Graph</a>
-        <a href="isochrone.html">Travel Comparison</a>
-        <a href="journey_times.html">Journey Times</a>
-        <a href="travel_race.html">Time Simulation</a>
-        <a href="time_distance.html">Time-Distance</a>
-        <a href="transport_eras.html">Transport Eras</a>
+        <div class="nav-dropdown">
+            <button class="nav-btn" id="navBtn">Other Visualizations ▼</button>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="one_hour_map.html">Saskatoon Corridor</a>
+                <a href="settlement_explorer.html">Settlement Explorer</a>
+                <a href="railway_timeline.html">Railway Timeline</a>
+                <a href="network_graph.html">Network Graph</a>
+                <a href="isochrone.html">Travel Comparison</a>
+                <a href="journey_times.html">Journey Times</a>
+                <a href="travel_race.html" class="current">Time Simulation</a>
+                <a href="time_distance.html">Time-Distance</a>
+                <a href="transport_eras.html">Transport Eras</a>
+            </div>
+        </div>
     </div>
     <div class="container">
         <div id="map"></div>
@@ -527,6 +613,15 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Nav dropdown toggle
+        document.getElementById('navBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('navMenu').classList.toggle('show');
+        });
+        document.addEventListener('click', function() {
+            document.getElementById('navMenu').classList.remove('show');
+        });
+
         // Data and state
         let data = null;
         let trackData = null;
@@ -720,7 +815,7 @@
 
             const icon = L.divIcon({
                 className: 'origin-marker',
-                html: '<div style="background:#e94560; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(233,69,96,0.5);"></div>',
+                html: '<div style="background:#0b6a41; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(11,106,65,0.5);"></div>',
                 iconSize: [20, 20],
                 iconAnchor: [10, 10]
             });
@@ -751,7 +846,7 @@
 
             const icon = L.divIcon({
                 className: 'dest-marker',
-                html: '<div style="background:#4ecca3; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(78,204,163,0.5);"></div>',
+                html: '<div style="background:#f1c730; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow: 0 0 10px rgba(241,199,48,0.5);"></div>',
                 iconSize: [20, 20],
                 iconAnchor: [10, 10]
             });
