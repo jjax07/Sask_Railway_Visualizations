@@ -629,8 +629,10 @@
             // Build adjacency list for current year
             const adj = buildAdjacencyList(currentYear);
 
-            // Run Dijkstra from hub node
-            const nodeDistances = dijkstraFromNode(hubNode, adj, maxDistKm);
+            // Run Dijkstra from hub node (generous limit to account for long edges)
+            const nodeDistances = dijkstraFromNode(hubNode, adj, maxDistKm + 500);
+
+            const hubSnapDistKm = (hubMapping.snap_distance_m || 0) / 1000;
 
             // Map node distances to settlement distances
             Object.entries(data.settlements).forEach(([name, settlement]) => {
@@ -644,12 +646,32 @@
                 const mapping = mappingData.lookup[name];
                 if (!mapping) return;
 
-                const node = mapping.snap_node;
-                if (nodeDistances[node] !== undefined) {
-                    // Add distance from node to actual settlement location (snap_distance)
-                    const snapDistKm = (mapping.snap_distance_m || 0) / 1000;
-                    const hubSnapDistKm = (hubMapping.snap_distance_m || 0) / 1000;
-                    railwayDistanceCache[name] = nodeDistances[node] + snapDistKm + hubSnapDistKm;
+                const snapDistKm = (mapping.snap_distance_m || 0) / 1000;
+                let bestNetworkDist = Infinity;
+
+                // For edge-snapped settlements, check both endpoints of the edge
+                if (mapping.snap_type === 'edge' && mapping.snap_nodes && mapping.snap_nodes.length === 2) {
+                    const t = mapping.snap_edge_t || 0;
+                    const edgeLen = mapping.snap_edge_length_km || 0;
+
+                    // Route through first endpoint
+                    const d1 = nodeDistances[mapping.snap_nodes[0]];
+                    if (d1 !== undefined) {
+                        bestNetworkDist = Math.min(bestNetworkDist, d1 + t * edgeLen);
+                    }
+
+                    // Route through second endpoint
+                    const d2 = nodeDistances[mapping.snap_nodes[1]];
+                    if (d2 !== undefined) {
+                        bestNetworkDist = Math.min(bestNetworkDist, d2 + (1 - t) * edgeLen);
+                    }
+                } else {
+                    const d = nodeDistances[mapping.snap_node];
+                    if (d !== undefined) bestNetworkDist = d;
+                }
+
+                if (bestNetworkDist < Infinity) {
+                    railwayDistanceCache[name] = bestNetworkDist + snapDistKm + hubSnapDistKm;
                 }
             });
 
@@ -690,7 +712,30 @@
             }
 
             // Draw circles (largest first so smaller ones are on top)
-            // Railway circle removed - actual railway reach depends on track routes, not straight-line distance
+            const showRailway = document.getElementById('showRailway').checked;
+
+            // Find furthest rail-connected settlement (straight-line) for railway circle
+            let maxRailStraightLineDist = 0;
+            if (showRailway) {
+                Object.entries(data.settlements).forEach(([name, s]) => {
+                    if (name === hubName) return;
+                    const rd = railwayDistanceCache[name];
+                    if (rd !== undefined && rd <= railDist) {
+                        const d = haversine(hub.lat, hub.lon, s.lat, s.lon);
+                        if (d > maxRailStraightLineDist) maxRailStraightLineDist = d;
+                    }
+                });
+            }
+
+            if (showRailway && maxRailStraightLineDist > 0) {
+                circles.railway = L.circle([hub.lat, hub.lon], {
+                    radius: maxRailStraightLineDist * 1000,
+                    color: '#0b6a41',
+                    fillColor: '#0b6a41',
+                    fillOpacity: 0.1,
+                    weight: 3
+                }).addTo(map);
+            }
 
             if (document.getElementById('showWagon').checked) {
                 circles.wagon = L.circle([hub.lat, hub.lon], {
@@ -724,7 +769,6 @@
 
             // Count settlements in each range
             let walkCount = 0, wagonCount = 0, railCount = 0;
-            const showRailway = document.getElementById('showRailway').checked;
 
             Object.entries(data.settlements).forEach(([name, s]) => {
                 if (name === hubName) return;
