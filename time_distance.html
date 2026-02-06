@@ -9,34 +9,72 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a2e;
+            background: #000000;
             color: #eee;
         }
         .header {
-            background: #16213e;
+            background: #1a1a1e;
             padding: 20px;
             text-align: center;
-            border-bottom: 3px solid #e94560;
+            border-bottom: 3px solid #0b6a41;
         }
-        .header h1 { color: #e94560; margin-bottom: 10px; }
-        .header p { color: #aaa; max-width: 800px; margin: 0 auto; }
+        .header h1 { color: #ffffff; margin-bottom: 10px; }
+        .header p { color: #9A9B9D; max-width: 800px; margin: 0 auto; }
         .nav {
-            background: #0f3460;
+            background: #252528;
             padding: 10px;
             text-align: center;
+            position: relative;
         }
-        .nav a {
-            color: #e94560;
-            text-decoration: none;
-            margin: 0 15px;
-            padding: 5px 15px;
-            border: 1px solid #e94560;
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .nav-btn {
+            color: #f1c730;
+            background: transparent;
+            border: 1px solid #f1c730;
+            padding: 8px 20px;
             border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
             transition: all 0.3s;
         }
-        .nav a:hover {
-            background: #e94560;
+        .nav-btn:hover {
+            background: #f1c730;
+            color: #000;
+        }
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #252528;
+            border: 1px solid #f1c730;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .nav-menu.show {
+            display: block;
+        }
+        .nav-menu a {
+            display: block;
+            color: #f1c730;
+            text-decoration: none;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0b6a41;
             color: #fff;
+        }
+        .nav-menu a.current {
+            color: #0b6a41;
+            font-weight: bold;
         }
         .container {
             display: flex;
@@ -62,20 +100,22 @@
         }
         .sidebar {
             width: 280px;
-            background: #16213e;
+            background: #1a1a1e;
             padding: 15px;
             overflow-y: auto;
         }
         .control-group {
-            background: #0f3460;
+            background: #252528;
             padding: 10px 12px;
             border-radius: 5px;
             margin-bottom: 10px;
         }
         .control-group h3 {
-            color: #e94560;
+            color: #f1c730;
             margin-bottom: 8px;
             font-size: 13px;
+            border-bottom: 1px solid #0b6a41;
+            padding-bottom: 5px;
         }
         .mode-grid {
             display: grid;
@@ -84,9 +124,9 @@
         }
         .mode-btn {
             padding: 8px 6px;
-            background: #1a1a2e;
-            color: #aaa;
-            border: 2px solid #0f3460;
+            background: #000000;
+            color: #9A9B9D;
+            border: 2px solid #252528;
             border-radius: 5px;
             cursor: pointer;
             font-size: 11px;
@@ -96,16 +136,16 @@
         .mode-btn:hover {
             color: #eee;
         }
-        .mode-btn[data-mode="geographic"] { border-color: #0f3460; }
+        .mode-btn[data-mode="geographic"] { border-color: #252528; }
         .mode-btn[data-mode="geographic"]:hover { border-color: #4ecca3; }
         .mode-btn[data-mode="geographic"].active { border-color: #4ecca3; color: #4ecca3; background: rgba(78, 204, 163, 0.1); }
-        .mode-btn[data-mode="walking"] { border-color: #0f3460; }
-        .mode-btn[data-mode="walking"]:hover { border-color: #e94560; }
-        .mode-btn[data-mode="walking"].active { border-color: #e94560; color: #e94560; background: rgba(233, 69, 96, 0.1); }
-        .mode-btn[data-mode="horse"] { border-color: #0f3460; }
+        .mode-btn[data-mode="walking"] { border-color: #252528; }
+        .mode-btn[data-mode="walking"]:hover { border-color: #ff6b6b; }
+        .mode-btn[data-mode="walking"].active { border-color: #ff6b6b; color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+        .mode-btn[data-mode="horse"] { border-color: #252528; }
         .mode-btn[data-mode="horse"]:hover { border-color: #e09530; }
         .mode-btn[data-mode="horse"].active { border-color: #e09530; color: #e09530; background: rgba(224, 149, 48, 0.1); }
-        .mode-btn[data-mode="railway"] { border-color: #0f3460; }
+        .mode-btn[data-mode="railway"] { border-color: #252528; }
         .mode-btn[data-mode="railway"]:hover { border-color: #4ecca3; }
         .mode-btn[data-mode="railway"].active { border-color: #4ecca3; color: #4ecca3; background: rgba(78, 204, 163, 0.1); }
         .year-row {
@@ -115,7 +155,7 @@
             margin-bottom: 8px;
         }
         .year-row label {
-            color: #e94560;
+            color: #f1c730;
             font-size: 13px;
             font-weight: bold;
         }
@@ -126,12 +166,48 @@
         .year-display {
             font-size: 16px;
             font-weight: bold;
-            color: #e94560;
+            color: #f1c730;
             min-width: 35px;
         }
         input[type="range"] {
             width: 100%;
             margin: 10px 0;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #4D4E53;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: transparent;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-track {
+            height: 6px;
+            background: #4D4E53;
+            border-radius: 3px;
+        }
+        input[type="range"]::-moz-range-progress {
+            height: 6px;
+            background: #f1c730;
+            border-radius: 3px 0 0 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            margin-top: -5px;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
         }
         .play-controls {
             display: flex;
@@ -140,7 +216,7 @@
             margin-bottom: 8px;
         }
         .play-controls button {
-            background: #e94560;
+            background: #0b6a41;
             color: white;
             border: none;
             padding: 8px 16px;
@@ -149,10 +225,10 @@
             font-size: 13px;
         }
         .play-controls button:hover {
-            background: #ff6b6b;
+            background: #0d8550;
         }
         .stats-box {
-            background: #1a1a2e;
+            background: #000000;
             padding: 10px 12px;
             border-radius: 5px;
             margin-top: 10px;
@@ -161,10 +237,10 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
-            border-bottom: 1px solid #0f3460;
+            border-bottom: 1px solid #252528;
             font-size: 12px;
         }
-        .stat-value { color: #4ecca3; font-weight: bold; }
+        .stat-value { color: #f1c730; font-weight: bold; }
         .legend {
             margin-top: 10px;
         }
@@ -190,11 +266,11 @@
         .explanation {
             margin-top: 10px;
             padding: 10px;
-            background: rgba(78, 204, 163, 0.1);
-            border-left: 3px solid #4ecca3;
+            background: #252528;
+            border-left: 3px solid #0b6a41;
             border-radius: 3px;
             font-size: 11px;
-            color: #aaa;
+            color: #9A9B9D;
             line-height: 1.5;
         }
     </style>
@@ -205,16 +281,21 @@
         <p>Watch settlements reposition based on travel time. Railways collapse connected settlements together while isolated ones stay far apart.</p>
     </div>
     <div class="nav">
-        <a href="index.html">Home</a>
-        <a href="one_hour_map.html">Saskatoon Corridor</a>
-        <a href="settlement_explorer.html">Settlement Explorer</a>
-        <a href="railway_timeline.html">Railway Timeline</a>
-        <a href="network_graph.html">Network Graph</a>
-        <a href="isochrone.html">Travel Comparison</a>
-        <a href="journey_times.html">Journey Times</a>
-        <a href="travel_race.html">Time Simulation</a>
-        <a href="time_distance.html">Time-Distance</a>
-        <a href="transport_eras.html">Transport Eras</a>
+        <div class="nav-dropdown">
+            <button class="nav-btn" id="navBtn">Other Visualizations ▼</button>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="one_hour_map.html">Saskatoon Corridor</a>
+                <a href="settlement_explorer.html">Settlement Explorer</a>
+                <a href="railway_timeline.html">Railway Timeline</a>
+                <a href="network_graph.html">Network Graph</a>
+                <a href="isochrone.html">Travel Comparison</a>
+                <a href="journey_times.html">Journey Times</a>
+                <a href="travel_race.html">Time Simulation</a>
+                <a href="time_distance.html" class="current">Time-Distance</a>
+                <a href="transport_eras.html">Transport Eras</a>
+            </div>
+        </div>
     </div>
     <div class="container">
         <div class="view-container" id="viewContainer">
@@ -281,6 +362,15 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+    // Nav dropdown toggle
+    document.getElementById('navBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('navMenu').classList.toggle('show');
+    });
+    document.addEventListener('click', function() {
+        document.getElementById('navMenu').classList.remove('show');
+    });
+
     (function() {
         // State
         let settlements = [];
@@ -550,7 +640,7 @@
             }
             updateStats();
             // Update legend colors
-            const lc = currentMode === 'walking' ? '#e94560' :
+            const lc = currentMode === 'walking' ? '#ff6b6b' :
                         currentMode === 'horse' ? '#e09530' : '#4ecca3';
             document.getElementById('legendDotRail').style.background = lc;
             document.getElementById('legendLineRail').style.background = lc;
@@ -664,22 +754,22 @@
             ctx.clearRect(0, 0, w, h);
 
             // Dark background (fades in as map fades out)
-            ctx.fillStyle = `rgba(26, 26, 46, ${1 - mapOpacity})`;
+            ctx.fillStyle = `rgba(0, 0, 0, ${1 - mapOpacity})`;
             ctx.fillRect(0, 0, w, h);
 
             // Railway company colors
             const railwayColors = {
-                'CPR': '#e94560',
-                'CNoR': '#4ecca3',
-                'GTPR': '#f0c040',
-                'QLSRSC': '#a080e0',
-                'Interchange': '#aaa',
-                'Other': '#6090d0'
+                'CPR': '#c75d38',
+                'CNoR': '#f1c730',
+                'GTPR': '#6c5ce7',
+                'QLSRSC': '#0b6a41',
+                'Interchange': '#ffffff',
+                'Other': '#888'
             };
 
             // Draw connection lines
             const isRailMode = currentMode === 'railway';
-            const lineColor = currentMode === 'walking' ? 'rgba(233, 69, 96, 0.15)' :
+            const lineColor = currentMode === 'walking' ? 'rgba(255, 107, 107, 0.15)' :
                               currentMode === 'horse' ? 'rgba(224, 149, 48, 0.15)' :
                               'rgba(78, 204, 163, 0.15)';
             for (const c of connections) {
@@ -708,7 +798,7 @@
             ctx.globalAlpha = 1.0;
 
             // Draw settlement dots
-            const modeColor = currentMode === 'walking' ? '#e94560' :
+            const modeColor = currentMode === 'walking' ? '#ff6b6b' :
                               currentMode === 'horse' ? '#e09530' : '#4ecca3';
             for (const s of settlements) {
                 if (isRailMode) {
@@ -798,7 +888,7 @@
                 ctx.fillStyle = '#4ecca3';
                 ctx.fillText('by rail (8\u00d7 closer)', x + contractedLen + 6, y + 16);
 
-                ctx.fillStyle = '#aaa';
+                ctx.fillStyle = '#9A9B9D';
                 ctx.font = '10px Segoe UI, sans-serif';
                 ctx.textAlign = 'left';
                 ctx.fillText('40 km/h rail vs 5 km/h walking', x, y - 10);
@@ -832,7 +922,8 @@
                 barPx = oneHourKm / kmPerPx * 1.0;
             }
 
-            ctx.strokeStyle = '#e94560';
+            const scaleColor = currentMode === 'walking' ? '#ff6b6b' : '#e09530';
+            ctx.strokeStyle = scaleColor;
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(x, y);
@@ -846,7 +937,7 @@
             ctx.lineTo(x + barPx, y + 5);
             ctx.stroke();
 
-            ctx.fillStyle = '#e94560';
+            ctx.fillStyle = scaleColor;
             ctx.font = '11px Segoe UI, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText('1 hour at ' + speed + ' km/h', x + barPx / 2, y - 10);
@@ -867,8 +958,8 @@
             const bx = s.x + 12;
             const by = s.y - boxH - 5;
 
-            ctx.fillStyle = 'rgba(15, 52, 96, 0.95)';
-            ctx.strokeStyle = '#e94560';
+            ctx.fillStyle = 'rgba(37, 37, 40, 0.95)';
+            ctx.strokeStyle = '#f1c730';
             ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.roundRect(bx, by, boxW, boxH, 4);
