@@ -14,6 +14,7 @@ Outputs:
 import json
 import csv
 import os
+import math
 
 # Paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -104,14 +105,36 @@ def get_all_shared_railways(s1_railways, s2_railways):
     return result
 
 
+def haversine_km(lat1, lon1, lat2, lon2):
+    """Calculate great-circle distance in km between two points."""
+    R = 6371
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = (math.sin(dlat / 2) ** 2 +
+         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
+         math.sin(dlon / 2) ** 2)
+    return R * 2 * math.asin(math.sqrt(a))
+
+
 def main():
     print("Loading data...")
     settlements = load_settlements()
     settlement_railways = load_railway_timeline()
     csv_connections = load_connections_csv()
 
+    # Backfill settlement_railways with settlements.json data for settlements
+    # not in railway_timeline.json
+    backfilled = 0
+    for name, sdata in settlements.items():
+        if name not in settlement_railways:
+            first_rw = sdata.get('first_railway')
+            rw_arrives = sdata.get('railway_arrives')
+            if first_rw and first_rw not in ['No', 'Missing', None] and rw_arrives:
+                settlement_railways[name] = [{'railway': first_rw, 'year': rw_arrives}]
+                backfilled += 1
+
     print(f"Loaded {len(settlements)} settlements")
-    print(f"Loaded {len(settlement_railways)} settlements with railway info")
+    print(f"Loaded {len(settlement_railways)} settlements with railway info ({backfilled} backfilled from settlements.json)")
     print(f"Loaded {len(csv_connections)} connection pairs from CSV")
 
     # Build output structure
@@ -180,6 +203,7 @@ def main():
                 'distance_km': round(distance, 1),
                 'shared_railway': earliest['railway'],
                 'connected_year': earliest['connected_year'],
+                'connection_type': 'same_railway',
                 # Include all shared railways
                 'all_shared_railways': shared if len(shared) > 1 else None
             })
@@ -190,26 +214,136 @@ def main():
                 'distance_km': round(distance, 1),
                 'shared_railway': earliest['railway'],
                 'connected_year': earliest['connected_year'],
+                'connection_type': 'same_railway',
                 'all_shared_railways': shared if len(shared) > 1 else None
             })
 
             connection_count += 1
         else:
-            # No shared railway - still add as "pending" (connected_year = None)
-            output['connections'][s1].append({
-                'to': s2,
-                'distance_km': round(distance, 1),
-                'shared_railway': None,
-                'connected_year': None,
-                'all_shared_railways': None
-            })
-            output['connections'][s2].append({
-                'to': s1,
-                'distance_km': round(distance, 1),
-                'shared_railway': None,
-                'connected_year': None,
-                'all_shared_railways': None
-            })
+            # No shared railway - check if both have rail service (interchange)
+            s1_has_rail = len(s1_railways) > 0
+            s2_has_rail = len(s2_railways) > 0
+
+            if s1_has_rail and s2_has_rail:
+                # Both have rail but on different railways - interchange connection
+                s1_earliest_year = min(r['year'] for r in s1_railways)
+                s2_earliest_year = min(r['year'] for r in s2_railways)
+                connected_year = max(s1_earliest_year, s2_earliest_year)
+
+                output['connections'][s1].append({
+                    'to': s2,
+                    'distance_km': round(distance, 1),
+                    'shared_railway': 'Interchange',
+                    'connected_year': connected_year,
+                    'connection_type': 'interchange',
+                    'all_shared_railways': None
+                })
+                output['connections'][s2].append({
+                    'to': s1,
+                    'distance_km': round(distance, 1),
+                    'shared_railway': 'Interchange',
+                    'connected_year': connected_year,
+                    'connection_type': 'interchange',
+                    'all_shared_railways': None
+                })
+            else:
+                # One or both lack rail service - keep as pending
+                output['connections'][s1].append({
+                    'to': s2,
+                    'distance_km': round(distance, 1),
+                    'shared_railway': None,
+                    'connected_year': None,
+                    'connection_type': None,
+                    'all_shared_railways': None
+                })
+                output['connections'][s2].append({
+                    'to': s1,
+                    'distance_km': round(distance, 1),
+                    'shared_railway': None,
+                    'connected_year': None,
+                    'connection_type': None,
+                    'all_shared_railways': None
+                })
+
+    # Fill gaps: settlements with railway data but missing from CSV
+    # Find their nearest neighbors and create connections
+    gap_count = 0
+    for name, sdata in output['settlements'].items():
+        if not sdata.get('railway_arrives'):
+            continue
+        # Check if this settlement has any valid connections
+        has_valid = any(c.get('connected_year') for c in output['connections'][name])
+        if has_valid:
+            continue
+
+        # Find nearest settlements by haversine distance
+        s_lat, s_lon = sdata['lat'], sdata['lon']
+        neighbors = []
+        for other_name, other_data in output['settlements'].items():
+            if other_name == name:
+                continue
+            dist = haversine_km(s_lat, s_lon, other_data['lat'], other_data['lon'])
+            if dist <= 120:  # Generous threshold to catch remote settlements
+                neighbors.append((other_name, dist))
+        neighbors.sort(key=lambda x: x[1])
+
+        # Take nearest neighbors (up to 5, or all within 40km)
+        selected = []
+        for nb_name, nb_dist in neighbors:
+            if len(selected) >= 5 and nb_dist > 40:
+                break
+            selected.append((nb_name, nb_dist))
+            if len(selected) >= 10:
+                break
+
+        s_railways = settlement_railways.get(name, [])
+        for nb_name, nb_dist in selected:
+            nb_railways = settlement_railways.get(nb_name, [])
+            shared = get_all_shared_railways(s_railways, nb_railways)
+
+            if shared:
+                earliest = shared[0]
+                output['connections'][name].append({
+                    'to': nb_name,
+                    'distance_km': round(nb_dist, 1),
+                    'shared_railway': earliest['railway'],
+                    'connected_year': earliest['connected_year'],
+                    'connection_type': 'same_railway',
+                    'all_shared_railways': shared if len(shared) > 1 else None
+                })
+                output['connections'][nb_name].append({
+                    'to': name,
+                    'distance_km': round(nb_dist, 1),
+                    'shared_railway': earliest['railway'],
+                    'connected_year': earliest['connected_year'],
+                    'connection_type': 'same_railway',
+                    'all_shared_railways': shared if len(shared) > 1 else None
+                })
+            elif s_railways and nb_railways:
+                s_earliest = min(r['year'] for r in s_railways)
+                nb_earliest = min(r['year'] for r in nb_railways)
+                connected_year = max(s_earliest, nb_earliest)
+                output['connections'][name].append({
+                    'to': nb_name,
+                    'distance_km': round(nb_dist, 1),
+                    'shared_railway': 'Interchange',
+                    'connected_year': connected_year,
+                    'connection_type': 'interchange',
+                    'all_shared_railways': None
+                })
+                output['connections'][nb_name].append({
+                    'to': name,
+                    'distance_km': round(nb_dist, 1),
+                    'shared_railway': 'Interchange',
+                    'connected_year': connected_year,
+                    'connection_type': 'interchange',
+                    'all_shared_railways': None
+                })
+
+        if any(c.get('connected_year') for c in output['connections'][name]):
+            gap_count += 1
+
+    print(f"Gap-filled {gap_count} settlements missing from CSV")
 
     # Sort connections by distance for each settlement
     for name in output['connections']:

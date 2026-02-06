@@ -502,6 +502,11 @@
                         <div class="railway-color" style="background: #888;"></div>
                         <span>Other</span>
                     </label>
+                    <label class="railway-toggle" data-railway="Interchange">
+                        <input type="checkbox" checked>
+                        <div class="railway-color" style="background: #ffffff; border: 1px dashed #888;"></div>
+                        <span>Interchange</span>
+                    </label>
                 </div>
             </div>
 
@@ -552,6 +557,10 @@
                     <span>GTPR settlement</span>
                 </div>
                 <div class="legend-item">
+                    <div class="legend-line" style="background: transparent; border-top: 2px dashed #ffffff;"></div>
+                    <span>Interchange (cross-railway)</span>
+                </div>
+                <div class="legend-item">
                     <div class="legend-diamond" style="background: #c75d38;"></div>
                     <span>Multi-railway junction</span>
                 </div>
@@ -581,13 +590,14 @@
             QLSRSC: '#0b6a41',
             CNoR: '#f1c730',
             GTPR: '#6c5ce7',
+            Interchange: '#ffffff',
             Other: '#888'
         };
 
         // State
         let data = null;
         let currentView = 'geo';  // 'geo' or 'force'
-        let visibleRailways = {CPR: true, QLSRSC: true, CNoR: true, GTPR: true, Other: true};
+        let visibleRailways = {CPR: true, QLSRSC: true, CNoR: true, GTPR: true, Interchange: true, Other: true};
         let isPlaying = false;
         let playInterval = null;
         let nodeDegrees = {};
@@ -710,13 +720,13 @@
             d3Links = [];
             Object.entries(data.connections).forEach(([from, connections]) => {
                 connections.forEach(conn => {
-                    if (!conn.shared_railway || !conn.connected_year) return;
+                    if (!conn.connected_year) return;
                     const key = [from, conn.to].sort().join('|');
                     if (linkSet.has(key)) return;
                     linkSet.add(key);
 
                     let railway = conn.shared_railway;
-                    if (!['CPR', 'QLSRSC', 'CNoR', 'GTPR'].includes(railway)) {
+                    if (!['CPR', 'QLSRSC', 'CNoR', 'GTPR', 'Interchange'].includes(railway)) {
                         railway = 'Other';
                     }
 
@@ -724,7 +734,8 @@
                         source: from,
                         target: conn.to,
                         railway: railway,
-                        connected_year: conn.connected_year
+                        connected_year: conn.connected_year,
+                        isInterchange: conn.connection_type === 'interchange'
                     });
                 });
             });
@@ -762,8 +773,9 @@
                     [[source.lat, source.lon], [target.lat, target.lon]],
                     {
                         color: railwayColors[link.railway],
-                        weight: 2,
-                        opacity: 0
+                        weight: link.isInterchange ? 1.5 : 2,
+                        opacity: 0,
+                        dashArray: link.isInterchange ? '4,3' : null
                     }
                 ).addTo(map);
 
@@ -828,7 +840,8 @@
                 .append('line')
                 .attr('class', 'link')
                 .attr('stroke', d => railwayColors[d.railway])
-                .attr('stroke-width', 2)
+                .attr('stroke-width', d => d.isInterchange ? 1.5 : 2)
+                .attr('stroke-dasharray', d => d.isInterchange ? '4,3' : null)
                 .attr('x1', d => d.source.geoX)
                 .attr('y1', d => d.source.geoY)
                 .attr('x2', d => d.target.geoX)
@@ -939,7 +952,7 @@
             leafletEdges.forEach(polyline => {
                 const link = polyline.linkData;
                 const isVisible = link.connected_year <= year && visibleRailways[link.railway];
-                polyline.setStyle({ opacity: isVisible ? 0.6 : 0 });
+                polyline.setStyle({ opacity: isVisible ? (link.isInterchange ? 0.3 : 0.6) : 0 });
 
                 if (isVisible) {
                     visibleEdgeCount++;
@@ -953,7 +966,7 @@
             // Update D3 links
             linkElements.attr('stroke-opacity', d => {
                 const isVisible = d.connected_year <= year && visibleRailways[d.railway];
-                return isVisible ? 0.6 : 0;
+                return isVisible ? (d.isInterchange ? 0.3 : 0.6) : 0;
             });
 
             // Update Leaflet markers
