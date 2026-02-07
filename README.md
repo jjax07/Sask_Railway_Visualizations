@@ -29,10 +29,11 @@ An interactive map showing which settlements could be reached from Saskatoon wit
 Select any of the 429 Saskatchewan settlements to discover which neighbours were reachable within one hour by train (40 km radius). Watch connectivity evolve from 1882 to 1920.
 
 **Features:**
-- Searchable dropdown with all 429 settlements
+- Searchable dropdown with all 429 settlements (type to filter or click arrow to browse full list, with railway hints)
 - All settlements visible on map (click any to explore)
 - 40 km radius circle showing potential connections
-- Connection lines drawn between railway-connected settlements
+- Connection lines drawn between railway-connected settlements using actual track routes
+- Connections filtered by actual railway distance (40 km / 1 hour at 40 km/h), not just direct distance
 - Time slider (1882-1920) showing connectivity evolution
 - "New this year" highlighting for connections made in selected year
 - Color-coded markers:
@@ -45,9 +46,12 @@ Select any of the 429 Saskatchewan settlements to discover which neighbours were
 
 **Connection Logic:**
 Two settlements are "connected" when:
-1. Both are within 40 km of each other
+1. Both are within 40 km direct distance of each other
 2. Both share the same railway line
 3. Both have received that railway by the selected year
+4. The actual railway distance between them is ≤ 40 km (one hour at 40 km/h)
+
+Note: Some settlements are close as the crow flies but far apart by rail (e.g., on different branch lines). These are excluded because they are not reachable within one hour by train.
 
 **Multi-Railway Junctions:**
 Eight major settlements were served by multiple railway companies, indicated by orange diamond markers:
@@ -542,5 +546,6 @@ This project is for academic research purposes.
 
 ### Data Corrections (February 6, 2026)
 
-- **Summerberry**: Changed `first_railway` from `"No information provided"` to `"CPR"` (1882) across `settlements.json`, `settlement_connections.json`, and `railway_timeline.json`
+- **Summerberry**: Changed `first_railway` from `"No information provided"` to `"CPR"` (1882) across `settlements.json`, `settlement_connections.json`, and `railway_timeline.json`. Also fixed 7 connection entries from `shared_railway: "Interchange"` to `"CPR"` (both directions), and corrected `railway_distance_km` values of 0.0 for Wolseley and Sintaluta connections
 - **Lockwood**: Added null-safety checks across all demo visualizations to prevent settlements with `railway_arrives: null` from appearing erroneously (JavaScript `null <= 1882` evaluates to `true`)
+- **Settlement Explorer**: Added railway distance filter (≤ 40 km) so only true one-hour rail connections are shown. Replaced browser datalist with custom searchable dropdown supporting keyboard navigation, clickable arrow to browse, and railway hints per settlement
