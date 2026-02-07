@@ -5596,11 +5596,11 @@
       {
         "to": "Summerberry",
         "distance_km": 13.0,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1882,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
-        "railway_distance_km": 0.0
+        "railway_distance_km": 13.5
       },
       {
         "to": "Sintaluta",
@@ -5733,9 +5733,9 @@
       {
         "to": "Summerberry",
         "distance_km": 36.5,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1882,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
         "railway_distance_km": 48.4
       },
@@ -6280,9 +6280,9 @@
       {
         "to": "Summerberry",
         "distance_km": 11.1,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1882,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
         "railway_distance_km": 11.0
       },
@@ -7511,20 +7511,20 @@
       {
         "to": "Grenfell",
         "distance_km": 11.1,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1882,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
         "railway_distance_km": 11.0
       },
       {
         "to": "Wolseley",
         "distance_km": 13.0,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1882,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
-        "railway_distance_km": 0.0
+        "railway_distance_km": 13.5
       },
       {
         "to": "Glenavon",
@@ -7538,18 +7538,18 @@
       {
         "to": "Sintaluta",
         "distance_km": 26.1,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1882,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
-        "railway_distance_km": 0.0
+        "railway_distance_km": 27.0
       },
       {
         "to": "Neudorf",
         "distance_km": 32.2,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1904,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
         "railway_distance_km": 191.4
       },
@@ -7565,27 +7565,27 @@
       {
         "to": "Lemberg",
         "distance_km": 35.0,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1904,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
         "railway_distance_km": 191.4
       },
       {
         "to": "Broadview",
         "distance_km": 36.5,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1882,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
         "railway_distance_km": 48.4
       },
       {
         "to": "Windthorst",
         "distance_km": 39.6,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1906,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
         "railway_distance_km": 145.5
       }
@@ -7612,11 +7612,11 @@
       {
         "to": "Summerberry",
         "distance_km": 26.1,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1882,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
-        "railway_distance_km": 0.0
+        "railway_distance_km": 27.0
       },
       {
         "to": "Kendal",
@@ -9650,9 +9650,9 @@
       {
         "to": "Summerberry",
         "distance_km": 32.2,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1904,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
         "railway_distance_km": 191.4
       },
@@ -12834,9 +12834,9 @@
       {
         "to": "Summerberry",
         "distance_km": 35.0,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1904,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
         "railway_distance_km": 191.4
       },
@@ -21195,9 +21195,9 @@
       {
         "to": "Summerberry",
         "distance_km": 39.6,
-        "shared_railway": "Interchange",
+        "shared_railway": "CPR",
         "connected_year": 1906,
-        "connection_type": "interchange",
+        "connection_type": "same_railway",
         "all_shared_railways": null,
         "railway_distance_km": 145.5
       }

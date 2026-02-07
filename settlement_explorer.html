@@ -112,9 +112,12 @@
             font-weight: bold;
             font-size: 13px;
         }
+        .settlement-selector .combo-wrapper {
+            position: relative;
+        }
         .settlement-selector input {
             width: 100%;
-            padding: 8px 10px;
+            padding: 8px 30px 8px 10px;
             border: 2px solid #252528;
             border-radius: 5px;
             background: #000000;
@@ -124,6 +127,63 @@
         .settlement-selector input:focus {
             outline: none;
             border-color: #0b6a41;
+        }
+        .combo-arrow {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9A9B9D;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        .combo-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 280px;
+            overflow-y: auto;
+            background: #1a1a1e;
+            border: 2px solid #0b6a41;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            z-index: 900;
+        }
+        .combo-dropdown.open {
+            display: block;
+        }
+        .combo-option {
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #ccc;
+            transition: background 0.15s;
+        }
+        .combo-option:hover,
+        .combo-option.active {
+            background: #0b6a41;
+            color: #fff;
+        }
+        .combo-option .railway-hint {
+            font-size: 10px;
+            color: #888;
+            margin-left: 6px;
+        }
+        .combo-option:hover .railway-hint,
+        .combo-option.active .railway-hint {
+            color: #ccc;
+        }
+        .combo-no-results {
+            padding: 8px 10px;
+            color: #666;
+            font-style: italic;
+            font-size: 12px;
         }
         .selected-info {
             background: #252528;
@@ -378,9 +438,12 @@
         <div id="map"></div>
         <div class="sidebar">
             <div class="settlement-selector">
-                <label for="settlementSearch">Search Settlement:</label>
-                <input type="text" id="settlementSearch" list="settlementList" placeholder="Type to search...">
-                <datalist id="settlementList"></datalist>
+                <label for="settlementSearch">Select Settlement:</label>
+                <div class="combo-wrapper">
+                    <input type="text" id="settlementSearch" placeholder="Type to search or click to browse..." autocomplete="off">
+                    <span class="combo-arrow">&#9662;</span>
+                    <div class="combo-dropdown" id="comboDropdown"></div>
+                </div>
             </div>
 
             <div class="selected-info" id="selectedInfo">
@@ -1174,33 +1237,139 @@
             });
         }
 
-        // Initialize settlement selector dropdown
-        function initSettlementSelector() {
-            const datalist = document.getElementById('settlementList');
-            const settlementNames = Object.keys(data.settlements).sort();
+        // Initialize searchable dropdown
+        let comboSettlementNames = [];
+        let comboActiveIndex = -1;
 
-            settlementNames.forEach(name => {
-                const option = document.createElement('option');
-                option.value = name;
-                datalist.appendChild(option);
+        function initSettlementSelector() {
+            comboSettlementNames = Object.keys(data.settlements).sort();
+            const searchInput = document.getElementById('settlementSearch');
+            const dropdown = document.getElementById('comboDropdown');
+
+            // Show full list on focus/click
+            searchInput.addEventListener('focus', () => {
+                populateDropdown(searchInput.value);
+                dropdown.classList.add('open');
             });
 
-            const searchInput = document.getElementById('settlementSearch');
-            searchInput.addEventListener('change', (e) => {
-                const name = e.target.value;
-                if (data.settlements[name]) {
-                    selectSettlement(name);
+            searchInput.addEventListener('click', () => {
+                populateDropdown(searchInput.value);
+                dropdown.classList.add('open');
+            });
+
+            // Arrow button toggles dropdown and focuses input
+            document.querySelector('.combo-arrow').addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (dropdown.classList.contains('open')) {
+                    dropdown.classList.remove('open');
+                } else {
+                    searchInput.focus();
+                    searchInput.select();
+                    populateDropdown('');
+                    dropdown.classList.add('open');
                 }
             });
 
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    const name = e.target.value;
-                    if (data.settlements[name]) {
+            // Filter as user types
+            searchInput.addEventListener('input', () => {
+                comboActiveIndex = -1;
+                populateDropdown(searchInput.value);
+                dropdown.classList.add('open');
+            });
+
+            // Keyboard navigation
+            searchInput.addEventListener('keydown', (e) => {
+                const options = dropdown.querySelectorAll('.combo-option');
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    comboActiveIndex = Math.min(comboActiveIndex + 1, options.length - 1);
+                    updateActiveOption(options);
+                    scrollActiveIntoView(dropdown);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    comboActiveIndex = Math.max(comboActiveIndex - 1, 0);
+                    updateActiveOption(options);
+                    scrollActiveIntoView(dropdown);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (comboActiveIndex >= 0 && options[comboActiveIndex]) {
+                        const name = options[comboActiveIndex].dataset.name;
+                        searchInput.value = name;
+                        dropdown.classList.remove('open');
+                        selectSettlement(name);
+                    } else if (options.length > 0) {
+                        // Select first match
+                        const name = options[0].dataset.name;
+                        searchInput.value = name;
+                        dropdown.classList.remove('open');
                         selectSettlement(name);
                     }
+                } else if (e.key === 'Escape') {
+                    dropdown.classList.remove('open');
+                    searchInput.blur();
                 }
             });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.settlement-selector')) {
+                    dropdown.classList.remove('open');
+                }
+            });
+        }
+
+        function populateDropdown(filter) {
+            const dropdown = document.getElementById('comboDropdown');
+            const query = filter.toLowerCase().trim();
+            const filtered = query
+                ? comboSettlementNames.filter(n => n.toLowerCase().includes(query))
+                : comboSettlementNames;
+
+            if (filtered.length === 0) {
+                dropdown.innerHTML = '<div class="combo-no-results">No matching settlements</div>';
+                return;
+            }
+
+            // Sort: exact prefix matches first, then contains
+            if (query) {
+                filtered.sort((a, b) => {
+                    const aStarts = a.toLowerCase().startsWith(query) ? 0 : 1;
+                    const bStarts = b.toLowerCase().startsWith(query) ? 0 : 1;
+                    return aStarts - bStarts || a.localeCompare(b);
+                });
+            }
+
+            dropdown.innerHTML = filtered.map((name, i) => {
+                const s = data.settlements[name];
+                const hint = s.first_railway && s.railway_arrives
+                    ? `${s.first_railway} ${s.railway_arrives}`
+                    : '';
+                return `<div class="combo-option${i === comboActiveIndex ? ' active' : ''}" data-name="${name}" data-index="${i}">${name}<span class="railway-hint">${hint}</span></div>`;
+            }).join('');
+
+            // Click handler for each option
+            dropdown.querySelectorAll('.combo-option').forEach(opt => {
+                opt.addEventListener('mousedown', (e) => {
+                    e.preventDefault(); // Prevent input blur
+                    const name = opt.dataset.name;
+                    document.getElementById('settlementSearch').value = name;
+                    dropdown.classList.remove('open');
+                    selectSettlement(name);
+                });
+            });
+        }
+
+        function updateActiveOption(options) {
+            options.forEach((opt, i) => {
+                opt.classList.toggle('active', i === comboActiveIndex);
+            });
+        }
+
+        function scrollActiveIntoView(dropdown) {
+            const active = dropdown.querySelector('.combo-option.active');
+            if (active) {
+                active.scrollIntoView({ block: 'nearest' });
+            }
         }
 
         // Select a settlement and update the map
@@ -1423,8 +1592,13 @@
                 const m = nearbyMarkers[conn.to];
                 if (!m) return;
 
-                const isConnected = conn.connected_year && conn.connected_year <= year && selectedHasRailway;
-                const isNewThisYear = conn.connected_year === year && selectedHasRailway;
+                // Use railway distance if available, otherwise fall back to direct distance
+                const effectiveDistance = (conn.railway_distance_km != null && conn.railway_distance_km > 0)
+                    ? conn.railway_distance_km
+                    : conn.distance_km;
+                const isWithinOneHour = effectiveDistance <= 40;
+                const isConnected = conn.connected_year && conn.connected_year <= year && selectedHasRailway && isWithinOneHour;
+                const isNewThisYear = conn.connected_year === year && selectedHasRailway && isWithinOneHour;
 
                 if (isConnected) {
                     connectedCount++;
