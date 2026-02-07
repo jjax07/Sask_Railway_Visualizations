@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Company Territory Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; color: #eee; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #1a1a1e; padding: 20px; text-align: center; border-bottom: 3px solid #0b6a41; }
+        .header h1 { color: #fff; margin-bottom: 10px; }
+        .header p { color: #9A9B9D; max-width: 800px; margin: 0 auto; font-size: 14px; }
+        .nav { background: #252528; padding: 10px; text-align: center; }
+        .nav-dropdown { position: relative; display: inline-block; }
+        .nav-btn { color: #f1c730; background: transparent; border: 1px solid #f1c730; padding: 8px 20px; border-radius: 3px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .nav-btn:hover { background: #f1c730; color: #000; }
+        .nav-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #252528; border: 1px solid #f1c730; border-radius: 5px; padding: 10px 0; min-width: 220px; z-index: 1000; margin-top: 5px; }
+        .nav-menu.show { display: block; }
+        .nav-menu a { display: block; color: #f1c730; text-decoration: none; padding: 8px 20px; transition: all 0.2s; }
+        .nav-menu a:hover { background: #0b6a41; color: #fff; }
+        .nav-menu a.current { color: #0b6a41; font-weight: bold; }
+        #map { flex: 1; }
+        .controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(26,26,30,0.95); padding: 12px 24px; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; gap: 16px; z-index: 1000; flex-wrap: wrap; }
+        .controls button { background: transparent; border: 1px solid #0b6a41; color: #0b6a41; padding: 6px 16px; border-radius: 3px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .controls button:hover, .controls button.active { background: #0b6a41; color: #fff; }
+        .year-slider { width: 250px; -webkit-appearance: none; appearance: none; height: 4px; background: #333; border-radius: 2px; outline: none; }
+        .year-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #0b6a41; border-radius: 50%; cursor: pointer; }
+        .year-display { font-size: 18px; font-weight: bold; color: #f1c730; min-width: 50px; text-align: center; }
+        .speed-select { background: #252528; color: #eee; border: 1px solid #333; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
+        .stats-panel { position: absolute; top: 80px; right: 10px; background: rgba(26,26,30,0.95); padding: 16px; border-radius: 8px; border: 1px solid #333; z-index: 1000; min-width: 180px; }
+        .stats-panel h3 { color: #f1c730; font-size: 13px; margin-bottom: 10px; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; }
+        .stat-bar { height: 6px; border-radius: 3px; margin-top: 2px; }
+        .stat-label { color: #aaa; }
+        .stat-val { color: #eee; font-weight: bold; }
+        .legend-panel { position: absolute; top: 80px; left: 10px; background: rgba(26,26,30,0.95); padding: 12px; border-radius: 8px; border: 1px solid #333; z-index: 1000; }
+        .legend-panel h4 { color: #999; font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }
+        .legend-row { display: flex; align-items: center; margin-bottom: 5px; font-size: 12px; color: #aaa; }
+        .legend-swatch { width: 16px; height: 16px; border-radius: 3px; margin-right: 8px; border: 1px solid rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Railway Company Territory Map</h1>
+    <p>Voronoi-style territory shading showing which railway company serves each area<br>of Saskatchewan, based on the nearest railway settlement in each year</p>
+</div>
+<div class="nav">
+    <div class="nav-dropdown">
+        <button class="nav-btn" onclick="document.querySelector('.nav-menu').classList.toggle('show')">All Visualizations &#9662;</button>
+        <div class="nav-menu">
+            <a href="index.html">Home</a>
+            <a href="one_hour_map.html">One-Hour Corridor</a>
+            <a href="railway_timeline.html">Railway Timeline</a>
+            <a href="settlement_explorer.html">Settlement Explorer</a>
+            <a href="network_graph.html">Network Graph</a>
+            <a href="isochrone.html">Travel Time Comparison</a>
+            <a href="journey_times.html">Journey Times</a>
+            <a href="travel_race.html">Travelling Time Simulation</a>
+            <a href="transport_eras.html">Transport Eras</a>
+            <a href="#" class="current">Railway Territory</a>
+        </div>
+    </div>
+</div>
+<div id="map"></div>
+<div class="legend-panel">
+    <h4>Railway Territory</h4>
+    <div class="legend-row"><div class="legend-swatch" style="background:rgba(199,93,56,0.5);"></div>CPR</div>
+    <div class="legend-row"><div class="legend-swatch" style="background:rgba(11,106,65,0.5);"></div>QLSRSC</div>
+    <div class="legend-row"><div class="legend-swatch" style="background:rgba(241,199,48,0.5);"></div>CNoR</div>
+    <div class="legend-row"><div class="legend-swatch" style="background:rgba(108,92,231,0.5);"></div>GTPR</div>
+    <div class="legend-row" style="margin-top:8px;"><div class="legend-swatch" style="background:rgba(0,0,0,0); border:1px dashed #555;"></div>No railway</div>
+</div>
+<div class="stats-panel" id="stats-panel">
+    <h3>Territory Coverage</h3>
+    <div id="stats-content"></div>
+</div>
+<div class="controls">
+    <button id="play-btn" onclick="togglePlay()">&#9654; Play</button>
+    <span class="year-display" id="year-display">1882</span>
+    <input type="range" class="year-slider" id="year-slider" min="1882" max="1920" value="1882" step="1">
+    <label style="font-size:12px;color:#999;">Speed: <select class="speed-select" id="speed-select"><option value="1000">Slow</option><option value="500" selected>Medium</option><option value="200">Fast</option></select></label>
+</div>
+<script>
+const COLORS = { CPR:[199,93,56], QLSRSC:[11,106,65], CNoR:[241,199,48], GTPR:[108,92,231] };
+const DOT_COLORS = { CPR:'#c75d38', QLSRSC:'#0b6a41', CNoR:'#f1c730', GTPR:'#6c5ce7' };
+const MAX_DIST = 100; // km - beyond this, no territory claimed
+const GRID_RES = 100; // columns
+let settlements = [], currentYear = 1882, isPlaying = false, playTimer;
+let map, canvasLayer, markers = [];
+
+// Haversine
+function haversine(lat1,lon1,lat2,lon2) {
+    const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+    const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+map = L.map('map',{zoomControl:true}).setView([52,-106],6);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; CARTO',maxZoom:18}).addTo(map);
+
+// Canvas overlay
+const TerritoryLayer = L.Layer.extend({
+    onAdd(map) {
+        this._map = map;
+        this._canvas = L.DomUtil.create('canvas','territory-canvas');
+        this._canvas.style.pointerEvents = 'none';
+        map.getPanes().overlayPane.appendChild(this._canvas);
+        map.on('moveend zoomend', this.redraw, this);
+        this.redraw();
+    },
+    onRemove(map) {
+        map.getPanes().overlayPane.removeChild(this._canvas);
+        map.off('moveend zoomend', this.redraw, this);
+    },
+    redraw() {
+        const size = this._map.getSize();
+        this._canvas.width = size.x;
+        this._canvas.height = size.y;
+        const topLeft = this._map.containerPointToLayerPoint([0,0]);
+        L.DomUtil.setPosition(this._canvas, topLeft);
+        const ctx = this._canvas.getContext('2d');
+        ctx.clearRect(0,0,size.x,size.y);
+
+        const active = settlements.filter(s => s.railway_arrives != null && s.railway_arrives <= currentYear);
+        if (!active.length) return;
+
+        const bounds = this._map.getBounds();
+        const cols = GRID_RES, rows = Math.round(cols * size.y / size.x);
+        const cellW = size.x / cols, cellH = size.y / rows;
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const px = (c + 0.5) * cellW, py = (r + 0.5) * cellH;
+                const latlng = this._map.containerPointToLatLng([px + topLeft.x, py + topLeft.y]);
+                // Restrict to roughly Saskatchewan
+                if (latlng.lat < 49 || latlng.lat > 55 || latlng.lng < -110 || latlng.lng > -101) continue;
+
+                let minDist = Infinity, nearest = null;
+                for (const s of active) {
+                    const d = haversine(latlng.lat, latlng.lng, s.lat, s.lon);
+                    if (d < minDist) { minDist = d; nearest = s; }
+                }
+                if (minDist > MAX_DIST || !nearest) continue;
+
+                const rgb = COLORS[nearest.first_railway];
+                if (!rgb) continue;
+                const alpha = Math.max(0.05, 0.35 * (1 - minDist / MAX_DIST));
+                ctx.fillStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha})`;
+                ctx.fillRect(c * cellW, r * cellH, cellW + 1, cellH + 1);
+            }
+        }
+    }
+});
+
+canvasLayer = new TerritoryLayer();
+canvasLayer.addTo(map);
+
+fetch('data/settlements.json').then(r=>r.json()).then(data => {
+    settlements = data;
+    updateMap();
+});
+
+function updateMap() {
+    // Clear old markers
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    const active = settlements.filter(s => s.railway_arrives != null && s.railway_arrives <= currentYear);
+    active.forEach(s => {
+        const m = L.circleMarker([s.lat, s.lon], {
+            radius: 4, fillColor: DOT_COLORS[s.first_railway] || '#888', fillOpacity: 0.9,
+            color: '#000', weight: 1
+        }).bindTooltip(s.name + ' (' + s.first_railway + ', ' + s.railway_arrives + ')');
+        m.addTo(map);
+        markers.push(m);
+    });
+
+    canvasLayer.redraw();
+    updateStats(active);
+}
+
+function updateStats(active) {
+    const counts = { CPR:0, QLSRSC:0, CNoR:0, GTPR:0 };
+    active.forEach(s => { if(counts.hasOwnProperty(s.first_railway)) counts[s.first_railway]++; });
+    const total = active.length || 1;
+    let html = `<div class="stat-row"><span class="stat-label">Settlements</span><span class="stat-val">${active.length} / 429</span></div>`;
+    for (const [rw, count] of Object.entries(counts)) {
+        const pct = Math.round(count/total*100);
+        html += `<div class="stat-row"><span class="stat-label" style="color:${DOT_COLORS[rw]}">${rw}</span><span class="stat-val">${count} (${pct}%)</span></div>`;
+        html += `<div class="stat-bar" style="width:${pct}%;background:${DOT_COLORS[rw]}"></div>`;
+    }
+    document.getElementById('stats-content').innerHTML = html;
+}
+
+document.getElementById('year-slider').addEventListener('input', e => {
+    currentYear = +e.target.value;
+    document.getElementById('year-display').textContent = currentYear;
+    updateMap();
+});
+
+function togglePlay() {
+    if (isPlaying) { isPlaying=false; clearTimeout(playTimer); document.getElementById('play-btn').innerHTML='&#9654; Play'; document.getElementById('play-btn').classList.remove('active'); }
+    else { isPlaying=true; document.getElementById('play-btn').innerHTML='&#10074;&#10074; Pause'; document.getElementById('play-btn').classList.add('active'); if(currentYear>=1920){currentYear=1882;document.getElementById('year-slider').value=1882;document.getElementById('year-display').textContent=1882;} stepPlay(); }
+}
+function stepPlay() {
+    if(!isPlaying||currentYear>=1920){isPlaying=false;document.getElementById('play-btn').innerHTML='&#9654; Play';document.getElementById('play-btn').classList.remove('active');return;}
+    currentYear++;document.getElementById('year-slider').value=currentYear;document.getElementById('year-display').textContent=currentYear;updateMap();
+    playTimer=setTimeout(stepPlay,+document.getElementById('speed-select').value);
+}
+
+document.addEventListener('click', e => { const m=document.querySelector('.nav-menu'),b=document.querySelector('.nav-btn'); if(m&&m.classList.contains('show')&&!m.contains(e.target)&&e.target!==b) m.classList.remove('show'); });
+</script>
+</body>
+</html>

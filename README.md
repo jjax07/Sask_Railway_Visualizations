@@ -76,10 +76,10 @@ Watch the four major railway companies expand across Saskatchewan year by year.
 **Railway Companies:**
 | Railway | Color | Period | Description |
 |---------|-------|--------|-------------|
-| CPR | Red | 1882+ | Canadian Pacific - First transcontinental through southern SK |
-| QLSRSC | Green | 1889-90 | Qu'Appelle, Long Lake & Saskatchewan - Regina to Prince Albert via Saskatoon |
-| CNoR | Yellow | 1899+ | Canadian Northern - Northerly competitor through Saskatoon |
-| GTPR | Purple | 1905+ | Grand Trunk Pacific - Third transcontinental via Saskatoon |
+| CPR | Rust (#c75d38) | 1882+ | Canadian Pacific - First transcontinental through southern SK |
+| QLSRSC | Green (#0b6a41) | 1889-90 | Qu'Appelle, Long Lake & Saskatchewan - Regina to Prince Albert via Saskatoon |
+| CNoR | Gold (#f1c730) | 1899+ | Canadian Northern - Northerly competitor through Saskatoon |
+| GTPR | Purple (#6c5ce7) | 1905+ | Grand Trunk Pacific - Third transcontinental via Saskatoon |
 
 ### 4. Network Graph
 
@@ -110,9 +110,9 @@ Interactive network graph visualization showing all 429 Saskatchewan settlements
 | Isolated Settlements | ~8 |
 
 **Color Scheme:**
-- CPR: Red (#e94560)
-- QLSRSC: Green (#4ecca3)
-- CNoR: Yellow (#ffd93d)
+- CPR: Rust (#c75d38)
+- QLSRSC: Green (#0b6a41)
+- CNoR: Gold (#f1c730)
 - GTPR: Purple (#6c5ce7)
 - Other/No railway: Gray (#888)
 
@@ -140,7 +140,7 @@ Compare walking, horse & cart, and railway travel times between any origin settl
 - **Red bars**: Walking time
 - **Orange bars**: Horse & cart time
 - **Green bars**: Railway time
-- **Yellow text**: Railway transfers (e.g., CPR → CNoR)
+- **Gold text**: Railway transfers (e.g., CPR → CNoR)
 - Color-coded rows by distance (green=near, yellow=mid, red=far)
 - Time savings column shows how much faster rail is vs walking
 
@@ -190,8 +190,8 @@ Compare how far you could travel by walking, wagon, or railway in the same amoun
 
 **Visual Elements:**
 - **Gray circle (solid)**: Walking range
-- **Yellow circle (solid)**: Wagon range
-- **Green circle (dashed)**: Railway range (theoretical)
+- **Gold circle (solid)**: Wagon range
+- **Green circle (solid)**: Railway range (radius extends to furthest rail-connected settlement)
 - **Green markers**: Settlements actually reachable by railway within time limit
 - Markers color-coded by fastest mode of access
 
@@ -202,35 +202,71 @@ Compare how far you could travel by walking, wagon, or railway in the same amoun
 **Technical Implementation:**
 - Uses Dijkstra's algorithm on the railway network graph
 - Calculates shortest path railway distances from selected hub to all settlements
-- Filters by year - only shows connections that existed by selected year
+- Edge-snapped settlements: considers both edge endpoints and along-edge position (`snap_edge_t`) for accurate distance calculation
+- Filters by year — only shows connections that existed by selected year
 - Railway reachability based on actual track routes, not straight-line distance
 
-### 8. Time-Distance Map
+### 8. Transport Eras
 
-Settlements reposition based on travel time rather than geography. Railways collapse connected settlements together while isolated ones stay far apart.
+Scrub through four transport eras and watch settlements shift from geographic positions through walking, horse & cart, and railway time-distance layouts.
 
 **Features:**
-- Four transport modes: Geographic, Walking (5 km/h), Horse & Cart (10 km/h), Railway (40 km/h)
-- Stress-minimized layout for railway mode using iterative spring algorithm on ~1,811 connection pairs
-- Year slider (1882-1920) shows network evolution
-- Animated LERP transitions between modes with map opacity fading
-- Canvas overlay on Leaflet dark basemap
-- Hover tooltips with settlement name and railway info
-- Mode-specific color coding matching Journey Times visualization
+- Unified slider across all transport modes
+- Smooth interpolation between eras
+- Auto-play with stage pauses
+- Railway connections colored by company
 
-**Transport Mode Layouts:**
-| Mode | Layout | Color |
-|------|--------|-------|
-| Geographic | Real lat/lon positions, Leaflet map visible | Teal (#4ecca3) |
-| Walking | 1.5x radial expansion from centroid | Red (#e94560) |
-| Horse & Cart | 1.0x reference scale | Orange (#e09530) |
-| Railway | Stress-minimized: rail pairs collapse, isolated nodes at walking distance | Teal (#4ecca3) |
+## Demo Visualizations (Experimental)
 
-**Technical Details:**
-- Iterative stress minimization: 300 iterations with decaying step size
-- Rail springs use `railway_distance_km / 40 * scale`, non-rail springs use `distance_km / 5 * scale`
-- Rail spring weight 1.0, non-rail weight 0.3, gentle centering force prevents drift
-- Railway layout recomputed on year change, cached otherwise
+Five additional demo visualizations exploring the railway data from new analytical perspectives. These are distinct from the main visualizations in that they focus on statistical, comparative, and aggregate views rather than individual map-based exploration.
+
+### Centrality Rankings Over Time (`demo_centrality.html`)
+
+A D3.js bump chart showing how settlement importance shifts as railways arrive. Settlements are ranked by **degree centrality** (number of active railway connections) for each year from 1882 to 1920, with the top 15 displayed.
+
+- Lines colored by first railway company (CPR/QLSRSC/CNoR/GTPR)
+- Hover to highlight a settlement and see its rank history
+- Play animation or use "Show All Years" toggle
+- Info panel shows railway details for hovered settlement
+
+### Railway Company Territory Map (`demo_territory.html`)
+
+A Leaflet map with a Voronoi-style canvas overlay showing which railway company "serves" each area of Saskatchewan, based on the nearest railway settlement. Territory shading fades with distance (max 100 km).
+
+- Year slider animates territory expansion from 1882 to 1920
+- Statistics panel shows settlement counts and percentages per railway
+- Visualizes competition and coverage gaps between companies
+
+### Small Multiples: Network Growth (`demo_small_multiples.html`)
+
+A filmstrip of 10 static Canvas maps (1882, 1886, 1890, 1895, 1900, 1905, 1908, 1910, 1915, 1920) displayed simultaneously in a 5x2 grid. No slider or animation required — the entire story is visible at a glance for side-by-side comparison.
+
+- Settlements colored by railway company
+- "Highlight new" toggle makes newly-added settlements glow
+- Hover on a panel to enlarge it
+- Summary bar shows settlement counts per year
+
+### Connectivity Inequality Dashboard (`demo_inequality.html`)
+
+A 2x2 grid of D3.js line charts showing aggregate network statistics over time:
+
+1. **Railway Coverage** — % of 429 settlements connected
+2. **Average Connections** — mean degree among connected settlements
+3. **Connectivity Inequality (Gini)** — degree distribution inequality
+4. **Network Density** — fraction of possible connections that exist
+
+- Synchronized scrubber line follows mouse across all 4 charts
+- Key railway events annotated (CPR 1882, QLSRSC 1889, CNoR 1899, GTPR 1905)
+- Summary bar shows year-by-year statistics
+
+### Settlement Accessibility Heatmap (`demo_heatmap.html`)
+
+A Leaflet map with a rasterized canvas overlay showing the distance from any point in Saskatchewan to the nearest railway settlement. Reveals **coverage gaps and accessibility deserts** that settlement-focused maps don't emphasize.
+
+- Color gradient from green (0 km) through yellow/orange to dark red (150+ km)
+- Year slider shows coverage expanding from 1882 to 1920
+- Stats panel: average distance, % within 25 km, % within 50 km
+- Adjustable heatmap opacity
 
 ## Project Structure
 
@@ -245,7 +281,12 @@ Sask_Railway_Visualizations/
 ├── journey_times_simple.html  # Simpler journey times (earlier version)
 ├── travel_race.html           # Travelling time simulation (animated race)
 ├── isochrone.html             # Travel time comparison visualization
-├── time_distance.html         # Time-distance map visualization
+├── transport_eras.html        # Transport eras animation
+├── demo_centrality.html      # Demo: Centrality rankings bump chart
+├── demo_territory.html       # Demo: Railway company territory map
+├── demo_small_multiples.html # Demo: Small multiples filmstrip
+├── demo_inequality.html      # Demo: Connectivity inequality dashboard
+├── demo_heatmap.html         # Demo: Settlement accessibility heatmap
 ├── data/
 │   ├── settlements.json              # 429 settlements with coordinates & railway info
 │   ├── settlement_connections.json   # Pre-calculated connections with railway distances
@@ -456,10 +497,27 @@ open http://localhost:8080
 - **CPR_map_1941_with_original_names.pdf**: CPR system map showing absorbed railways
 - **CNoR_Map_1906.pdf**: Canadian Northern Railway system map
 
+## Visual Theme
+
+All visualizations use University of Saskatchewan branding:
+
+| Element | Color | Hex |
+|---------|-------|-----|
+| Page background | Black | `#000000` |
+| Header/sidebar | Dark gray | `#1a1a1e` |
+| Section backgrounds | Charcoal | `#252528` |
+| Header border | USask Green | `#0b6a41` |
+| Section headings | USask Gold | `#f1c730` |
+| Buttons | USask Green | `#0b6a41` |
+| Muted text | Gray | `#9A9B9D` |
+
+Navigation uses a dropdown menu ("Other Visualizations") consistent across all pages.
+
 ## Technical Details
 
 Built with:
 - [Leaflet.js](https://leafletjs.com/) for interactive maps
+- [D3.js](https://d3js.org/) for network graph visualization
 - [CARTO Dark Matter](https://carto.com/basemaps/) basemap tiles
 - Vanilla JavaScript (no frameworks)
 - Python 3 for data processing
@@ -480,4 +538,9 @@ This project is for academic research purposes.
 ---
 
 *Created January 2026*
-*Last updated: February 3, 2026*
+*Last updated: February 6, 2026*
+
+### Data Corrections (February 6, 2026)
+
+- **Summerberry**: Changed `first_railway` from `"No information provided"` to `"CPR"` (1882) across `settlements.json`, `settlement_connections.json`, and `railway_timeline.json`
+- **Lockwood**: Added null-safety checks across all demo visualizations to prevent settlements with `railway_arrives: null` from appearing erroneously (JavaScript `null <= 1882` evaluates to `true`)

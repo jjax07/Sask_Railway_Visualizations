@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connectivity Inequality Dashboard</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; color: #eee; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #1a1a1e; padding: 20px; text-align: center; border-bottom: 3px solid #0b6a41; }
+        .header h1 { color: #fff; margin-bottom: 10px; }
+        .header p { color: #9A9B9D; max-width: 800px; margin: 0 auto; font-size: 14px; }
+        .nav { background: #252528; padding: 10px; text-align: center; }
+        .nav-dropdown { position: relative; display: inline-block; }
+        .nav-btn { color: #f1c730; background: transparent; border: 1px solid #f1c730; padding: 8px 20px; border-radius: 3px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .nav-btn:hover { background: #f1c730; color: #000; }
+        .nav-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #252528; border: 1px solid #f1c730; border-radius: 5px; padding: 10px 0; min-width: 220px; z-index: 1000; margin-top: 5px; }
+        .nav-menu.show { display: block; }
+        .nav-menu a { display: block; color: #f1c730; text-decoration: none; padding: 8px 20px; transition: all 0.2s; }
+        .nav-menu a:hover { background: #0b6a41; color: #fff; }
+        .nav-menu a.current { color: #0b6a41; font-weight: bold; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; flex: 1; gap: 12px; padding: 12px; overflow: hidden; }
+        .chart-panel { background: #1a1a1e; border-radius: 8px; border: 1px solid #252528; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .chart-title { padding: 10px 16px 0; font-size: 13px; font-weight: bold; color: #f1c730; }
+        .chart-subtitle { padding: 2px 16px 6px; font-size: 11px; color: #666; }
+        .chart-svg { flex: 1; }
+        .controls-bar { background: #1a1a1e; border-top: 1px solid #333; padding: 10px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .controls-bar button { background: transparent; border: 1px solid #0b6a41; color: #0b6a41; padding: 6px 16px; border-radius: 3px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .controls-bar button:hover, .controls-bar button.active { background: #0b6a41; color: #fff; }
+        .year-display { font-size: 18px; font-weight: bold; color: #f1c730; min-width: 50px; text-align: center; }
+        .summary-bar { background: #1a1a1e; padding: 10px 24px; border-top: 1px solid #252528; text-align: center; font-size: 13px; color: #999; }
+        .summary-bar b { color: #f1c730; }
+        .annotation { font-size: 9px; fill: #666; }
+        .anno-line { stroke: #444; stroke-width: 1; stroke-dasharray: 3,3; }
+        .scrubber { stroke: #f1c730; stroke-width: 1; stroke-dasharray: 4,4; opacity: 0.7; }
+        .scrub-dot { fill: #f1c730; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Connectivity Inequality Dashboard</h1>
+    <p>Aggregate network statistics revealing how railway expansion changed<br>Saskatchewan's connectivity landscape from 1882 to 1920</p>
+</div>
+<div class="nav">
+    <div class="nav-dropdown">
+        <button class="nav-btn" onclick="document.querySelector('.nav-menu').classList.toggle('show')">All Visualizations &#9662;</button>
+        <div class="nav-menu">
+            <a href="index.html">Home</a>
+            <a href="one_hour_map.html">One-Hour Corridor</a>
+            <a href="railway_timeline.html">Railway Timeline</a>
+            <a href="settlement_explorer.html">Settlement Explorer</a>
+            <a href="network_graph.html">Network Graph</a>
+            <a href="isochrone.html">Travel Time Comparison</a>
+            <a href="journey_times.html">Journey Times</a>
+            <a href="travel_race.html">Travelling Time Simulation</a>
+            <a href="transport_eras.html">Transport Eras</a>
+            <a href="#" class="current">Connectivity Inequality</a>
+        </div>
+    </div>
+</div>
+<div class="charts-grid" id="charts-grid">
+    <div class="chart-panel"><div class="chart-title">Railway Coverage</div><div class="chart-subtitle">Percentage of 429 settlements connected to the railway network</div><div class="chart-svg" id="chart-coverage"></div></div>
+    <div class="chart-panel"><div class="chart-title">Average Connections</div><div class="chart-subtitle">Mean number of railway connections per connected settlement</div><div class="chart-svg" id="chart-degree"></div></div>
+    <div class="chart-panel"><div class="chart-title">Connectivity Inequality (Gini)</div><div class="chart-subtitle">Gini coefficient of degree distribution (0 = equal, 1 = unequal)</div><div class="chart-svg" id="chart-gini"></div></div>
+    <div class="chart-panel"><div class="chart-title">Network Density</div><div class="chart-subtitle">Fraction of possible connections that actually exist among connected settlements</div><div class="chart-svg" id="chart-density"></div></div>
+</div>
+<div class="summary-bar" id="summary-bar">Move mouse over charts to explore year-by-year statistics</div>
+<div class="controls-bar">
+    <button id="play-btn" onclick="togglePlay()">&#9654; Play</button>
+    <span class="year-display" id="year-display">1920</span>
+</div>
+<script>
+const TOTAL = 429;
+const ANNOTATIONS = [{year:1882,label:'CPR arrives'},{year:1889,label:'QLSRSC built'},{year:1899,label:'CNoR begins'},{year:1905,label:'GTPR begins'}];
+let connData, metrics = [], isPlaying = false, playTimer, scrubYear = 1920;
+const charts = [];
+
+d3.json('data/settlement_connections.json').then(raw => {
+    connData = raw;
+    computeMetrics();
+    buildCharts();
+});
+
+function computeMetrics() {
+    for (let yr = 1882; yr <= 1920; yr++) {
+        const deg = {};
+        // all 429 settlements get 0 initially
+        for (const [name, info] of Object.entries(connData.settlements)) {
+            deg[name] = 0;
+        }
+        // count active connections
+        let edgeCount = 0;
+        for (const [name, conns] of Object.entries(connData.connections)) {
+            if (!conns) continue;
+            for (const c of conns) {
+                if (c.connected_year <= yr && deg.hasOwnProperty(name)) {
+                    deg[name]++;
+                    edgeCount++;
+                }
+            }
+        }
+
+        const degrees = Object.values(deg);
+        const connected = degrees.filter(d => d > 0);
+        const connectedCount = connected.length;
+        const coverage = connectedCount / TOTAL * 100;
+        const avgDegree = connectedCount > 0 ? connected.reduce((a,b) => a+b, 0) / connectedCount : 0;
+
+        // Gini on all 429
+        const sorted = [...degrees].sort((a,b) => a-b);
+        const n = sorted.length;
+        let gini = 0;
+        const sum = sorted.reduce((a,b) => a+b, 0);
+        if (sum > 0) {
+            let cumSum = 0;
+            sorted.forEach((v, i) => { cumSum += v; gini += (2*(i+1) - n - 1) * v; });
+            gini = gini / (n * sum);
+        }
+
+        // Density among connected settlements
+        const V = connectedCount;
+        const density = V > 1 ? edgeCount / (V * (V - 1)) : 0;
+
+        metrics.push({ year: yr, coverage, avgDegree, gini, density, connectedCount, edgeCount });
+    }
+}
+
+function buildCharts() {
+    const configs = [
+        { id: 'chart-coverage', key: 'coverage', color: '#0b6a41', fmt: v => v.toFixed(1) + '%', yLabel: '% Connected' },
+        { id: 'chart-degree', key: 'avgDegree', color: '#f1c730', fmt: v => v.toFixed(1), yLabel: 'Avg Connections' },
+        { id: 'chart-gini', key: 'gini', color: '#c75d38', fmt: v => v.toFixed(3), yLabel: 'Gini Coefficient' },
+        { id: 'chart-density', key: 'density', color: '#6c5ce7', fmt: v => v.toFixed(4), yLabel: 'Density' }
+    ];
+
+    configs.forEach(cfg => {
+        const el = document.getElementById(cfg.id);
+        const rect = el.getBoundingClientRect();
+        const margin = { top: 16, right: 16, bottom: 28, left: 50 };
+        const w = rect.width - margin.left - margin.right;
+        const h = rect.height - margin.top - margin.bottom;
+
+        const svg = d3.select('#' + cfg.id).append('svg').attr('width', rect.width).attr('height', rect.height);
+        const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+        const x = d3.scaleLinear().domain([1882, 1920]).range([0, w]);
+        const yMax = d3.max(metrics, d => d[cfg.key]) * 1.15 || 1;
+        const y = d3.scaleLinear().domain([0, yMax]).range([h, 0]);
+
+        // Grid
+        g.selectAll('.grid-h').data(y.ticks(4)).enter().append('line')
+            .attr('x1', 0).attr('x2', w).attr('y1', d => y(d)).attr('y2', d => y(d)).attr('stroke', '#222');
+
+        // Axes
+        const xA = g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(x).ticks(10).tickFormat(d3.format('d')));
+        xA.selectAll('text').style('fill', '#999').style('font-size', '10px');
+        xA.selectAll('path,line').style('stroke', '#444');
+
+        const yA = g.append('g').call(d3.axisLeft(y).ticks(4).tickFormat(d => cfg.key === 'coverage' ? d.toFixed(0) + '%' : cfg.key === 'gini' ? d.toFixed(2) : cfg.key === 'density' ? d.toFixed(3) : d.toFixed(1)));
+        yA.selectAll('text').style('fill', '#999').style('font-size', '10px');
+        yA.selectAll('path,line').style('stroke', '#444');
+
+        // Area fill
+        const area = d3.area().x(d => x(d.year)).y0(h).y1(d => y(d[cfg.key])).curve(d3.curveMonotoneX);
+        g.append('path').datum(metrics).attr('d', area).attr('fill', cfg.color).attr('opacity', 0.1);
+
+        // Line
+        const line = d3.line().x(d => x(d.year)).y(d => y(d[cfg.key])).curve(d3.curveMonotoneX);
+        g.append('path').datum(metrics).attr('d', line).attr('fill', 'none').attr('stroke', cfg.color).attr('stroke-width', 2.5);
+
+        // Dots
+        g.selectAll('.dot').data(metrics).enter().append('circle')
+            .attr('cx', d => x(d.year)).attr('cy', d => y(d[cfg.key])).attr('r', 2).attr('fill', cfg.color);
+
+        // Annotations
+        ANNOTATIONS.forEach(a => {
+            g.append('line').attr('class', 'anno-line').attr('x1', x(a.year)).attr('x2', x(a.year)).attr('y1', 0).attr('y2', h);
+            g.append('text').attr('class', 'annotation').attr('x', x(a.year) + 3).attr('y', 10).text(a.label);
+        });
+
+        // Scrubber
+        const scrubLine = g.append('line').attr('class', 'scrubber').attr('y1', 0).attr('y2', h).attr('x1', x(1920)).attr('x2', x(1920));
+        const scrubDot = g.append('circle').attr('class', 'scrub-dot').attr('r', 5)
+            .attr('cx', x(1920)).attr('cy', y(metrics[metrics.length-1][cfg.key]));
+        const scrubText = g.append('text').attr('fill', '#eee').attr('font-size', '12px').attr('font-weight', 'bold')
+            .attr('x', x(1920) + 8).attr('y', y(metrics[metrics.length-1][cfg.key]) + 4)
+            .text(cfg.fmt(metrics[metrics.length-1][cfg.key]));
+
+        // Mouse interaction
+        const overlay = g.append('rect').attr('width', w).attr('height', h).attr('fill', 'transparent');
+        overlay.on('mousemove', function(event) {
+            const [mx] = d3.pointer(event);
+            const yr = Math.round(x.invert(mx));
+            if (yr < 1882 || yr > 1920) return;
+            scrubYear = yr;
+            updateScrubbers(yr);
+        });
+
+        charts.push({ g, x, y, cfg, scrubLine, scrubDot, scrubText, w, h });
+    });
+}
+
+function updateScrubbers(yr) {
+    const m = metrics.find(d => d.year === yr);
+    if (!m) return;
+    charts.forEach(ch => {
+        const val = m[ch.cfg.key];
+        ch.scrubLine.attr('x1', ch.x(yr)).attr('x2', ch.x(yr));
+        ch.scrubDot.attr('cx', ch.x(yr)).attr('cy', ch.y(val));
+        let tx = ch.x(yr) + 8;
+        if (tx + 50 > ch.w) tx = ch.x(yr) - 55;
+        ch.scrubText.attr('x', tx).attr('y', ch.y(val) + 4).text(ch.cfg.fmt(val));
+    });
+    document.getElementById('year-display').textContent = yr;
+    document.getElementById('summary-bar').innerHTML =
+        `In <b>${yr}</b>: <b>${m.coverage.toFixed(1)}%</b> connected | Avg <b>${m.avgDegree.toFixed(1)}</b> connections | Gini <b>${m.gini.toFixed(3)}</b> | ${m.connectedCount} settlements, ${m.edgeCount} links`;
+}
+
+function togglePlay() {
+    if (isPlaying) { isPlaying = false; clearTimeout(playTimer); document.getElementById('play-btn').innerHTML = '&#9654; Play'; document.getElementById('play-btn').classList.remove('active'); }
+    else { isPlaying = true; document.getElementById('play-btn').innerHTML = '&#10074;&#10074; Pause'; document.getElementById('play-btn').classList.add('active'); if(scrubYear>=1920) scrubYear=1881; stepPlay(); }
+}
+function stepPlay() {
+    if (!isPlaying || scrubYear >= 1920) { isPlaying = false; document.getElementById('play-btn').innerHTML = '&#9654; Play'; document.getElementById('play-btn').classList.remove('active'); return; }
+    scrubYear++; updateScrubbers(scrubYear);
+    playTimer = setTimeout(stepPlay, 400);
+}
+
+document.addEventListener('click', e => { const m=document.querySelector('.nav-menu'),b=document.querySelector('.nav-btn'); if(m&&m.classList.contains('show')&&!m.contains(e.target)&&e.target!==b) m.classList.remove('show'); });
+</script>
+</body>
+</html>

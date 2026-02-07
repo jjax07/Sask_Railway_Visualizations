@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settlement Accessibility Heatmap</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; color: #eee; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #1a1a1e; padding: 20px; text-align: center; border-bottom: 3px solid #0b6a41; }
+        .header h1 { color: #fff; margin-bottom: 10px; }
+        .header p { color: #9A9B9D; max-width: 800px; margin: 0 auto; font-size: 14px; }
+        .nav { background: #252528; padding: 10px; text-align: center; }
+        .nav-dropdown { position: relative; display: inline-block; }
+        .nav-btn { color: #f1c730; background: transparent; border: 1px solid #f1c730; padding: 8px 20px; border-radius: 3px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .nav-btn:hover { background: #f1c730; color: #000; }
+        .nav-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #252528; border: 1px solid #f1c730; border-radius: 5px; padding: 10px 0; min-width: 220px; z-index: 1000; margin-top: 5px; }
+        .nav-menu.show { display: block; }
+        .nav-menu a { display: block; color: #f1c730; text-decoration: none; padding: 8px 20px; transition: all 0.2s; }
+        .nav-menu a:hover { background: #0b6a41; color: #fff; }
+        .nav-menu a.current { color: #0b6a41; font-weight: bold; }
+        #map { flex: 1; }
+        .controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(26,26,30,0.95); padding: 12px 24px; border-radius: 8px; border: 1px solid #333; display: flex; align-items: center; gap: 16px; z-index: 1000; flex-wrap: wrap; }
+        .controls button { background: transparent; border: 1px solid #0b6a41; color: #0b6a41; padding: 6px 16px; border-radius: 3px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .controls button:hover, .controls button.active { background: #0b6a41; color: #fff; }
+        .year-slider { width: 220px; -webkit-appearance: none; height: 4px; background: #333; border-radius: 2px; outline: none; }
+        .year-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #0b6a41; border-radius: 50%; cursor: pointer; }
+        .year-display { font-size: 18px; font-weight: bold; color: #f1c730; min-width: 50px; text-align: center; }
+        .speed-select, .opacity-slider { background: #252528; color: #eee; border: 1px solid #333; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
+        .opacity-slider { width: 80px; -webkit-appearance: none; height: 4px; background: #333; border-radius: 2px; }
+        .opacity-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: #f1c730; border-radius: 50%; cursor: pointer; }
+        .stats-panel { position: absolute; top: 80px; right: 10px; background: rgba(26,26,30,0.95); padding: 16px; border-radius: 8px; border: 1px solid #333; z-index: 1000; min-width: 200px; }
+        .stats-panel h3 { color: #f1c730; font-size: 13px; margin-bottom: 10px; }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; }
+        .stat-label { color: #aaa; }
+        .stat-val { color: #eee; font-weight: bold; }
+        .color-legend { position: absolute; top: 80px; left: 10px; background: rgba(26,26,30,0.95); padding: 12px; border-radius: 8px; border: 1px solid #333; z-index: 1000; }
+        .color-legend h4 { color: #999; font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }
+        .gradient-bar { width: 20px; height: 160px; border-radius: 3px; position: relative; }
+        .gradient-labels { position: absolute; left: 28px; top: 0; height: 160px; display: flex; flex-direction: column; justify-content: space-between; }
+        .gradient-labels span { font-size: 10px; color: #aaa; white-space: nowrap; }
+        .legend-wrapper { position: relative; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Settlement Accessibility Heatmap</h1>
+    <p>Distance to the nearest railway settlement across all of Saskatchewan,<br>revealing coverage gaps and accessibility deserts over time</p>
+</div>
+<div class="nav">
+    <div class="nav-dropdown">
+        <button class="nav-btn" onclick="document.querySelector('.nav-menu').classList.toggle('show')">All Visualizations &#9662;</button>
+        <div class="nav-menu">
+            <a href="index.html">Home</a>
+            <a href="one_hour_map.html">One-Hour Corridor</a>
+            <a href="railway_timeline.html">Railway Timeline</a>
+            <a href="settlement_explorer.html">Settlement Explorer</a>
+            <a href="network_graph.html">Network Graph</a>
+            <a href="isochrone.html">Travel Time Comparison</a>
+            <a href="journey_times.html">Journey Times</a>
+            <a href="travel_race.html">Travelling Time Simulation</a>
+            <a href="transport_eras.html">Transport Eras</a>
+            <a href="#" class="current">Accessibility Heatmap</a>
+        </div>
+    </div>
+</div>
+<div id="map"></div>
+<div class="color-legend">
+    <h4>Distance to Railway</h4>
+    <div class="legend-wrapper">
+        <canvas id="gradient-canvas" width="20" height="160" style="border-radius:3px;"></canvas>
+        <div class="gradient-labels">
+            <span>0 km</span>
+            <span>25 km</span>
+            <span>50 km</span>
+            <span>75 km</span>
+            <span>100 km</span>
+            <span>150+ km</span>
+        </div>
+    </div>
+</div>
+<div class="stats-panel" id="stats-panel">
+    <h3>Accessibility Stats</h3>
+    <div id="stats-content"></div>
+</div>
+<div class="controls">
+    <button id="play-btn" onclick="togglePlay()">&#9654; Play</button>
+    <span class="year-display" id="year-display">1882</span>
+    <input type="range" class="year-slider" id="year-slider" min="1882" max="1920" value="1882" step="1">
+    <label style="font-size:12px;color:#999;">Speed: <select class="speed-select" id="speed-select"><option value="1000">Slow</option><option value="500" selected>Medium</option><option value="200">Fast</option></select></label>
+    <label style="font-size:12px;color:#999;">Opacity: <input type="range" class="opacity-slider" id="opacity-slider" min="20" max="90" value="60"></label>
+</div>
+<script>
+let settlements = [], currentYear = 1882, isPlaying = false, playTimer;
+let map, heatLayer, markerGroup, heatOpacity = 0.6;
+
+function haversine(lat1,lon1,lat2,lon2) {
+    const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+    const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function distColor(d) {
+    // Gradient: green -> yellow -> orange -> red -> dark red
+    if (d <= 10) return [0, 255, 136];
+    if (d <= 25) { const t=(d-10)/15; return [Math.round(11*(1-t)+143*t), Math.round(255*(1-t)+188*t), Math.round(136*(1-t)+60*t)]; }
+    if (d <= 50) { const t=(d-25)/25; return [Math.round(143*(1-t)+241*t), Math.round(188*(1-t)+199*t), Math.round(60*(1-t)+48*t)]; }
+    if (d <= 75) { const t=(d-50)/25; return [Math.round(241*(1-t)+230*t), Math.round(199*(1-t)+126*t), Math.round(48*(1-t)+34*t)]; }
+    if (d <= 100) { const t=(d-75)/25; return [Math.round(230*(1-t)+199*t), Math.round(126*(1-t)+93*t), Math.round(34*(1-t)+56*t)]; }
+    if (d <= 150) { const t=(d-100)/50; return [Math.round(199*(1-t)+139*t), Math.round(93*(1-t)+0*t), Math.round(56*(1-t)+0*t)]; }
+    return [139, 0, 0];
+}
+
+// Draw gradient legend
+const gc = document.getElementById('gradient-canvas').getContext('2d');
+for (let y = 0; y < 160; y++) {
+    const d = (y / 160) * 150;
+    const [r,g,b] = distColor(d);
+    gc.fillStyle = `rgb(${r},${g},${b})`;
+    gc.fillRect(0, y, 20, 1);
+}
+
+map = L.map('map', { zoomControl: true }).setView([52, -106], 6);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 18 }).addTo(map);
+markerGroup = L.layerGroup().addTo(map);
+
+// Heatmap canvas overlay
+const HeatLayer = L.Layer.extend({
+    onAdd(map) {
+        this._map = map;
+        this._canvas = L.DomUtil.create('canvas', 'heat-canvas');
+        this._canvas.style.pointerEvents = 'none';
+        map.getPanes().overlayPane.appendChild(this._canvas);
+        map.on('moveend zoomend resize', this._redraw, this);
+        this._redraw();
+    },
+    onRemove(map) {
+        map.getPanes().overlayPane.removeChild(this._canvas);
+        map.off('moveend zoomend resize', this._redraw, this);
+    },
+    _redraw() {
+        const size = this._map.getSize();
+        this._canvas.width = size.x;
+        this._canvas.height = size.y;
+        const topLeft = this._map.containerPointToLayerPoint([0, 0]);
+        L.DomUtil.setPosition(this._canvas, topLeft);
+        const ctx = this._canvas.getContext('2d');
+        ctx.clearRect(0, 0, size.x, size.y);
+
+        const active = settlements.filter(s => s.railway_arrives != null && s.railway_arrives <= currentYear);
+        if (!active.length) return;
+
+        const cols = 120, rows = Math.round(cols * size.y / size.x);
+        const cellW = size.x / cols, cellH = size.y / rows;
+        let totalDist = 0, gridCount = 0, within25 = 0, within50 = 0;
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const px = (c + 0.5) * cellW, py = (r + 0.5) * cellH;
+                const pt = this._map.containerPointToLatLng([px + topLeft.x, py + topLeft.y]);
+                if (pt.lat < 49 || pt.lat > 55 || pt.lng < -110 || pt.lng > -101) continue;
+
+                let minD = Infinity;
+                for (const s of active) {
+                    const d = haversine(pt.lat, pt.lng, s.lat, s.lon);
+                    if (d < minD) minD = d;
+                }
+
+                totalDist += minD; gridCount++;
+                if (minD <= 25) within25++;
+                if (minD <= 50) within50++;
+
+                const [cr, cg, cb] = distColor(Math.min(minD, 150));
+                ctx.fillStyle = `rgba(${cr},${cg},${cb},${heatOpacity})`;
+                ctx.fillRect(c * cellW, r * cellH, cellW + 1, cellH + 1);
+            }
+        }
+
+        // Update stats
+        const avgDist = gridCount > 0 ? (totalDist / gridCount).toFixed(1) : '—';
+        const pct25 = gridCount > 0 ? (within25 / gridCount * 100).toFixed(1) : '0';
+        const pct50 = gridCount > 0 ? (within50 / gridCount * 100).toFixed(1) : '0';
+        document.getElementById('stats-content').innerHTML =
+            `<div class="stat-row"><span class="stat-label">Year</span><span class="stat-val">${currentYear}</span></div>` +
+            `<div class="stat-row"><span class="stat-label">Railway Settlements</span><span class="stat-val">${active.length}</span></div>` +
+            `<div class="stat-row"><span class="stat-label">Avg Distance</span><span class="stat-val">${avgDist} km</span></div>` +
+            `<div class="stat-row"><span class="stat-label">Within 25 km</span><span class="stat-val">${pct25}%</span></div>` +
+            `<div class="stat-row"><span class="stat-label">Within 50 km</span><span class="stat-val">${pct50}%</span></div>`;
+    }
+});
+
+heatLayer = new HeatLayer();
+heatLayer.addTo(map);
+
+fetch('data/settlements.json').then(r => r.json()).then(data => {
+    settlements = data;
+    updateMarkers();
+    heatLayer._redraw();
+});
+
+function updateMarkers() {
+    markerGroup.clearLayers();
+    const active = settlements.filter(s => s.railway_arrives != null && s.railway_arrives <= currentYear);
+    active.forEach(s => {
+        L.circleMarker([s.lat, s.lon], {
+            radius: 3, fillColor: '#fff', fillOpacity: 0.9, color: '#000', weight: 1
+        }).bindTooltip(s.name + ' (' + s.railway_arrives + ')').addTo(markerGroup);
+    });
+}
+
+document.getElementById('year-slider').addEventListener('input', e => {
+    currentYear = +e.target.value;
+    document.getElementById('year-display').textContent = currentYear;
+    updateMarkers();
+    heatLayer._redraw();
+});
+
+document.getElementById('opacity-slider').addEventListener('input', e => {
+    heatOpacity = +e.target.value / 100;
+    heatLayer._redraw();
+});
+
+function togglePlay() {
+    if (isPlaying) { isPlaying=false; clearTimeout(playTimer); document.getElementById('play-btn').innerHTML='&#9654; Play'; document.getElementById('play-btn').classList.remove('active'); }
+    else { isPlaying=true; document.getElementById('play-btn').innerHTML='&#10074;&#10074; Pause'; document.getElementById('play-btn').classList.add('active'); if(currentYear>=1920){currentYear=1882;document.getElementById('year-slider').value=1882;document.getElementById('year-display').textContent=1882;} stepPlay(); }
+}
+function stepPlay() {
+    if(!isPlaying||currentYear>=1920){isPlaying=false;document.getElementById('play-btn').innerHTML='&#9654; Play';document.getElementById('play-btn').classList.remove('active');return;}
+    currentYear++;document.getElementById('year-slider').value=currentYear;document.getElementById('year-display').textContent=currentYear;updateMarkers();heatLayer._redraw();
+    playTimer=setTimeout(stepPlay,+document.getElementById('speed-select').value);
+}
+
+document.addEventListener('click', e => { const m=document.querySelector('.nav-menu'),b=document.querySelector('.nav-btn'); if(m&&m.classList.contains('show')&&!m.contains(e.target)&&e.target!==b) m.classList.remove('show'); });
+</script>
+</body>
+</html>

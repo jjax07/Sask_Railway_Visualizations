@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centrality Rankings Over Time</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000000; color: #eee; display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #1a1a1e; padding: 20px; text-align: center; border-bottom: 3px solid #0b6a41; }
+        .header h1 { color: #ffffff; margin-bottom: 10px; }
+        .header p { color: #9A9B9D; max-width: 800px; margin: 0 auto; font-size: 14px; }
+        .nav { background: #252528; padding: 10px; text-align: center; }
+        .nav-dropdown { position: relative; display: inline-block; }
+        .nav-btn { color: #f1c730; background: transparent; border: 1px solid #f1c730; padding: 8px 20px; border-radius: 3px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .nav-btn:hover { background: #f1c730; color: #000; }
+        .nav-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #252528; border: 1px solid #f1c730; border-radius: 5px; padding: 10px 0; min-width: 220px; z-index: 1000; margin-top: 5px; }
+        .nav-menu.show { display: block; }
+        .nav-menu a { display: block; color: #f1c730; text-decoration: none; padding: 8px 20px; transition: all 0.2s; }
+        .nav-menu a:hover { background: #0b6a41; color: #fff; }
+        .nav-menu a.current { color: #0b6a41; font-weight: bold; }
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        .chart-area { flex: 1; position: relative; }
+        .info-panel { width: 240px; background: #1a1a1e; border-left: 1px solid #252528; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; }
+        .info-panel h3 { color: #f1c730; font-size: 14px; margin-bottom: 12px; }
+        .info-settlement-name { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+        .info-detail { font-size: 12px; color: #aaa; margin-bottom: 4px; }
+        .info-detail span { color: #eee; }
+        .info-rank-history { margin-top: 12px; }
+        .info-rank-history h4 { color: #999; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .rank-entry { font-size: 12px; color: #888; padding: 2px 0; }
+        .rank-entry.highlighted { color: #fff; }
+        .info-placeholder { color: #666; font-style: italic; font-size: 13px; margin-top: 20px; }
+        .legend { margin-top: auto; padding-top: 20px; border-top: 1px solid #333; }
+        .legend h4 { color: #999; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .legend-item { display: flex; align-items: center; margin-bottom: 6px; font-size: 12px; color: #aaa; }
+        .legend-swatch { width: 20px; height: 4px; border-radius: 2px; margin-right: 8px; flex-shrink: 0; }
+        .controls-bar { background: #1a1a1e; border-top: 1px solid #333; padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .controls-bar label { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+        .controls-bar button { background: transparent; border: 1px solid #0b6a41; color: #0b6a41; padding: 6px 16px; border-radius: 3px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+        .controls-bar button:hover, .controls-bar button.active { background: #0b6a41; color: #fff; }
+        .year-slider { flex: 1; min-width: 200px; -webkit-appearance: none; appearance: none; height: 4px; background: #333; border-radius: 2px; outline: none; }
+        .year-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: #0b6a41; border-radius: 50%; cursor: pointer; }
+        .year-display { font-size: 18px; font-weight: bold; color: #f1c730; min-width: 50px; text-align: center; }
+        .speed-select { background: #252528; color: #eee; border: 1px solid #333; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
+        .toggle-label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: #999; }
+        .toggle-label input { accent-color: #0b6a41; }
+        .bump-line { fill: none; stroke-width: 2.5; cursor: pointer; transition: opacity 0.2s; }
+        .bump-dot { cursor: pointer; transition: opacity 0.2s; }
+        .bump-label { font-size: 11px; fill: #888; cursor: pointer; transition: opacity 0.2s; }
+        .dimmed { opacity: 0.12 !important; }
+        .highlighted-line { stroke-width: 4 !important; }
+        .tooltip { position: absolute; background: rgba(20,20,24,0.95); border: 1px solid #444; border-radius: 4px; padding: 8px 12px; font-size: 12px; color: #eee; pointer-events: none; z-index: 100; white-space: nowrap; }
+        .tooltip .tt-name { font-weight: bold; margin-bottom: 3px; }
+        .tooltip .tt-detail { color: #aaa; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Centrality Rankings Over Time</h1>
+    <p>A bump chart showing how settlement importance shifts as railways arrive,<br>ranked by degree centrality (number of active railway connections) from 1882 to 1920</p>
+</div>
+<div class="nav">
+    <div class="nav-dropdown">
+        <button class="nav-btn" onclick="document.querySelector('.nav-menu').classList.toggle('show')">All Visualizations &#9662;</button>
+        <div class="nav-menu">
+            <a href="index.html">Home</a>
+            <a href="one_hour_map.html">One-Hour Corridor</a>
+            <a href="railway_timeline.html">Railway Timeline</a>
+            <a href="settlement_explorer.html">Settlement Explorer</a>
+            <a href="network_graph.html">Network Graph</a>
+            <a href="isochrone.html">Travel Time Comparison</a>
+            <a href="journey_times.html">Journey Times</a>
+            <a href="travel_race.html">Travelling Time Simulation</a>
+            <a href="transport_eras.html">Transport Eras</a>
+            <a href="#" class="current">Centrality Rankings</a>
+        </div>
+    </div>
+</div>
+<div class="main-container">
+    <div class="chart-area" id="chart-area">
+        <div class="tooltip" id="tooltip" style="display:none;"></div>
+    </div>
+    <div class="info-panel" id="info-panel">
+        <h3>Settlement Details</h3>
+        <div id="info-content"><p class="info-placeholder">Hover over a line to see settlement details</p></div>
+        <div class="legend">
+            <h4>Railway Companies</h4>
+            <div class="legend-item"><div class="legend-swatch" style="background:#c75d38;"></div>CPR</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#0b6a41;"></div>QLSRSC</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#f1c730;"></div>CNoR</div>
+            <div class="legend-item"><div class="legend-swatch" style="background:#6c5ce7;"></div>GTPR</div>
+        </div>
+    </div>
+</div>
+<div class="controls-bar">
+    <button id="play-btn" onclick="togglePlay()">&#9654; Play</button>
+    <span class="year-display" id="year-display">1920</span>
+    <input type="range" class="year-slider" id="year-slider" min="1882" max="1920" value="1920" step="1">
+    <label>Speed: <select class="speed-select" id="speed-select"><option value="1200">Slow</option><option value="700" selected>Medium</option><option value="300">Fast</option></select></label>
+    <label class="toggle-label"><input type="checkbox" id="show-all-toggle" checked onchange="toggleShowAll()"> Show All Years</label>
+</div>
+<script>
+const COLORS = { CPR:'#c75d38', QLSRSC:'#0b6a41', CNoR:'#f1c730', GTPR:'#6c5ce7' };
+const TOP_N = 15;
+let data, rankings, currentYear = 1920, isPlaying = false, playTimer, showAll = true, highlighted = null;
+let svg, g, xScale, yScale, margin = {top:30,right:140,bottom:40,left:50}, w, h;
+
+d3.json('data/settlement_connections.json').then(raw => {
+    data = raw;
+    computeRankings();
+    initChart();
+    updateChart();
+});
+
+function computeRankings() {
+    rankings = [];
+    for (let yr = 1882; yr <= 1920; yr++) {
+        const deg = {};
+        for (const [name, info] of Object.entries(data.settlements)) {
+            if (info.railway_arrives != null && info.railway_arrives <= yr) deg[name] = 0;
+        }
+        for (const [name, conns] of Object.entries(data.connections)) {
+            if (!conns) continue;
+            for (const c of conns) {
+                if (c.connected_year <= yr && deg.hasOwnProperty(name)) deg[name]++;
+            }
+        }
+        const sorted = Object.entries(deg).filter(d => d[1] > 0).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]));
+        rankings.push({ year: yr, ranks: sorted.slice(0, TOP_N).map((d,i) => ({name:d[0], degree:d[1], rank:i+1, year:yr, rw: data.settlements[d[0]].first_railway})) });
+    }
+}
+
+function initChart() {
+    const el = document.getElementById('chart-area'), rect = el.getBoundingClientRect();
+    w = rect.width - margin.left - margin.right;
+    h = rect.height - margin.top - margin.bottom;
+    svg = d3.select('#chart-area').append('svg').attr('width', rect.width).attr('height', rect.height);
+    g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+    xScale = d3.scaleLinear().domain([1882,1920]).range([0,w]);
+    yScale = d3.scaleLinear().domain([1,TOP_N]).range([0,h]);
+
+    // grid
+    g.selectAll('.gh').data(d3.range(1,TOP_N+1)).enter().append('line').attr('x1',0).attr('x2',w).attr('y1',d=>yScale(d)).attr('y2',d=>yScale(d)).attr('stroke','#222').attr('stroke-width',0.5);
+    g.selectAll('.gv').data(d3.range(1885,1921,5)).enter().append('line').attr('x1',d=>xScale(d)).attr('x2',d=>xScale(d)).attr('y1',0).attr('y2',h).attr('stroke','#1a1a1e').attr('stroke-width',0.5);
+
+    const xA = g.append('g').attr('transform',`translate(0,${h})`).call(d3.axisBottom(xScale).ticks(19).tickFormat(d3.format('d')));
+    xA.selectAll('text').style('fill','#999').style('font-size','10px'); xA.selectAll('path,line').style('stroke','#444');
+    const yA = g.append('g').call(d3.axisLeft(yScale).ticks(TOP_N).tickFormat(d=>'#'+d));
+    yA.selectAll('text').style('fill','#999').style('font-size','11px'); yA.selectAll('path,line').style('stroke','#444');
+    g.append('text').attr('transform','rotate(-90)').attr('x',-h/2).attr('y',-38).attr('text-anchor','middle').attr('fill','#999').attr('font-size','12px').text('Rank');
+
+    g.append('g').attr('class','lines'); g.append('g').attr('class','dots'); g.append('g').attr('class','labels');
+    g.append('line').attr('class','yr-line').attr('y1',-10).attr('y2',h+10).attr('stroke','#f1c730').attr('stroke-width',1).attr('stroke-dasharray','4,4').attr('opacity',0.6);
+
+    document.getElementById('year-slider').addEventListener('input', e => {
+        currentYear = +e.target.value;
+        document.getElementById('year-display').textContent = currentYear;
+        if (!showAll) updateChart();
+    });
+}
+
+function color(name) { return COLORS[data.settlements[name]?.first_railway] || '#888'; }
+
+function buildData(upTo) {
+    const range = showAll ? rankings : rankings.filter(r => r.year <= upTo);
+    const names = new Set(); range.forEach(r => r.ranks.forEach(d => names.add(d.name)));
+    const series = {};
+    names.forEach(n => series[n] = []);
+    range.forEach(r => { const m = {}; r.ranks.forEach(d => m[d.name]=d); names.forEach(n => { if(m[n]) series[n].push(m[n]); }); });
+    return { names: [...names], series };
+}
+
+function updateChart() {
+    const upTo = showAll ? 1920 : currentYear;
+    const bd = buildData(upTo);
+    const line = d3.line().x(d=>xScale(d.year)).y(d=>yScale(d.rank)).curve(d3.curveMonotoneX);
+
+    g.select('.yr-line').attr('x1',xScale(upTo)).attr('x2',xScale(upTo)).attr('opacity',showAll?0:0.6);
+
+    // lines
+    const lines = g.select('.lines').selectAll('.bump-line').data(bd.names, d=>d);
+    lines.exit().transition().duration(300).attr('opacity',0).remove();
+    lines.enter().append('path').attr('class','bump-line').merge(lines)
+        .attr('data-name',d=>d).attr('stroke',d=>color(d))
+        .on('mouseenter', function(e) { hover(d3.select(this).attr('data-name'),e); })
+        .on('mouseleave', unhover)
+        .transition().duration(400).attr('d',d => bd.series[d].length ? line(bd.series[d]) : null).attr('opacity',0.8);
+
+    // dots
+    const allDots = []; bd.names.forEach(n => bd.series[n].forEach(pt => allDots.push(pt)));
+    const dots = g.select('.dots').selectAll('.bump-dot').data(allDots, d=>d.name+'-'+d.year);
+    dots.exit().transition().duration(300).attr('r',0).remove();
+    dots.enter().append('circle').attr('class','bump-dot').attr('r',0).attr('stroke','#000').attr('stroke-width',1)
+        .merge(dots).attr('data-name',d=>d.name)
+        .on('mouseenter', function(e,d) { hover(d.name,e); showTip(e,d); })
+        .on('mousemove', (e,d) => showTip(e,d))
+        .on('mouseleave', unhover)
+        .transition().duration(400).attr('cx',d=>xScale(d.year)).attr('cy',d=>yScale(d.rank)).attr('r',4).attr('fill',d=>color(d.name));
+
+    // labels
+    const labelData = bd.names.map(n => { const pts = bd.series[n]; return pts.length ? {name:n,...pts[pts.length-1]} : null; }).filter(Boolean);
+    const labels = g.select('.labels').selectAll('.bump-label').data(labelData, d=>d.name);
+    labels.exit().transition().duration(300).attr('opacity',0).remove();
+    labels.enter().append('text').attr('class','bump-label').attr('opacity',0).merge(labels)
+        .attr('data-name',d=>d.name)
+        .on('mouseenter', function(e,d) { hover(d.name,e); })
+        .on('mouseleave', unhover)
+        .transition().duration(400).attr('x',d=>xScale(d.year)+10).attr('y',d=>yScale(d.rank)+4).attr('fill',d=>color(d.name)).attr('opacity',1).text(d=>d.name);
+
+    if (highlighted) applyHL(highlighted);
+}
+
+function hover(name,e) { highlighted=name; applyHL(name); showInfo(name); }
+function unhover() { highlighted=null; clearHL(); document.getElementById('info-content').innerHTML='<p class="info-placeholder">Hover over a line to see settlement details</p>'; document.getElementById('tooltip').style.display='none'; }
+
+function applyHL(name) {
+    g.selectAll('.bump-line,.bump-dot,.bump-label').classed('dimmed',true);
+    const esc = CSS.escape(name);
+    g.selectAll(`[data-name="${esc}"]`).classed('dimmed',false);
+    g.selectAll(`.bump-line[data-name="${esc}"]`).classed('highlighted-line',true).raise();
+    g.selectAll(`.bump-dot[data-name="${esc}"]`).raise();
+}
+function clearHL() { g.selectAll('.bump-line,.bump-dot,.bump-label').classed('dimmed',false); g.selectAll('.bump-line').classed('highlighted-line',false); }
+
+function showTip(e,d) {
+    const tip = document.getElementById('tooltip'), area = document.getElementById('chart-area').getBoundingClientRect();
+    tip.style.display='block';
+    tip.innerHTML=`<div class="tt-name">${d.name}</div><div class="tt-detail">Year: ${d.year}</div><div class="tt-detail">Rank: #${d.rank}</div><div class="tt-detail">Connections: ${d.degree}</div>`;
+    let x = e.clientX - area.left + 12, y = e.clientY - area.top - 10;
+    if (x+160>area.width) x-=170; if (y+80>area.height) y-=80;
+    tip.style.left=x+'px'; tip.style.top=y+'px';
+}
+
+function showInfo(name) {
+    const info = data.settlements[name]; if(!info) return;
+    const bd = buildData(showAll?1920:currentYear), pts = bd.series[name]||[];
+    let html = `<div class="info-settlement-name" style="color:${color(name)}">${name}</div>`;
+    html += `<div class="info-detail">First Railway: <span style="color:${COLORS[info.first_railway]||'#eee'}">${info.first_railway}</span></div>`;
+    html += `<div class="info-detail">Railway Arrives: <span>${info.railway_arrives}</span></div>`;
+    html += `<div class="info-detail">Total Railways: <span>${info.railways.length}</span></div>`;
+    if (pts.length) {
+        html += '<div class="info-rank-history"><h4>Rank History</h4>';
+        pts.slice(-12).forEach(pt => { html += `<div class="rank-entry">${pt.year}: #${pt.rank} (${pt.degree} conn.)</div>`; });
+        html += '</div>';
+    }
+    document.getElementById('info-content').innerHTML = html;
+}
+
+function togglePlay() {
+    if (isPlaying) { isPlaying=false; clearTimeout(playTimer); document.getElementById('play-btn').innerHTML='&#9654; Play'; document.getElementById('play-btn').classList.remove('active'); }
+    else { if(showAll){document.getElementById('show-all-toggle').checked=false; showAll=false;} isPlaying=true; document.getElementById('play-btn').innerHTML='&#10074;&#10074; Pause'; document.getElementById('play-btn').classList.add('active'); if(currentYear>=1920){currentYear=1882;document.getElementById('year-slider').value=1882;document.getElementById('year-display').textContent=1882;} stepPlay(); }
+}
+function stepPlay() {
+    if(!isPlaying||currentYear>=1920){isPlaying=false;document.getElementById('play-btn').innerHTML='&#9654; Play';document.getElementById('play-btn').classList.remove('active');return;}
+    currentYear++;document.getElementById('year-slider').value=currentYear;document.getElementById('year-display').textContent=currentYear;updateChart();
+    playTimer=setTimeout(stepPlay,+document.getElementById('speed-select').value);
+}
+function toggleShowAll() { showAll=document.getElementById('show-all-toggle').checked; if(showAll){isPlaying=false;clearTimeout(playTimer);document.getElementById('play-btn').innerHTML='&#9654; Play';} updateChart(); }
+
+document.addEventListener('click', e => { const m=document.querySelector('.nav-menu'),b=document.querySelector('.nav-btn'); if(m&&m.classList.contains('show')&&!m.contains(e.target)&&e.target!==b) m.classList.remove('show'); });
+window.addEventListener('resize', () => {
+    const el=document.getElementById('chart-area'),rect=el.getBoundingClientRect();
+    w=rect.width-margin.left-margin.right; h=rect.height-margin.top-margin.bottom;
+    svg.attr('width',rect.width).attr('height',rect.height);
+    xScale.range([0,w]); yScale.range([0,h]);
+    g.selectAll('.gh,.gv,line,.x-axis,.y-axis').remove(); // simplified: just redraw
+    initChart(); updateChart();
+});
+</script>
+</body>
+</html>

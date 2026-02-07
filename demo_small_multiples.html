@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Small Multiples - Railway Network Growth</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; color: #eee; }
+        .header { background: #1a1a1e; padding: 20px; text-align: center; border-bottom: 3px solid #0b6a41; }
+        .header h1 { color: #fff; margin-bottom: 10px; }
+        .header p { color: #9A9B9D; max-width: 800px; margin: 0 auto; font-size: 14px; }
+        .nav { background: #252528; padding: 10px; text-align: center; }
+        .nav-dropdown { position: relative; display: inline-block; }
+        .nav-btn { color: #f1c730; background: transparent; border: 1px solid #f1c730; padding: 8px 20px; border-radius: 3px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .nav-btn:hover { background: #f1c730; color: #000; }
+        .nav-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #252528; border: 1px solid #f1c730; border-radius: 5px; padding: 10px 0; min-width: 220px; z-index: 1000; margin-top: 5px; }
+        .nav-menu.show { display: block; }
+        .nav-menu a { display: block; color: #f1c730; text-decoration: none; padding: 8px 20px; transition: all 0.2s; }
+        .nav-menu a:hover { background: #0b6a41; color: #fff; }
+        .nav-menu a.current { color: #0b6a41; font-weight: bold; }
+        .legend-bar { background: #1a1a1e; padding: 10px 20px; display: flex; justify-content: center; gap: 24px; align-items: center; border-bottom: 1px solid #252528; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #aaa; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .toggle-label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: #999; margin-left: 20px; }
+        .toggle-label input { accent-color: #0b6a41; }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 16px; max-width: 1400px; margin: 0 auto; }
+        .panel { background: #1a1a1e; border-radius: 8px; border: 1px solid #252528; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; cursor: default; }
+        .panel:hover { transform: scale(1.03); box-shadow: 0 8px 24px rgba(11,106,65,0.3); z-index: 10; }
+        .panel-header { padding: 8px 12px; display: flex; justify-content: space-between; align-items: baseline; }
+        .panel-year { font-size: 20px; font-weight: bold; color: #f1c730; }
+        .panel-count { font-size: 12px; color: #999; }
+        .panel canvas { display: block; width: 100%; }
+        .summary { background: #1a1a1e; padding: 14px 20px; text-align: center; border-top: 1px solid #252528; }
+        .summary span { font-size: 13px; color: #999; margin: 0 12px; }
+        .summary b { color: #f1c730; }
+        @media (max-width: 1000px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Small Multiples: Railway Network Growth</h1>
+    <p>A filmstrip view of Saskatchewan's railway expansion at 10 key years,<br>allowing side-by-side comparison without animation or sliders</p>
+</div>
+<div class="nav">
+    <div class="nav-dropdown">
+        <button class="nav-btn" onclick="document.querySelector('.nav-menu').classList.toggle('show')">All Visualizations &#9662;</button>
+        <div class="nav-menu">
+            <a href="index.html">Home</a>
+            <a href="one_hour_map.html">One-Hour Corridor</a>
+            <a href="railway_timeline.html">Railway Timeline</a>
+            <a href="settlement_explorer.html">Settlement Explorer</a>
+            <a href="network_graph.html">Network Graph</a>
+            <a href="isochrone.html">Travel Time Comparison</a>
+            <a href="journey_times.html">Journey Times</a>
+            <a href="travel_race.html">Travelling Time Simulation</a>
+            <a href="transport_eras.html">Transport Eras</a>
+            <a href="#" class="current">Small Multiples</a>
+        </div>
+    </div>
+</div>
+<div class="legend-bar">
+    <div class="legend-item"><div class="legend-dot" style="background:#c75d38;"></div>CPR</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#0b6a41;"></div>QLSRSC</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f1c730;"></div>CNoR</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#6c5ce7;"></div>GTPR</div>
+    <label class="toggle-label"><input type="checkbox" id="highlight-new" onchange="redrawAll()"> Highlight new settlements</label>
+</div>
+<div class="grid" id="grid"></div>
+<div class="summary" id="summary"></div>
+<script>
+const COLORS = { CPR:'#c75d38', QLSRSC:'#0b6a41', CNoR:'#f1c730', GTPR:'#6c5ce7' };
+const YEARS = [1882, 1886, 1890, 1895, 1900, 1905, 1908, 1910, 1915, 1920];
+const BOUNDS = { minLat:49, maxLat:55, minLon:-110, maxLon:-101 };
+let allSettlements = [], timelineData = {};
+
+Promise.all([
+    fetch('data/settlements.json').then(r=>r.json()),
+    fetch('data/railway_timeline.json').then(r=>r.json())
+]).then(([settlements, timeline]) => {
+    allSettlements = settlements;
+    timelineData = timeline;
+    buildPanels();
+    redrawAll();
+});
+
+function buildPanels() {
+    const grid = document.getElementById('grid');
+    YEARS.forEach(yr => {
+        const panel = document.createElement('div');
+        panel.className = 'panel';
+        const count = allSettlements.filter(s => s.railway_arrives != null && s.railway_arrives <= yr).length;
+        panel.innerHTML = `<div class="panel-header"><span class="panel-year">${yr}</span><span class="panel-count" id="count-${yr}">${count} settlements</span></div>`;
+        const canvas = document.createElement('canvas');
+        canvas.id = `canvas-${yr}`;
+        canvas.width = 280;
+        canvas.height = 220;
+        panel.appendChild(canvas);
+        grid.appendChild(panel);
+    });
+    // Summary
+    updateSummary();
+}
+
+function updateSummary() {
+    let html = '';
+    YEARS.forEach(yr => {
+        const count = allSettlements.filter(s => s.railway_arrives != null && s.railway_arrives <= yr).length;
+        html += `<span><b>${yr}:</b> ${count}</span>`;
+    });
+    document.getElementById('summary').innerHTML = html;
+}
+
+function toXY(lat, lon, w, h) {
+    const pad = 12;
+    const x = pad + ((lon - BOUNDS.minLon) / (BOUNDS.maxLon - BOUNDS.minLon)) * (w - 2*pad);
+    const y = pad + (1 - (lat - BOUNDS.minLat) / (BOUNDS.maxLat - BOUNDS.minLat)) * (h - 2*pad);
+    return [x, y];
+}
+
+function redrawAll() {
+    const highlightNew = document.getElementById('highlight-new').checked;
+    const prevYear = {};
+    YEARS.forEach((yr, i) => {
+        prevYear[yr] = i > 0 ? YEARS[i-1] : yr;
+    });
+
+    YEARS.forEach(yr => {
+        const canvas = document.getElementById(`canvas-${yr}`);
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        // Province outline
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        const [x1, y1] = toXY(BOUNDS.maxLat, BOUNDS.minLon, w, h);
+        const [x2, y2] = toXY(BOUNDS.minLat, BOUNDS.maxLon, w, h);
+        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+
+        // Draw connections between settlements of same railway that both exist by this year
+        const active = allSettlements.filter(s => s.railway_arrives != null && s.railway_arrives <= yr);
+        const activeSet = new Set(active.map(s => s.name));
+
+        // Draw railway lines from timeline data (connect consecutive settlements of same railway)
+        for (const [rw, stops] of Object.entries(timelineData)) {
+            const rwStops = stops.filter(s => s.year <= yr).sort((a,b) => a.year - b.year);
+            if (rwStops.length < 2) continue;
+            ctx.strokeStyle = COLORS[rw] || '#888';
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            const [sx, sy] = toXY(rwStops[0].lat, rwStops[0].lon, w, h);
+            ctx.moveTo(sx, sy);
+            for (let i = 1; i < rwStops.length; i++) {
+                const [px, py] = toXY(rwStops[i].lat, rwStops[i].lon, w, h);
+                ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+
+        // Draw settlements
+        const prev = prevYear[yr];
+        active.forEach(s => {
+            const [x, y] = toXY(s.lat, s.lon, w, h);
+            const isNew = highlightNew && s.railway_arrives > prev && s.railway_arrives != null && s.railway_arrives <= yr;
+            const color = COLORS[s.first_railway] || '#888';
+
+            if (isNew) {
+                // Glow effect
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.globalAlpha = 0.3;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+
+            ctx.beginPath();
+            ctx.arc(x, y, isNew ? 3.5 : 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+        });
+
+        // Year watermark
+        ctx.fillStyle = 'rgba(255,255,255,0.03)';
+        ctx.font = 'bold 60px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(yr, w/2, h/2 + 20);
+    });
+}
+
+document.addEventListener('click', e => { const m=document.querySelector('.nav-menu'),b=document.querySelector('.nav-btn'); if(m&&m.classList.contains('show')&&!m.contains(e.target)&&e.target!==b) m.classList.remove('show'); });
+</script>
+</body>
+</html>
