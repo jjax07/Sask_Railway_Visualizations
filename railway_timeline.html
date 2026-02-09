@@ -446,6 +446,19 @@
             const response = await fetch('data/railway_timeline.json');
             data = await response.json();
 
+            // Build lookup of all railways per settlement
+            const settlementRailways = {};
+            Object.keys(data).forEach(railway => {
+                data[railway].forEach(s => {
+                    if (!settlementRailways[s.name]) {
+                        settlementRailways[s.name] = [];
+                    }
+                    settlementRailways[s.name].push({railway, year: s.year});
+                });
+            });
+            // Sort each settlement's railways by year
+            Object.values(settlementRailways).forEach(arr => arr.sort((a, b) => a.year - b.year));
+
             // Create markers for all settlements
             Object.keys(data).forEach(railway => {
                 markers[railway] = [];
@@ -460,11 +473,18 @@
                         fillOpacity: 0
                     }).addTo(map);
 
-                    marker.bindPopup(`
-                        <b>${s.name}</b><br>
-                        Railway: ${railway}<br>
-                        Year: ${s.year}
-                    `);
+                    const allRailways = settlementRailways[s.name] || [];
+                    const first = allRailways[0];
+                    let popupHtml = `<b>${s.name}</b><br>`;
+                    popupHtml += `<b>First railway: ${first.railway} (${first.year})</b>`;
+                    if (allRailways.length > 1) {
+                        popupHtml += `<br><br>All railways:`;
+                        allRailways.forEach(r => {
+                            const color = railwayColors[r.railway] || '#9A9B9D';
+                            popupHtml += `<br><span style="color:${color}">&#9679;</span> ${r.railway}: ${r.year}`;
+                        });
+                    }
+                    marker.bindPopup(popupHtml);
 
                     markers[railway].push({marker, data: s});
                 });
