@@ -6,30 +6,92 @@
     <title>Saskatchewan Railways - Temporal Network</title>
     <script src="https://unpkg.com/vis-network@9.1.2/standalone/umd/vis-network.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            height: 100vh;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000000;
             color: #eee;
+            height: 100vh;
             overflow: hidden;
         }
         .header {
-            padding: 15px 30px;
-            background: rgba(0,0,0,0.3);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: #1a1a1e;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #0b6a41;
         }
-        .header h1 { font-size: 1.5rem; }
-        .header .subtitle { color: #888; font-size: 0.9rem; }
-        .header-links { display: flex; gap: 20px; }
-        .header-links a { color: #7eb8da; text-decoration: none; font-size: 0.9rem; }
-        .header-links a:hover { color: #fff; }
+        .header h1 {
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #9A9B9D;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .nav {
+            background: #252528;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .nav-btn {
+            color: #f1c730;
+            background: transparent;
+            border: 1px solid #f1c730;
+            padding: 8px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .nav-btn:hover {
+            background: #f1c730;
+            color: #000;
+        }
+        .nav-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #252528;
+            border: 1px solid #f1c730;
+            border-radius: 5px;
+            padding: 10px 0;
+            min-width: 200px;
+            z-index: 1000;
+            margin-top: 5px;
+        }
+        .nav-menu.show {
+            display: block;
+        }
+        .nav-menu a {
+            display: block;
+            color: #f1c730;
+            text-decoration: none;
+            padding: 8px 20px;
+            transition: all 0.2s;
+        }
+        .nav-menu a:hover {
+            background: #0b6a41;
+            color: #fff;
+        }
+        .nav-menu a.current {
+            color: #0b6a41;
+            font-weight: bold;
+        }
         .main-container {
             display: flex;
-            height: calc(100vh - 70px);
+            height: calc(100vh - 140px);
             overflow: hidden;
         }
         .network-panel {
@@ -39,76 +101,99 @@
         }
         #network { width: 100%; height: 100%; }
         .sidebar {
-            width: 300px;
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
+            width: 280px;
+            background: #1a1a1e;
+            padding: 15px;
             overflow-y: auto;
-            border-left: 1px solid rgba(255,255,255,0.1);
         }
-        .sidebar h3 {
-            color: #aaa;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
+        .sidebar-section {
+            background: #252528;
+            padding: 10px 12px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .sidebar-section h3 {
+            color: #f1c730;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #0b6a41;
+            padding-bottom: 5px;
+            font-size: 13px;
         }
         .legend-item {
             display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-            font-size: 0.8rem;
+            align-items: flex-start;
+            margin: 5px 0;
+            font-size: 12px;
         }
-        .legend-dot { width: 14px; height: 14px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 8px;
+            margin-top: 2px;
+            border: 2px solid white;
+            flex-shrink: 0;
+        }
         .legend-diamond {
-            width: 10px; height: 10px;
+            width: 10px;
+            height: 10px;
             transform: rotate(45deg);
-            margin-right: 10px;
+            margin-right: 8px;
             flex-shrink: 0;
         }
         .legend-box {
-            width: 20px; height: 12px;
-            margin-right: 10px;
+            width: 20px;
+            height: 12px;
+            margin-right: 8px;
             border-radius: 2px;
             flex-shrink: 0;
         }
         .stat-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
-            font-size: 0.8rem;
+            padding: 4px 0;
+            border-bottom: 1px solid #000000;
+            font-size: 12px;
         }
-        .stat-item .label { color: #888; }
-        .stat-item .value { color: #fff; font-weight: 500; }
+        .stat-item:last-child {
+            border-bottom: none;
+        }
         .control-btn {
             display: block;
             width: 100%;
-            padding: 10px;
+            padding: 8px 16px;
             margin-bottom: 8px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: #0b6a41;
+            color: white;
+            border: none;
             border-radius: 5px;
-            color: #ccc;
-            font-size: 0.85rem;
             cursor: pointer;
+            font-size: 13px;
             text-align: center;
-            text-decoration: none;
         }
-        .control-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .control-btn.active { background: rgba(78,121,167,0.3); border-color: #4E79A7; }
-        .details-panel {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+        .control-btn:hover {
+            background: #0d8550;
         }
-        .details-content { font-size: 0.85rem; color: #bbb; line-height: 1.5; }
-        .instructions {
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 5px;
-            font-size: 0.75rem;
-            color: #888;
+        .details-content {
+            font-size: 12px;
+            color: #9A9B9D;
             line-height: 1.5;
+        }
+        .info-box {
+            background: #252528;
+            padding: 10px 12px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .info-box h3 {
+            color: #f1c730;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .info-box p {
+            font-size: 11px;
+            color: #9A9B9D;
+            line-height: 1.4;
         }
         .loading {
             position: absolute;
@@ -116,20 +201,30 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 1.2rem;
-            color: #888;
+            color: #9A9B9D;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <div>
-            <h1>Saskatchewan Railways: Temporal Network</h1>
-            <p class="subtitle">Settlements anchored by year, railway companies pulled by construction activity</p>
-        </div>
-        <div class="header-links">
-            <a href="railway_timeline.html">Map Timeline</a>
-            <a href="network_graph.html">Network Graph</a>
-            <a href="index.html">Back to Index</a>
+        <h1>Saskatchewan Railways: Temporal Network</h1>
+        <p>Settlements anchored by year, railway companies pulled by construction activity</p>
+    </div>
+    <div class="nav">
+        <div class="nav-dropdown">
+            <button class="nav-btn" id="navBtn">Other Visualizations &#9660;</button>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html">Home</a>
+                <a href="one_hour_map.html">Saskatoon Corridor</a>
+                <a href="settlement_explorer.html">Settlement Explorer</a>
+                <a href="railway_timeline.html">Railway Timeline</a>
+                <a href="network_graph.html">Network Graph</a>
+                <a href="isochrone.html">Travel Comparison</a>
+                <a href="journey_times.html">Journey Times</a>
+                <a href="travel_race.html">Time Simulation</a>
+                <a href="transport_eras.html">Transport Eras</a>
+                <a href="railway_temporal_network.html" class="current">Temporal Network</a>
+            </div>
         </div>
     </div>
     <div class="main-container">
@@ -138,55 +233,86 @@
             <div class="loading" id="loading">Loading railway data...</div>
         </div>
         <div class="sidebar">
-            <h3>Node Types</h3>
-            <div class="legend-item"><div class="legend-box" style="background: #2d3748; border: 1px solid #4a5568;"></div><span>Years (fixed timeline)</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background: #c75d38;"></div><span>CPR (Canadian Pacific)</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background: #0b6a41;"></div><span>QLSRSC (Qu'Appelle, Long Lake)</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background: #f1c730;"></div><span>CNoR (Canadian Northern)</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background: #6c5ce7;"></div><span>GTPR (Grand Trunk Pacific)</span></div>
-            <div class="legend-item"><div class="legend-dot" style="background: #9A9B9D;"></div><span>Other Railways</span></div>
+                <div class="sidebar-section">
+                    <h3>Railway Companies</h3>
+                    <div class="legend-item"><div class="legend-dot" style="background: #c75d38;"></div><span><b>CPR</b><br><span style="color:#9A9B9D; font-size:11px;">Canadian Pacific Railway</span></span></div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #0b6a41;"></div><span><b>QLSRSC</b><br><span style="color:#9A9B9D; font-size:11px;">Qu'Appelle, Long Lake &amp; Saskatchewan Railway</span></span></div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #f1c730;"></div><span><b>CNoR</b><br><span style="color:#9A9B9D; font-size:11px;">Canadian Northern Railway</span></span></div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #6c5ce7;"></div><span><b>GTPR</b><br><span style="color:#9A9B9D; font-size:11px;">Grand Trunk Pacific Railway</span></span></div>
+                    <div class="legend-item"><div class="legend-dot" style="background: #9A9B9D;"></div><span><b>Other</b><br><span style="color:#9A9B9D; font-size:11px;">Other Railways</span></span></div>
+                </div>
 
-            <h3 style="margin-top: 15px;">Settlement Nodes</h3>
-            <div class="legend-item"><div class="legend-diamond" style="background: #c75d38;"></div><span>CPR settlement</span></div>
-            <div class="legend-item"><div class="legend-diamond" style="background: #0b6a41;"></div><span>QLSRSC settlement</span></div>
-            <div class="legend-item"><div class="legend-diamond" style="background: #f1c730;"></div><span>CNoR settlement</span></div>
-            <div class="legend-item"><div class="legend-diamond" style="background: #6c5ce7;"></div><span>GTPR settlement</span></div>
-            <div class="legend-item"><div class="legend-diamond" style="background: #9A9B9D;"></div><span>Other settlement</span></div>
+                <div class="sidebar-section">
+                    <h3>Settlement Nodes</h3>
+                    <div class="legend-item"><div class="legend-box" style="background: #2d3748; border: 1px solid #4a5568;"></div><span>Years (fixed timeline)</span></div>
+                    <div class="legend-item"><div class="legend-diamond" style="background: #c75d38;"></div><span>Served by CPR</span></div>
+                    <div class="legend-item"><div class="legend-diamond" style="background: #0b6a41;"></div><span>Served by QLSRSC</span></div>
+                    <div class="legend-item"><div class="legend-diamond" style="background: #f1c730;"></div><span>Served by CNoR</span></div>
+                    <div class="legend-item"><div class="legend-diamond" style="background: #6c5ce7;"></div><span>Served by GTPR</span></div>
+                    <div class="legend-item"><div class="legend-diamond" style="background: #9A9B9D;"></div><span>Served by other railway</span></div>
+                </div>
 
-            <h3 style="margin-top: 15px;">Statistics</h3>
-            <div class="stat-item"><span class="label">Years Covered</span><span class="value" id="statYears">-</span></div>
-            <div class="stat-item"><span class="label">Railway Companies</span><span class="value" id="statRailways">-</span></div>
-            <div class="stat-item"><span class="label">Settlements</span><span class="value" id="statSettlements">-</span></div>
-            <div class="stat-item"><span class="label">Connections</span><span class="value" id="statConnections">-</span></div>
+                <div class="sidebar-section">
+                    <h3>Statistics</h3>
+                    <div class="stat-item"><span>Years Covered</span><span id="statYears">-</span></div>
+                    <div class="stat-item"><span>Railway Companies</span><span id="statRailways">-</span></div>
+                    <div class="stat-item"><span>Settlements</span><span id="statSettlements">-</span></div>
+                    <div class="stat-item"><span>Connections</span><span id="statConnections">-</span></div>
+                </div>
 
-            <h3 style="margin-top: 15px;">Controls</h3>
-            <button class="control-btn" onclick="togglePhysics()">Toggle Physics</button>
-            <button class="control-btn" onclick="resetView()">Reset View</button>
-            <button class="control-btn" onclick="showSettlementsOnly()">Show Settlements Only</button>
-            <button class="control-btn" onclick="showAll()">Show All</button>
+                <div class="sidebar-section">
+                    <h3>Controls</h3>
+                    <button class="control-btn" onclick="togglePhysics()">Toggle Physics</button>
+                    <button class="control-btn" onclick="resetView()">Reset View</button>
+                    <button class="control-btn" onclick="showSettlementsOnly()">Show Settlements Only</button>
+                    <button class="control-btn" onclick="showAll()">Show All</button>
+                </div>
 
-            <div class="details-panel">
-                <h3>Selection</h3>
-                <div class="details-content" id="details">Click a node to see details. Drag railway companies to reposition.</div>
-            </div>
+                <div class="sidebar-section">
+                    <h3>Selection</h3>
+                    <div class="details-content" id="details">Click a node to see details. Drag railway companies to reposition.</div>
+                </div>
 
-            <div class="instructions">
-                <strong>How it works:</strong> Years are fixed along the top as a timeline from 1882 to 1923.
-                Each diamond represents a settlement being reached by a railway in a given year.
-                Railway company circles are pulled toward the years when they were most actively building,
-                revealing the temporal patterns of Saskatchewan's railway expansion.
-                <br><br>
-                <strong>CPR</strong> dominates the early 1880s, <strong>CNoR</strong> surges in 1905-1914,
-                <strong>GTPR</strong> builds through 1907-1914, and <strong>QLSRSC</strong> connects
-                Regina to Prince Albert in 1887-1890.
-            </div>
+                <div class="info-box">
+                    <h3>How It Works</h3>
+                    <p>
+                        Years are fixed along the top as a timeline from 1882 to 1923.
+                        Each diamond represents a settlement being reached by a railway in a given year.
+                        Railway company circles are pulled toward the years when they were most actively building,
+                        revealing the temporal patterns of Saskatchewan's railway expansion.
+                    </p>
+                    <p style="margin-top: 6px;">
+                        <b>CPR</b> dominates the early 1880s, <b>CNoR</b> surges in 1905-1914,
+                        <b>GTPR</b> builds through 1907-1914, and <b>QLSRSC</b> connects
+                        Regina to Prince Albert in 1887-1890.
+                    </p>
+                </div>
         </div>
     </div>
 
     <script>
+    // Nav dropdown toggle
+    document.getElementById('navBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('navMenu').classList.toggle('show');
+    });
+    document.addEventListener('click', function() {
+        document.getElementById('navMenu').classList.remove('show');
+    });
+
     async function init() {
-        const response = await fetch('data/railway_timeline.json');
-        const data = await response.json();
+        const [timelineResponse, settlementsResponse] = await Promise.all([
+            fetch('data/railway_timeline.json'),
+            fetch('data/settlements.json')
+        ]);
+        const data = await timelineResponse.json();
+        const settlementsData = await settlementsResponse.json();
+
+        // Build lookup: settlement name -> first_railway from settlements.json
+        const actualRailway = {};
+        settlementsData.forEach(s => {
+            actualRailway[s.name] = s.first_railway;
+        });
 
         const railwayColors = {
             CPR: '#c75d38',
@@ -263,6 +389,11 @@
                 settlementCount++;
                 railwaySettlementIds[rw].push(nodeId);
 
+                // For "Other" settlements, show the actual railway name
+                const displayRailway = (rw === 'Other' && actualRailway[s.name])
+                    ? actualRailway[s.name]
+                    : rw;
+
                 networkNodes.push({
                     id: nodeId,
                     label: '',
@@ -273,9 +404,10 @@
                     y: 150,
                     mass: 0.5,
                     color: { background: railwayColors[rw], border: railwayColors[rw] },
-                    title: s.name + ' (' + s.year + ')\nRailway: ' + rw,
+                    title: s.name + ' (' + s.year + ')\nRailway: ' + displayRailway,
                     settlementName: s.name,
                     railway: rw,
+                    displayRailway: displayRailway,
                     year: s.year
                 });
 
@@ -284,7 +416,7 @@
                     id: 'e' + (edgeId++),
                     from: nodeId,
                     to: 'year_' + s.year,
-                    color: { color: '#ffffff', opacity: 0.15 },
+                    color: { color: '#ffffff', opacity: 0.5 },
                     width: 0.5,
                     smooth: { type: 'continuous' }
                 });
@@ -433,7 +565,7 @@
                     html += '<span style="color:#888">Type: ' + node.nodeType + '</span><br>';
                     if (node.nodeType === 'settlement') {
                         html += 'Settlement: ' + node.settlementName + '<br>';
-                        html += 'Railway: ' + node.railway + '<br>';
+                        html += 'Railway: ' + node.displayRailway + '<br>';
                         html += 'Year: ' + node.year;
                     } else if (node.nodeType === 'railway') {
                         html += 'Settlements: ' + node.settlementCount + '<br>';
