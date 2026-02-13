@@ -220,6 +220,41 @@ Scrub through four transport eras and watch settlements shift from geographic po
 - Auto-play with stage pauses
 - Railway connections colored by company
 
+### 9. Railway Temporal Network
+
+A vis.js force-directed network visualization showing Saskatchewan's railway expansion as a temporal gravity graph, inspired by the [Joseph Banks Leather Crisis correspondence network](https://jburnford.github.io/JosephBanksKG/banks_leather_temporal.html).
+
+Years are fixed along the top as a timeline. Settlement diamonds are anchored to their year of railway arrival. Railway company circles float below, pulled toward the years when they were most actively building — revealing the temporal rhythm of each company's expansion.
+
+**Features:**
+- vis.js Barnes-Hut physics simulation with stabilization
+- Fixed year nodes forming a horizontal timeline (1882-1923)
+- Settlement nodes (diamonds) colored by railway company, anchored to their arrival year
+- Railway company nodes (circles) sized by settlement count, gravitationally pulled toward active years
+- Invisible barrier nodes preventing railway circles from drifting into the year line
+- Toggle Physics, Reset View, Show Settlements Only, Show All controls
+- Click any node for details (settlement name, railway, year)
+- Post-stabilization damping for subtle floating effect
+
+**Node Types:**
+| Type | Shape | Count | Description |
+|------|-------|-------|-------------|
+| Year | Box (fixed) | ~35 | Timeline anchors at y=0 |
+| Settlement | Diamond | ~500 | One per settlement-railway-year entry |
+| Railway | Circle | 5 | CPR, QLSRSC, CNoR, GTPR, Other |
+| Barrier | Invisible dot | ~80 | Physics wall at y=80 |
+
+**Design Pattern (adapted from Banks visualization):**
+| Banks (Letters) | Saskatchewan (Railways) |
+|---|---|
+| Year nodes (1773-1810) | Year nodes (1882-1923) |
+| Letter diamonds (by archive) | Settlement diamonds (by railway) |
+| Person circles (by role) | Railway company circles |
+| Person→Letter edges | Railway→Settlement edges |
+| Letter→Year edges | Settlement→Year edges |
+
+**Technical:** Uses [vis-network v9.1.2](https://visjs.github.io/vis-network/docs/network/) loaded from CDN. Loads `data/railway_timeline.json` via fetch. Custom `beforeDrawing` force pushes railway nodes below y=200.
+
 ## Demo Visualizations (Experimental)
 
 Five additional demo visualizations exploring the railway data from new analytical perspectives. These are distinct from the main visualizations in that they focus on statistical, comparative, and aggregate views rather than individual map-based exploration.
@@ -286,6 +321,7 @@ Sask_Railway_Visualizations/
 ├── travel_race.html           # Travelling time simulation (animated race)
 ├── isochrone.html             # Travel time comparison visualization
 ├── transport_eras.html        # Transport eras animation
+├── railway_temporal_network.html # Temporal gravity network (vis.js)
 ├── demo_centrality.html      # Demo: Centrality rankings bump chart
 ├── demo_territory.html       # Demo: Railway company territory map
 ├── demo_small_multiples.html # Demo: Small multiples filmstrip
@@ -521,6 +557,7 @@ Navigation uses a dropdown menu ("Other Visualizations") consistent across all p
 
 Built with:
 - [Leaflet.js](https://leafletjs.com/) for interactive maps
+- [vis.js](https://visjs.github.io/vis-network/) for force-directed network graphs
 - [D3.js](https://d3js.org/) for network graph visualization
 - [CARTO Dark Matter](https://carto.com/basemaps/) basemap tiles
 - Vanilla JavaScript (no frameworks)
@@ -542,7 +579,7 @@ This project is for academic research purposes.
 ---
 
 *Created January 2026*
-*Last updated: February 6, 2026*
+*Last updated: February 13, 2026*
 
 ### Data Corrections (February 6, 2026)
 
