@@ -1929,7 +1929,7 @@
     "lat": 52.44131729505196,
     "lon": -109.15079482980433,
     "railway_arrives": 1908,
-    "first_railway": "CPR"
+    "first_railway": "GTPR"
   },
   {
     "name": "Lafleche",
@@ -1978,7 +1978,7 @@
     "lat": 49.94010477640994,
     "lon": -105.96496871970724,
     "railway_arrives": 1912,
-    "first_railway": "CPR"
+    "first_railway": "CNoR"
   },
   {
     "name": "Raymore",
@@ -2006,7 +2006,7 @@
     "lat": 51.76538105190566,
     "lon": -105.7471813983044,
     "railway_arrives": 1907,
-    "first_railway": "CPR"
+    "first_railway": "GTPR"
   },
   {
     "name": "Quinton",
@@ -2531,7 +2531,7 @@
     "lat": 51.5250792009916,
     "lon": -107.24375347257966,
     "railway_arrives": 1911,
-    "first_railway": "CPR"
+    "first_railway": "CNoR"
   },
   {
     "name": "Ceylon",
